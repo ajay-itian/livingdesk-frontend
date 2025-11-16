@@ -3,6 +3,7 @@ import { Building2, Users, Briefcase, Coffee } from "lucide-react";
 import privateOfficeImage from "@/assets/private-office.jpg";
 import meetingRoomImage from "@/assets/meeting-room.jpg";
 import dedicatedDeskImage from "@/assets/dedicated-desk.jpg";
+import managedOfficeImage from "@/assets/managed-office.jpg";
 
 const services = [
   {
@@ -29,6 +30,12 @@ const services = [
     description: "Flexible workspace solutions perfect for freelancers and remote workers seeking variety.",
     image: privateOfficeImage,
   },
+  {
+    icon: Building2,
+    title: "Managed Office",
+    description: "Fully managed office solutions with complete setup, maintenance, and premium services handled for you.",
+    image: managedOfficeImage,
+  },
 ];
 
 const Services = () => {
@@ -42,7 +49,7 @@ const Services = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {services.map((service, index) => (
             <Card 
               key={index}
