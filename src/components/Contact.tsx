@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -138,6 +138,25 @@ const Contact = () => {
                 <p className="text-muted-foreground">Saturday: 10:00 AM - 4:00 PM</p>
               </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Button
+                onClick={() => window.open('https://web.whatsapp.com/send?phone=917066002650&text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.', '_blank')}
+                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white"
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Chat on WhatsApp
+              </Button>
+              
+              <Button
+                onClick={() => window.open('https://g.page/r/YOUR_GOOGLE_REVIEW_LINK/review', '_blank')}
+                className="w-full"
+                variant="outline"
+              >
+                <Star className="mr-2 h-5 w-5 text-yellow-500 fill-yellow-500" />
+                Leave a Review
+              </Button>
+            </div>
           </div>
         </div>
       </div>

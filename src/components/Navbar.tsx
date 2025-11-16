@@ -31,6 +31,9 @@ const Navbar = () => {
             <button onClick={() => scrollToSection('pricing')} className="text-foreground hover:text-primary transition-colors">
               Pricing
             </button>
+            <button onClick={() => scrollToSection('locate')} className="text-foreground hover:text-primary transition-colors">
+              Locate Us
+            </button>
             <button onClick={() => scrollToSection('contact')} className="text-foreground hover:text-primary transition-colors">
               Contact
             </button>
@@ -57,6 +60,9 @@ const Navbar = () => {
               </button>
               <button onClick={() => scrollToSection('pricing')} className="text-foreground hover:text-primary transition-colors text-left">
                 Pricing
+              </button>
+              <button onClick={() => scrollToSection('locate')} className="text-foreground hover:text-primary transition-colors text-left">
+                Locate Us
               </button>
               <button onClick={() => scrollToSection('contact')} className="text-foreground hover:text-primary transition-colors text-left">
                 Contact
