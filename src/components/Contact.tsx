@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, MessageCircle, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,10 +15,22 @@ const Contact = () => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you! We'll get back to you soon.");
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      toast.success("Thank you! We'll get back to you soon.");
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error("Failed to send message. Please try again or contact us directly.");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -128,7 +141,9 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">hello@thelivingdesk.in</p>
+                <a href="mailto:thelivingdesk@gmail.com" className="text-muted-foreground hover:text-primary">
+                  thelivingdesk@gmail.com
+                </a>
               </CardContent>
             </Card>
 
@@ -155,7 +170,7 @@ const Contact = () => {
               </Button>
               
               <Button
-                onClick={() => window.open('https://g.page/r/YOUR_GOOGLE_REVIEW_LINK/review', '_blank')}
+                onClick={() => window.open('https://g.page/r/CWL2B_TX2OjlEBM/review', '_blank')}
                 className="w-full"
                 variant="outline"
               >

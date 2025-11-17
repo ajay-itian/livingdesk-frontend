@@ -36,24 +36,24 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-primary-foreground/80">
-              <li>+91 XXX XXX XXXX</li>
-              <li>hello@thelivingdesk.in</li>
+              <li>+91 70660 02650</li>
+              <li>thelivingdesk@gmail.com</li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Follow Us</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://www.facebook.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://twitter.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://www.instagram.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://www.linkedin.com/company/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
