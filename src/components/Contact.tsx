@@ -98,7 +98,11 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Visit us at our premium location in the heart of the city</p>
+                <p className="text-muted-foreground">
+                  Office 607, 608, 609, Vision Flora<br />
+                  Kunal Icon Rd, Pimple Saudagar<br />
+                  Pune, Maharashtra 411027
+                </p>
               </CardContent>
             </Card>
 
@@ -110,7 +114,9 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">+91 XXX XXX XXXX</p>
+                <a href="tel:+917066002650" className="text-muted-foreground hover:text-primary">
+                  +91 70660 02650
+                </a>
               </CardContent>
             </Card>
 
