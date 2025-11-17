@@ -1,4 +1,5 @@
 import { MapPin } from "lucide-react";
+import directionGuide from "@/assets/direction-guide.jpg";
 
 const LocateUs = () => {
   return (
@@ -25,19 +26,33 @@ const LocateUs = () => {
             ></iframe>
           </div>
 
-          <div className="bg-card rounded-lg p-8 shadow-sm border">
-            <div className="flex items-start">
-              <MapPin className="h-6 w-6 text-primary mr-4 mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="text-xl font-semibold mb-2 text-foreground">Our Address</h3>
-                <p className="text-muted-foreground text-lg">
-                  Office 607, 608, 609, Vision Flora<br />
-                  Kunal Icon Rd, in front of PCMC ground<br />
-                  Siddhivinayak Ginger Society<br />
-                  Pimple Saudagar, Pune<br />
-                  Pimpri-Chinchwad, Maharashtra 411027
-                </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-card rounded-lg p-8 shadow-sm border">
+              <div className="flex items-start">
+                <MapPin className="h-6 w-6 text-primary mr-4 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">Our Address</h3>
+                  <p className="text-muted-foreground text-lg">
+                    Office 607, 608, 609, Vision Flora<br />
+                    Kunal Icon Rd, in front of PCMC ground<br />
+                    Siddhivinayak Ginger Society<br />
+                    Pimple Saudagar, Pune<br />
+                    Pimpri-Chinchwad, Maharashtra 411027
+                  </p>
+                </div>
               </div>
+            </div>
+
+            <div className="bg-card rounded-lg p-8 shadow-sm border">
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Direction Guide</h3>
+              <p className="text-muted-foreground mb-4">
+                Follow this hand-drawn map to easily find our location
+              </p>
+              <img 
+                src={directionGuide} 
+                alt="Hand-drawn direction guide to The Living Desk" 
+                className="w-full rounded-lg border"
+              />
             </div>
           </div>
         </div>
