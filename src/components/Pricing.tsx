@@ -4,8 +4,21 @@ import { Check } from "lucide-react";
 
 const plans = [
   {
+    name: "Day Pass",
+    price: "₹249",
+    period: "per day",
+    description: "Perfect for occasional visits and trial days",
+    features: [
+      "Flexible seating",
+      "High-speed WiFi",
+      "Complimentary beverages",
+      "Access during business hours",
+      "Community events",
+    ],
+  },
+  {
     name: "Hot Desk",
-    price: "₹5,999",
+    price: "₹3,999",
     period: "per month",
     description: "Perfect for freelancers and remote workers",
     features: [
@@ -18,7 +31,7 @@ const plans = [
   },
   {
     name: "Dedicated Desk",
-    price: "₹9,999",
+    price: "₹5,999",
     period: "per month",
     description: "Your own space in a shared environment",
     features: [
@@ -36,9 +49,10 @@ const plans = [
     name: "Private Office",
     price: "₹24,999",
     period: "per month",
-    description: "Exclusive space for your team",
+    description: "Exclusive space for your team (6 persons)",
     features: [
       "Fully furnished office",
+      "Capacity for 6 people",
       "24/7 access",
       "Dedicated phone line",
       "High-speed WiFi",
@@ -66,7 +80,7 @@ const Pricing = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <Card 
               key={index}
