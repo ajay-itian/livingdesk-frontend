@@ -45,7 +45,7 @@ const Hero = () => {
             </div>
           </div>
           
-          <div className="relative w-full max-w-md mx-auto">
+          <div className="relative w-full max-w-xs mx-auto">
             <div className="relative rounded-lg overflow-hidden shadow-2xl aspect-[9/16]">
               <iframe
                 className="absolute inset-0 w-full h-full"
