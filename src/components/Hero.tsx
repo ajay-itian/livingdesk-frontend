@@ -20,23 +20,41 @@ const Hero = () => {
       </div>
 
       <div className="container mx-auto px-4 z-10">
-        <div className="max-w-2xl">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-            Your Workspace,
-            <span className="block text-primary">Reimagined</span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-            Premium coworking spaces designed for productivity, collaboration, and growth. 
-            Experience the perfect blend of professionalism and comfort.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" onClick={scrollToContact} className="group">
-              Schedule a Tour
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}>
-              Explore Spaces
-            </Button>
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="max-w-2xl">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+              Your Workspace,
+              <span className="block text-primary">Reimagined</span>
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
+              Premium coworking spaces designed for productivity, collaboration, and growth. 
+              Experience the perfect blend of professionalism and comfort.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" onClick={scrollToContact} className="group">
+                Schedule a Tour
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                onClick={() => window.open('https://www.youtube.com/shorts/CSPZWy99wzQ', '_blank')}
+              >
+                Virtual Tour
+              </Button>
+            </div>
+          </div>
+          
+          <div className="relative w-full max-w-md mx-auto">
+            <div className="relative rounded-lg overflow-hidden shadow-2xl aspect-[9/16]">
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src="https://www.youtube.com/embed/CSPZWy99wzQ"
+                title="The Living Desk Virtual Tour"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       </div>
