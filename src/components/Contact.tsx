@@ -170,7 +170,7 @@ const Contact = () => {
               </Button>
               
               <Button
-                onClick={() => window.open('https://g.page/r/CWL2B_TX2OjlEBM/review', '_blank')}
+                onClick={() => window.open('https://www.google.com/maps/place/Office+607,608,609,+Vision+Flora,+Kunal+Icon+Rd,+in+front+of+PCMC+ground,+Siddhivinayak+Ginger+Society,+Siddhivinayak+Ginger,+Pimple+Saudagar,+Pune,+Pimpri-Chinchwad,+Maharashtra+411027/@18.5921498,73.7589091,17z/data=!4m8!3m7!1s0x3bc2b9a2c94a9e1d:0xe5e8d937f600f662!8m2!3d18.5921498!4d73.758909!9m1!1b1!16s%2Fg%2F11y4g5fwh4?entry=ttu', '_blank')}
                 className="w-full"
                 variant="outline"
               >
