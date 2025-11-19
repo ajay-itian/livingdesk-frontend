@@ -44,7 +44,7 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Follow Us</h4>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://www.facebook.com/people/The-Living-Desk-Coworking-Spaces/61580666948052/#" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="https://twitter.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
@@ -53,7 +53,7 @@ const Footer = () => {
               <a href="https://www.instagram.com/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://www.linkedin.com/company/thelivingdesk" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <a href="https://www.linkedin.com/company/living-desk/?" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
