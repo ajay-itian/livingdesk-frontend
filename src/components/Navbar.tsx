@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -40,6 +42,7 @@ const Navbar = () => {
             <button onClick={() => scrollToSection('contact')} className="text-foreground hover:text-primary transition-colors">
               Contact
             </button>
+            <Button onClick={() => navigate('/booking')} variant="outline">Book Room</Button>
             <Button onClick={() => scrollToSection('contact')}>Get Started</Button>
           </div>
 
@@ -73,6 +76,7 @@ const Navbar = () => {
               <button onClick={() => scrollToSection('contact')} className="text-foreground hover:text-primary transition-colors text-left">
                 Contact
               </button>
+              <Button onClick={() => navigate('/booking')} variant="outline" className="w-full">Book Room</Button>
               <Button onClick={() => scrollToSection('contact')} className="w-full">Get Started</Button>
             </div>
           </div>
