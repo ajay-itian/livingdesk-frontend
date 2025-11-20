@@ -5,6 +5,7 @@ import Pricing from "@/components/Pricing";
 import Gallery from "@/components/Gallery";
 import LocateUs from "@/components/LocateUs";
 import Contact from "@/components/Contact";
+import Booking from "@/components/Booking"
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
+      <Booking/>
       <Services />
       <Pricing />
       <Gallery />
