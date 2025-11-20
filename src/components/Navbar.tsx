@@ -7,30 +7,28 @@ import logo from "@/assets/logo.jpeg";
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  // close mobile menu whenever route changes
+  // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // If a scroll was requested from another route, perform it when we land on "/"
+  // Apply pending scroll when landing on home page
   useEffect(() => {
     if (!pendingScrollId) return;
 
-    // Only attempt to scroll when we're on the home route
     if (location.pathname === "/") {
       const id = pendingScrollId;
       setPendingScrollId(null);
 
-      // small timeout to allow DOM to render
       requestAnimationFrame(() => {
         const el = document.getElementById(id);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
         } else {
-          // fallback: try again shortly (useful if content renders slightly later)
           setTimeout(() => {
             const el2 = document.getElementById(id);
             if (el2) el2.scrollIntoView({ behavior: "smooth" });
@@ -42,12 +40,8 @@ const Navbar: React.FC = () => {
 
   const close = () => setIsOpen(false);
 
-  /**
-   * Scroll to a section on the home page.
-   * If we're not on "/", navigate there first and set a pending scroll.
-   */
+  // Smooth scroll or navigate + scroll
   const scrollToSection = (id: string) => {
-    // If already on home page, scroll immediately
     if (location.pathname === "/") {
       const element = document.getElementById(id);
       if (element) {
@@ -57,9 +51,8 @@ const Navbar: React.FC = () => {
       return;
     }
 
-    // Not on home page: navigate to "/" and set pending scroll
     setPendingScrollId(id);
-    navigate("/", { replace: false });
+    navigate("/");
     close();
   };
 
@@ -73,44 +66,44 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop */}
           <div className="hidden md:flex items-center space-x-8">
-            <button type="button" onClick={() => scrollToSection("home")} className="text-foreground transition-colors">Home</button>
-            <button type="button" onClick={() => scrollToSection("services")} className="text-foreground transition-colors">Services</button>
+            <button onClick={() => scrollToSection("home")} className="text-foreground transition-colors">Home</button>
+            <button onClick={() => scrollToSection("services")} className="text-foreground transition-colors">Services</button>
 
-            {/* Booking route (desktop) */}
+            {/* Booking (desktop) */}
             <Link to="/booking" onClick={close} className="text-foreground transition-colors">Booking</Link>
 
-            <button type="button" onClick={() => scrollToSection("pricing")} className="text-foreground transition-colors">Pricing</button>
-            <button type="button" onClick={() => scrollToSection("gallery")} className="text-foreground transition-colors">Gallery</button>
-            <button type="button" onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
-            <button type="button" onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
+            <button onClick={() => scrollToSection("pricing")} className="text-foreground transition-colors">Pricing</button>
+            <button onClick={() => scrollToSection("gallery")} className="text-foreground transition-colors">Gallery</button>
+            <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
+            <button onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
             <Button onClick={() => scrollToSection("contact")} type="button">Get Started</Button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button type="button" onClick={() => setIsOpen(!isOpen)} className="text-foreground" aria-label="Toggle menu">
+            <button type="button" onClick={() => setIsOpen(!isOpen)} className="text-foreground">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile */}
         {isOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-4">
-              <button type="button" onClick={() => scrollToSection("home")} className="text-foreground text-left">Home</button>
-              <button type="button" onClick={() => scrollToSection("services")} className="text-foreground text-left">Services</button>
+              <button onClick={() => scrollToSection("home")} className="text-foreground text-left">Home</button>
+              <button onClick={() => scrollToSection("services")} className="text-foreground text-left">Services</button>
 
-              {/* Booking route (mobile) */}
+              {/* Booking (mobile) */}
               <Link to="/booking" onClick={close} className="text-foreground text-left">Booking</Link>
 
-              <button type="button" onClick={() => scrollToSection("pricing")} className="text-foreground text-left">Pricing</button>
-              <button type="button" onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
-              <button type="button" onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
-              <button type="button" onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
-              <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full" type="button">Get Started</Button>
+              <button onClick={() => scrollToSection("pricing")} className="text-foreground text-left">Pricing</button>
+              <button onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
+              <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
+              <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
+              <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>
             </div>
           </div>
         )}
