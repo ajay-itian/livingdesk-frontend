@@ -8,32 +8,32 @@ import managedOfficeImage from "@/assets/managed-office.jpg";
 const services = [
   {
     icon: Building2,
-    title: "Private Offices in Pune",
-    description: "Fully furnished private office spaces in Pimple Saudagar for teams of all sizes with 24/7 access and premium amenities.",
+    title: "Private Offices",
+    description: "Fully furnished private office spaces for teams of all sizes with 24/7 access and premium amenities.",
     image: privateOfficeImage,
   },
   {
     icon: Users,
-    title: "Meeting Rooms Pimpri Chinchwad",
-    description: "Professional meeting rooms in Pune equipped with the latest technology for presentations and collaborations.",
+    title: "Meeting Rooms",
+    description: "Professional meeting rooms equipped with the latest technology for presentations and collaborations.",
     image: meetingRoomImage,
   },
   {
     icon: Briefcase,
-    title: "Dedicated Desk Pune",
-    description: "Your own dedicated desk in our vibrant coworking community in Pimple Saudagar with all the amenities you need.",
+    title: "Dedicated Desks",
+    description: "Your own dedicated desk in our vibrant coworking community with all the amenities you need.",
     image: dedicatedDeskImage,
   },
   {
     icon: Coffee,
-    title: "Hot Desk Coworking Pune",
-    description: "Flexible hot desk workspace solutions in Pimpri Chinchwad perfect for freelancers and remote workers.",
+    title: "Hot Desks",
+    description: "Flexible hot desk workspace solutions perfect for freelancers and remote workers.",
     image: privateOfficeImage,
   },
   {
     icon: Building2,
-    title: "Managed Office Space Pune",
-    description: "Fully managed office solutions in Pimple Saudagar with complete setup, maintenance, and premium services.",
+    title: "Managed Office",
+    description: "Fully managed office solutions with complete setup, maintenance, and premium services.",
     image: managedOfficeImage,
   },
 ];
@@ -43,9 +43,9 @@ const Services = () => {
     <section id="services" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-foreground">Coworking Space Solutions in Pune</h2>
+          <h2 className="text-4xl font-bold mb-4 text-foreground">Our Workspace Solutions</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Flexible office space and workspace solutions in Pimple Saudagar, Pimpri Chinchwad tailored for startups, freelancers, and businesses
+            Flexible office space and workspace solutions tailored for startups, freelancers, and businesses
           </p>
         </div>
 

@@ -23,12 +23,12 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-              Best Coworking Space in
-              <span className="block text-primary">Pimple Saudagar, Pune</span>
+              Your Workspace,
+              <span className="block text-primary">Reimagined</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-              Premium coworking space in Pimpri Chinchwad with private offices, dedicated desks & meeting rooms. 
-              Experience flexible workspace solutions designed for productivity and growth in Pune.
+              Premium coworking spaces with private offices, dedicated desks & meeting rooms. 
+              Experience flexible workspace solutions designed for productivity and growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" onClick={scrollToContact} className="group">
