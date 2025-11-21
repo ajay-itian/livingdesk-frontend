@@ -8,32 +8,32 @@ import managedOfficeImage from "@/assets/managed-office.jpg";
 const services = [
   {
     icon: Building2,
-    title: "Private Offices",
-    description: "Fully furnished private offices for teams of all sizes with 24/7 access and premium amenities.",
+    title: "Private Offices in Pune",
+    description: "Fully furnished private office spaces in Pimple Saudagar for teams of all sizes with 24/7 access and premium amenities.",
     image: privateOfficeImage,
   },
   {
     icon: Users,
-    title: "Meeting Rooms",
-    description: "Professional meeting spaces equipped with the latest technology for presentations and collaborations.",
+    title: "Meeting Rooms Pimpri Chinchwad",
+    description: "Professional meeting rooms in Pune equipped with the latest technology for presentations and collaborations.",
     image: meetingRoomImage,
   },
   {
     icon: Briefcase,
-    title: "Dedicated Desks",
-    description: "Your own dedicated workspace in our vibrant community with all the amenities you need.",
+    title: "Dedicated Desk Pune",
+    description: "Your own dedicated desk in our vibrant coworking community in Pimple Saudagar with all the amenities you need.",
     image: dedicatedDeskImage,
   },
   {
     icon: Coffee,
-    title: "Hot Desks",
-    description: "Flexible workspace solutions perfect for freelancers and remote workers seeking variety.",
+    title: "Hot Desk Coworking Pune",
+    description: "Flexible hot desk workspace solutions in Pimpri Chinchwad perfect for freelancers and remote workers.",
     image: privateOfficeImage,
   },
   {
     icon: Building2,
-    title: "Managed Office",
-    description: "Fully managed office solutions with complete setup, maintenance, and premium services handled for you.",
+    title: "Managed Office Space Pune",
+    description: "Fully managed office solutions in Pimple Saudagar with complete setup, maintenance, and premium services.",
     image: managedOfficeImage,
   },
 ];
@@ -43,9 +43,9 @@ const Services = () => {
     <section id="services" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-foreground">Our Workspace Solutions</h2>
+          <h2 className="text-4xl font-bold mb-4 text-foreground">Coworking Space Solutions in Pune</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Choose from a variety of flexible workspace options tailored to your business needs
+            Flexible office space and workspace solutions in Pimple Saudagar, Pimpri Chinchwad tailored for startups, freelancers, and businesses
           </p>
         </div>
 
@@ -58,7 +58,7 @@ const Services = () => {
               <div className="relative h-48 overflow-hidden">
                 <img 
                   src={service.image} 
-                  alt={service.title}
+                  alt={`${service.title} - coworking space solution in Pimple Saudagar Pune`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
