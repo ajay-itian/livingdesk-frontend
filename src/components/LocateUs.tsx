@@ -6,9 +6,9 @@ const LocateUs = () => {
     <section id="locate" className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-foreground">Locate Us</h2>
+          <h2 className="text-4xl font-bold mb-4 text-foreground">Find Our Coworking Space in Pimple Saudagar</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Find us at our convenient location in the heart of the city
+            Visit our premium workspace in Pimpri Chinchwad, Pune - Conveniently located near PCMC ground
           </p>
         </div>
 

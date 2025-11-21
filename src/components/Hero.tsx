@@ -13,7 +13,7 @@ const Hero = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
-          alt="Modern coworking space" 
+          alt="Premium coworking space in Pimple Saudagar Pune with modern workspace and office solutions" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
@@ -23,12 +23,12 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-              Your Workspace,
-              <span className="block text-primary">Reimagined</span>
+              Best Coworking Space in
+              <span className="block text-primary">Pimple Saudagar, Pune</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-              Premium coworking spaces designed for productivity, collaboration, and growth. 
-              Experience the perfect blend of professionalism and comfort.
+              Premium coworking space in Pimpri Chinchwad with private offices, dedicated desks & meeting rooms. 
+              Experience flexible workspace solutions designed for productivity and growth in Pune.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" onClick={scrollToContact} className="group">
