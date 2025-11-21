@@ -44,9 +44,9 @@ const Contact = () => {
     <section id="contact" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-foreground">Contact The Living Desk Coworking Space Pune</h2>
+          <h2 className="text-4xl font-bold mb-4 text-foreground">Get In Touch</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ready to book your workspace in Pimple Saudagar? Contact us today for a tour of our coworking space in Pimpri Chinchwad
+            Ready to book your workspace? Contact us today for a tour of our coworking space
           </p>
         </div>
 
