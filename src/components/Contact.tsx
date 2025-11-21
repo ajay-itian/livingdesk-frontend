@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { MapPin, Phone, Mail, Clock, MessageCircle, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +14,7 @@ const Contact = () => {
     name: '',
     email: '',
     phone: '',
+    service: '',
     message: ''
   });
 
@@ -26,7 +29,7 @@ const Contact = () => {
       if (error) throw error;
 
       toast.success("Thank you! We'll get back to you soon.");
-      setFormData({ name: '', email: '', phone: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', service: '', message: '' });
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error("Failed to send message. Please try again or contact us directly.");
@@ -37,6 +40,13 @@ const Contact = () => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSelectChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      service: value
     }));
   };
 
@@ -86,6 +96,23 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="service">Service Interested In</Label>
+                  <Select value={formData.service} onValueChange={handleSelectChange} required>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select a service" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      <SelectItem value="Day Pass">Day Pass</SelectItem>
+                      <SelectItem value="Hot Desk">Hot Desk</SelectItem>
+                      <SelectItem value="Dedicated Desk">Dedicated Desk</SelectItem>
+                      <SelectItem value="Small Cabin">Small Cabin</SelectItem>
+                      <SelectItem value="Private Office">Private Office</SelectItem>
+                      <SelectItem value="Meeting Room">Meeting Room</SelectItem>
+                      <SelectItem value="Managed Office">Managed Office</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Textarea

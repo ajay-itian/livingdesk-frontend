@@ -13,6 +13,7 @@ interface ContactEmailRequest {
   name: string;
   email: string;
   phone: string;
+  service: string;
   message: string;
 }
 
@@ -22,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, phone, message }: ContactEmailRequest = await req.json();
+    const { name, email, phone, service, message }: ContactEmailRequest = await req.json();
 
     console.log("Sending contact email from:", email);
 
@@ -37,6 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Service Interested In:</strong> ${service}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
