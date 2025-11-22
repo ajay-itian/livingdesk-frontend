@@ -47,7 +47,9 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const API_BASE = "http://localhost:8000";
+import { fetchWithApiKey } from "@/config/api";
+
+import { API_BASE } from "@/config/api";
 
 const bookingSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -144,7 +146,7 @@ export default function Booking() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/rooms`);
+        const res = await fetchWithApiKey(`${API_BASE}/api/rooms`);
         if (!res.ok) throw new Error("Failed to load rooms");
         const data: Room[] = await res.json();
         if (mounted) setRooms(data);
@@ -173,7 +175,7 @@ export default function Booking() {
         try {
           const url = new URL(`${API_BASE}/api/bookings/check-charge`);
           url.searchParams.set("email", watchedEmail);
-          const res = await fetch(url.toString());
+          const res = await fetchWithApiKey(url.toString());
           if (!res.ok) throw new Error("Failed to check charge");
           const data: ChargeInfo = await res.json();
           if (!cancelled) setChargeInfo(data);
@@ -208,7 +210,7 @@ export default function Booking() {
         const url = new URL(`${API_BASE}/api/bookings/availability`);
         url.searchParams.set("room_id", String(selectedRoomId));
         url.searchParams.set("date", selectedDateStr);
-        const res = await fetch(url.toString());
+        const res = await fetchWithApiKey(url.toString());
         if (!res.ok) throw new Error("Failed to load availability");
         const data: AvailabilityResponse = await res.json();
         if (cancelled) return;
@@ -244,9 +246,8 @@ export default function Booking() {
   };
 
   const createBookingInDatabase = async (bookingData: PendingBooking) => {
-    const response = await fetch(`${API_BASE}/api/bookings`, {
+    const response = await fetchWithApiKey(`${API_BASE}/api/bookings`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: bookingData.email,
         phone: bookingData.phone,
@@ -272,9 +273,8 @@ export default function Booking() {
   const createPaymentIntent = async (bookingData: PendingBooking) => {
     setLoadingPayment(true);
     try {
-      const response = await fetch(`${API_BASE}/api/payments/create-intent`, {
+      const response = await fetchWithApiKey(`${API_BASE}/api/payments/create-intent`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: bookingData.email,
           amount: Math.round(bookingData.totalCharge),
@@ -372,9 +372,9 @@ export default function Booking() {
     setIsSubmitting(true);
     try {
       if (paymentIntent && pendingBooking.totalCharge > 0) {
-        const res = await fetch(`${API_BASE}/api/payments/${paymentIntent.payment_id}/complete`, {
+        const res = await fetchWithApiKey(`${API_BASE}/api/payments/${paymentIntent.payment_id}/complete`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+         
         });
         if (!res.ok) {
           let msg = "Failed to mark payment as completed";
