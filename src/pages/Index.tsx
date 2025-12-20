@@ -6,9 +6,7 @@ import Gallery from "@/components/Gallery";
 import LocateUs from "@/components/LocateUs";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import Booking from "@/components/features/bookings/Booking";
-import BlogsPage from "@/components/blogs/BlogsPage";
-import Community from "@/components/Community";
+
 
 const Index = () => {
   return (
@@ -16,11 +14,8 @@ const Index = () => {
       <Navbar />
       <Hero />
       <Services />
-      <Booking />
       <Pricing />
       <Gallery />
-      <BlogsPage />
-      <Community />
       <LocateUs />
       <Contact />
       <Footer />
