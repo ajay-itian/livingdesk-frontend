@@ -1,4 +1,5 @@
 // components/features/bookings/booking.types.ts
+// FIXED VERSION - Matches backend response exactly
 import { z } from "zod";
 
 export const bookingSchema = z.object({
@@ -13,20 +14,25 @@ export const bookingSchema = z.object({
 export type BookingFormData = z.infer<typeof bookingSchema>;
 
 export interface ChargeInfo {
-  charge: number;
   is_existing_customer: boolean;
+  monthly_hours: number;
+  charge_per_hour: number;
+  tier: string;
+  tier_description: string;
+  currency: string;
 }
 
+// ✅ FIXED: Updated to match backend response exactly
 export interface PaymentIntent {
-  payment_id: string;  // Changed from number to string (UUID)
-  email: string;
-  amount: number;
-  currency: string;
-  status: string;
-  upi_id: string;
-  upi_url: string;
-  qr_code: string;  // Base64 data URL
-  created_at: string;
+  payment_id: string;        // Backend returns: payment.id
+  email: string;             // Backend returns: payment.email
+  amount: number;            // Backend returns: payment.amount
+  currency: string;          // Backend returns: payment.currency
+  status: string;            // Backend returns: payment.status
+  upi_id: string;            // Backend returns: settings.upi_vpa
+  upi_url: string;           // Backend returns: upi_url (from build_upi_url)
+  qr_code: string;           // ✅ FIXED: Was qr_code_url, backend returns qr_code
+  created_at: string;        // Backend returns: payment.created_at.isoformat()
 }
 
 export interface PendingBooking {
@@ -45,6 +51,26 @@ export interface AvailabilityResponse {
   disabled_slots: string[];
 }
 
+export interface BookingResponse {
+  id: string;
+  email: string;
+  phone: string;
+  room_id: number;
+  date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+  created_at: string;
+  pricing: {
+    duration_hours: number;
+    rate_per_hour: number;
+    total_charge: number;
+    tier: string;
+    tier_description: string;
+    currency: string;
+  };
+}
+
 export const TIME_SLOTS = [
   "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
   "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -55,9 +81,11 @@ export const TIME_SLOTS = [
 
 export function isContiguous(slots: string[]): boolean {
   if (slots.length === 0) return true;
-  const indices = slots.map((s) => TIME_SLOTS.indexOf(s)).sort((a, b) => a - b);
-  for (let i = 1; i < indices.length; i++) {
-    if (indices[i] !== indices[i - 1] + 1) return false;
+  const sortedSlots = [...slots].sort((a, b) => TIME_SLOTS.indexOf(a) - TIME_SLOTS.indexOf(b));
+  for (let i = 0; i < sortedSlots.length - 1; i++) {
+    const currentIndex = TIME_SLOTS.indexOf(sortedSlots[i]);
+    const nextIndex = TIME_SLOTS.indexOf(sortedSlots[i + 1]);
+    if (nextIndex - currentIndex !== 1) return false;
   }
   return true;
 }

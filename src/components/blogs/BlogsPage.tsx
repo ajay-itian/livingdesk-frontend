@@ -27,12 +27,11 @@ const BlogsPage = () => {
     // ==========================================
     // 🔧 CONFIGURATION 
     // ==========================================
-    // These load from your .env file to fix the mobile connection issue
     const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
     const API_KEY = import.meta.env.VITE_API_KEY || "";
 
-    // S3 Configuration
-    const S3_BUCKET = "thelivingdesk-backend-blogsbucket-srif3kik1lob";
+    // ✅ UPDATED S3 CONFIGURATION
+    const S3_BUCKET = "thelivingdesk-backend-blogs-313701249911";
     const S3_REGION = "ap-south-1";
     const S3_PREFIX = "blogs/";
     const bucketBase = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
@@ -62,13 +61,13 @@ const BlogsPage = () => {
                 fetchBlogStats()
             ]);
 
+            console.log("📊 Blog Stats from API:", blogStats);
+            console.log("📁 S3 Blogs:", s3Blogs.map(b => ({ id: b.id, title: b.title })));
+
             // 2. Merge Data
             const mergedBlogs = s3Blogs.map(blog => {
-                const pureId = blog.htmlUrl?.split('/').pop()?.replace('.html', '') || blog.id;
-                const stats = blogStats[pureId] || { views: 0, likes: 0 };
-
-                // Check if user already liked this post in the past
-                const localLiked = localStorage.getItem(`liked_${pureId}`) === 'true';
+                const stats = blogStats[blog.id] || { views: 0, likes: 0 };
+                const localLiked = localStorage.getItem(`liked_${blog.id}`) === 'true';
 
                 return {
                     ...blog,
@@ -89,6 +88,7 @@ const BlogsPage = () => {
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Failed to load blogs";
             setError(errorMessage);
+            console.error("❌ Error loading blogs:", err);
         } finally {
             setLoading(false);
         }
@@ -100,13 +100,17 @@ const BlogsPage = () => {
             const res = await fetch(`${API_BASE}/blogs/stats/all`, {
                 headers: {
                     "Content-Type": "application/json",
-                    "x-api-key": API_KEY // <--- Critical for AWS connection
+                    "x-api-key": API_KEY
                 }
             });
-            if (!res.ok) return {};
-            return await res.json();
+            if (!res.ok) {
+                console.error(`❌ Stats API returned ${res.status}: ${res.statusText}`);
+                return {};
+            }
+            const stats = await res.json();
+            return stats;
         } catch (e) {
-            console.error("Failed to fetch stats", e);
+            console.error("❌ Failed to fetch stats:", e);
             return {};
         }
     };
@@ -114,67 +118,60 @@ const BlogsPage = () => {
     // --- Action: Increment View ---
     const incrementView = async (blog: ExtendedBlog) => {
         try {
-            const pureId = blog.htmlUrl?.split('/').pop()?.replace('.html', '');
-            if (pureId) {
-                // Fire and forget
-                fetch(`${API_BASE}/blogs/${pureId}/view`, {
+            if (blog.id) {
+                fetch(`${API_BASE}/blogs/${blog.id}/view`, {
                     method: "POST",
                     headers: { "x-api-key": API_KEY }
                 });
             }
         } catch (e) {
-            console.error("Failed to increment view", e);
+            console.error("❌ Failed to increment view:", e);
         }
     };
 
     // --- Action: Handle Like ---
     const handleLike = async (e: React.MouseEvent, blog: ExtendedBlog) => {
-        e.stopPropagation(); // Stop click from opening the blog
-        if (blog.isLiked) return; // Prevent spamming likes
+        e.stopPropagation();
+        if (blog.isLiked) return;
 
-        const pureId = blog.htmlUrl?.split('/').pop()?.replace('.html', '');
-
-        // 1. Optimistic Update (Update UI instantly)
         setBlogs(prev => prev.map(b =>
             b.id === blog.id
                 ? { ...b, likes: (b.likes || 0) + 1, isLiked: true }
                 : b
         ));
 
-        // 2. Save state locally
-        if (pureId) localStorage.setItem(`liked_${pureId}`, 'true');
+        if (blog.id) localStorage.setItem(`liked_${blog.id}`, 'true');
 
-        // 3. Send to API
         try {
-            if (pureId) {
-                await fetch(`${API_BASE}/blogs/${pureId}/like`, {
+            if (blog.id) {
+                await fetch(`${API_BASE}/blogs/${blog.id}/like`, {
                     method: "POST",
                     headers: { "x-api-key": API_KEY }
                 });
             }
         } catch (err) {
-            console.error("Failed to like", err);
+            console.error("❌ Failed to like:", err);
         }
     };
 
     // --- S3 Parsing Logic ---
     const fetchS3Blogs = async (): Promise<ExtendedBlog[]> => {
+        // Fetch XML list of objects
         const listUrl = `${bucketBase}?list-type=2&prefix=${S3_PREFIX}&t=${Date.now()}`;
         const res = await fetch(listUrl);
-        if (!res.ok) throw new Error("Unable to list S3 objects");
+        if (!res.ok) throw new Error(`Unable to access S3 Bucket. Check CORS/Permissions. Status: ${res.status}`);
 
         const xmlText = await res.text();
         const xml = new DOMParser().parseFromString(xmlText, "text/xml");
         const allKeys = Array.from(xml.getElementsByTagName("Key")).map(k => k.textContent || "");
 
-        // Find matching images in S3 bucket
         const imageSet = new Set(allKeys.filter(k => /\.(jpg|jpeg|png|webp|gif)$/i.test(k)));
         const htmlKeys = allKeys.filter((k) => k.endsWith(".html"));
 
         const blogPromises = htmlKeys.map(async (key) => {
             const baseKey = key.replace(/\.html$/, "");
             let s3Image = null;
-            // Try to find an image with the same name as the HTML file
+
             for (const ext of ['.jpg', '.jpeg', '.png', '.webp']) {
                 if (imageSet.has(baseKey + ext)) {
                     s3Image = `${bucketBase}/${baseKey}${ext}`;
@@ -204,16 +201,13 @@ const BlogsPage = () => {
 
         const title = getMeta("title") || getMeta("og:title") || doc.title || capitalizeWords(fileNameWithoutExt);
         const description = getMeta("description") || getMeta("og:description") || "";
-        const id = key.replace(/\//g, '-');
+        const id = fileName.replace(".html", "");
 
-        // Image Selection Priority:
-        // 1. S3 File with same name -> 2. <img class="featured"> -> 3. Meta og:image -> 4. Random Fallback
         let image = s3Image;
         if (!image) { const featuredImg = doc.querySelector('img.featured-image') as HTMLImageElement; if (featuredImg) image = featuredImg.src; }
         if (!image) image = getMeta("og:image") || getMeta("image");
         if (!image) { const firstImg = doc.querySelector('img') as HTMLImageElement; if (firstImg) image = firstImg.src; }
 
-        // Fallback generator
         if (!image || image.includes("onerror")) {
             let hash = 0;
             for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
@@ -276,6 +270,11 @@ const BlogsPage = () => {
                             <Loader2 className="w-12 h-12 text-primary animate-spin" />
                             <p className="mt-4 text-muted-foreground">Fetching latest stories...</p>
                         </div>
+                    ) : error ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <p className="text-red-500 text-lg">{error}</p>
+                            <p className="text-sm text-gray-500 mt-2">Check console (F12) for CORS/Network errors.</p>
+                        </div>
                     ) : (
                         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {blogs.map((blog) => (
@@ -297,8 +296,6 @@ const BlogsPage = () => {
                                             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/90 text-xs font-medium backdrop-blur-sm">
                                                 <Clock className="w-3 h-3" /> {getReadTime(blog.excerpt)} min
                                             </div>
-
-
                                         </div>
                                     </div>
 
@@ -322,7 +319,6 @@ const BlogsPage = () => {
                                                     <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Read
                                                 </Button>
 
-                                                {/* Like Button */}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -331,12 +327,10 @@ const BlogsPage = () => {
                                                 >
                                                     <Heart className={`w-4 h-4 ${blog.isLiked ? 'fill-current' : ''}`} />
                                                 </Button>
-                                                {/* Like Counter */}
                                                 <span className={`text-xs font-medium ${blog.isLiked ? 'text-red-500' : 'text-muted-foreground'}`}>
                                                     {blog.likes || 0}
                                                 </span>
 
-                                                {/* Views Counter */}
                                                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/90 text-xs font-medium backdrop-blur-sm">
                                                     <Eye className="w-3 h-3 text-primary" />
                                                     {blog.views?.toLocaleString() || 0}

@@ -1,4 +1,4 @@
-// pages/Booking.tsx - COMPLETE UPDATED FILE
+// pages/Booking.tsx - COMPLETE UPDATED FILE WITH INSTANT UI UPDATES
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ import {
   type PaymentIntent,
   type PendingBooking,
   type AvailabilityResponse,
+  type BookingResponse,
   TIME_SLOTS,
   isContiguous,
 } from "@/components/features/bookings/booking.types";
@@ -70,9 +71,7 @@ export default function Booking() {
   const selectedRoomId = useMemo(() => (watchedRoomId ? parseInt(watchedRoomId, 10) : undefined), [watchedRoomId]);
   const selectedDateStr = useMemo(() => (watchedDate ? format(watchedDate as Date, "yyyy-MM-dd") : undefined), [watchedDate]);
 
-  // NO_HOVER constant for disabling hover on buttons in this page only
-  const NO_HOVER = "hover:none";
-
+  // Load rooms on mount
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -88,6 +87,7 @@ export default function Booking() {
     return () => { mounted = false; };
   }, [toast]);
 
+  // Check charge info when email changes
   useEffect(() => {
     let cancelled = false;
     let timeoutId: NodeJS.Timeout;
@@ -125,18 +125,17 @@ export default function Booking() {
     };
   }, [watchedEmail]);
 
+  // Fetch availability when room or date changes
   useEffect(() => {
     let cancelled = false;
 
     const fetchAvailability = async () => {
       if (!selectedRoomId || !selectedDateStr) {
         setDisabledSlots([]);
-        // Clear selected slots when room or date is cleared
         setSelectedTimeSlots([]);
         return;
       }
 
-      // Clear selected slots when fetching new availability
       setSelectedTimeSlots([]);
       setLoadingAvailability(true);
 
@@ -163,11 +162,53 @@ export default function Booking() {
     return () => { cancelled = true; };
   }, [selectedRoomId, selectedDateStr, toast]);
 
+  // Calculate total charge based on selected slots and charge info
   const calculateTotalCharge = () => {
-    if (!chargeInfo || selectedTimeSlots.length === 0) return null;
+    if (selectedTimeSlots.length === 0) return null;
+
     const durationHours = selectedTimeSlots.length * 0.5;
-    const totalCharge = chargeInfo.charge;
-    return { durationHours, totalCharge };
+
+    // If no charge info yet (email not entered), returns valid duration but 0 price
+    if (!chargeInfo) {
+      return {
+        durationHours,
+        totalCharge: 0,
+        breakdown: undefined
+      };
+    }
+
+    let totalCharge = 0;
+    let freeHours = 0;
+    let billableHours = 0;
+
+    if (chargeInfo.is_existing_customer) {
+      const FREE_LIMIT = 10;
+      const PAID_RATE = 300;
+      const usedHours = chargeInfo.monthly_hours;
+
+      // Calculate how many free hours remain BEFORE this booking
+      const remainingFree = Math.max(0, FREE_LIMIT - usedHours);
+
+      // Determine how much of THIS booking is free vs paid
+      freeHours = Math.min(durationHours, remainingFree);
+      billableHours = Math.max(0, durationHours - freeHours);
+
+      totalCharge = Math.round(billableHours * PAID_RATE);
+
+      return {
+        durationHours,
+        totalCharge,
+        breakdown: { freeHours, billableHours }
+      };
+    } else {
+      // New Customer: Simple rate multiplication
+      totalCharge = Math.round(durationHours * chargeInfo.charge_per_hour);
+      return {
+        durationHours,
+        totalCharge,
+        breakdown: { freeHours: 0, billableHours: durationHours }
+      };
+    }
   };
 
   const chargeCalc = useMemo(() => calculateTotalCharge(), [chargeInfo, selectedTimeSlots]);
@@ -188,8 +229,7 @@ export default function Booking() {
 
     const start_time = selectedTimeSlots[0];
 
-    // FIX: Add 30 minutes to the last selected slot to get the exclusive end time
-    // Backend expects end_time to be AFTER the last slot (half-open interval [start, end))
+    // Add 30 minutes to the last selected slot to get the exclusive end time
     const lastSlot = selectedTimeSlots[selectedTimeSlots.length - 1];
     const end_time = addThirtyMinutes(lastSlot);
 
@@ -201,17 +241,18 @@ export default function Booking() {
       room_id: parseInt(data.room_id, 10),
       date: format(data.date, "yyyy-MM-dd"),
       start_time,
-      end_time, // Now this is 30 minutes after the last slot
+      end_time,
       totalCharge: chargeCalc.totalCharge,
     };
 
-    if (chargeInfo.is_existing_customer || chargeCalc.totalCharge === 0) {
+    // Free booking for existing customers with ≥10 hours or zero charge
+    if (chargeCalc.totalCharge === 0) {
       setIsSubmitting(true);
       try {
         const booking = await createBookingInDatabase(bookingData);
         toast({
           title: "Booking Successful! 🎉",
-          description: `Booking ID: ${booking.id} - Free booking! Check your what's app for confirmation`,
+          description: `Booking ID: ${booking.id} - Free booking! Check your WhatsApp for confirmation`,
         });
         resetForm();
       } catch (error: any) {
@@ -221,6 +262,7 @@ export default function Booking() {
         setIsSubmitting(false);
       }
     } else {
+      // Paid booking - show payment dialog
       setPendingBooking(bookingData);
       setShowPaymentDialog(true);
       await createPaymentIntent(bookingData);
@@ -255,8 +297,8 @@ export default function Booking() {
 
       const booking = await createBookingInDatabase(pendingBooking);
       toast({
-        title: "Booking Confirmed!  🎉",
-        description: `Booking ID: ${booking.id}. You'll receive an confirmation shortly on what's app.`,
+        title: "Booking Confirmed! 🎉",
+        description: `Booking ID: ${booking.id}. You'll receive confirmation shortly on WhatsApp.`,
       });
       setShowPaymentDialog(false);
       resetForm();
@@ -331,7 +373,7 @@ export default function Booking() {
     }
   }
 
-  async function createBookingInDatabase(bookingData: PendingBooking) {
+  async function createBookingInDatabase(bookingData: PendingBooking): Promise<BookingResponse> {
     const response = await fetchWithApiKey(`${API_BASE}/bookings`, {
       method: "POST",
       body: JSON.stringify({
@@ -407,7 +449,7 @@ export default function Booking() {
                       Processing...
                     </>
                   ) : (
-                    "Confirm"
+                    "Confirm Booking"
                   )}
                 </Button>
               </form>
