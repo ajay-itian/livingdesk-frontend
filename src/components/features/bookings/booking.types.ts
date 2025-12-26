@@ -1,5 +1,4 @@
 // components/features/bookings/booking.types.ts
-// FIXED VERSION - Matches backend response exactly
 import { z } from "zod";
 
 export const bookingSchema = z.object({
@@ -22,17 +21,16 @@ export interface ChargeInfo {
   currency: string;
 }
 
-// ✅ FIXED: Updated to match backend response exactly
 export interface PaymentIntent {
-  payment_id: string;        // Backend returns: payment.id
-  email: string;             // Backend returns: payment.email
-  amount: number;            // Backend returns: payment.amount
-  currency: string;          // Backend returns: payment.currency
-  status: string;            // Backend returns: payment.status
-  upi_id: string;            // Backend returns: settings.upi_vpa
-  upi_url: string;           // Backend returns: upi_url (from build_upi_url)
-  qr_code: string;           // ✅ FIXED: Was qr_code_url, backend returns qr_code
-  created_at: string;        // Backend returns: payment.created_at.isoformat()
+  payment_id: string;
+  email: string;
+  amount: number;
+  currency: string;
+  status: string;
+  upi_id: string;
+  upi_url: string;
+  qr_code: string;
+  created_at: string;
 }
 
 export interface PendingBooking {
@@ -68,6 +66,11 @@ export interface BookingResponse {
     tier: string;
     tier_description: string;
     currency: string;
+  };
+  zoho_sync?: {
+    success: boolean;
+    contact_id?: string;
+    error?: string;
   };
 }
 

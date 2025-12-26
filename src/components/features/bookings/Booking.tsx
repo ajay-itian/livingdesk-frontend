@@ -1,4 +1,4 @@
-// pages/Booking.tsx - COMPLETE UPDATED FILE WITH INSTANT UI UPDATES
+// pages/Booking.tsx - COMPLETE UPDATED FILE WITH ZOHO STATUS
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -250,9 +250,22 @@ export default function Booking() {
       setIsSubmitting(true);
       try {
         const booking = await createBookingInDatabase(bookingData);
+
+        // Enhanced success message with Zoho status
+        let toastMessage = `Booking ID: ${booking.id} - Free booking! Check your WhatsApp for confirmation`;
+
+        if (booking.zoho_sync) {
+          if (booking.zoho_sync.success) {
+            toastMessage += " (CRM synced ✓)";
+          } else {
+            console.warn("Zoho sync failed:", booking.zoho_sync.error);
+            toastMessage += " (CRM sync pending)";
+          }
+        }
+
         toast({
           title: "Booking Successful! 🎉",
-          description: `Booking ID: ${booking.id} - Free booking! Check your WhatsApp for confirmation`,
+          description: toastMessage,
         });
         resetForm();
       } catch (error: any) {
@@ -296,9 +309,22 @@ export default function Booking() {
       }
 
       const booking = await createBookingInDatabase(pendingBooking);
+
+      // Enhanced success message with Zoho status
+      let toastMessage = `Booking ID: ${booking.id}. You'll receive confirmation shortly on WhatsApp.`;
+
+      if (booking.zoho_sync) {
+        if (booking.zoho_sync.success) {
+          toastMessage += " (CRM synced ✓)";
+        } else {
+          console.warn("Zoho sync failed:", booking.zoho_sync.error);
+          toastMessage += " (CRM sync pending)";
+        }
+      }
+
       toast({
         title: "Booking Confirmed! 🎉",
-        description: `Booking ID: ${booking.id}. You'll receive confirmation shortly on WhatsApp.`,
+        description: toastMessage,
       });
       setShowPaymentDialog(false);
       resetForm();

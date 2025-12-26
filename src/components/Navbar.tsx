@@ -105,6 +105,7 @@ const Navbar: React.FC = () => {
               <button onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
               <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
               <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>
+              <Link to="/charts" onClick={close} className="text-foreground text-left">Charts</Link>
               <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
               <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
               <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>
