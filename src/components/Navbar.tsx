@@ -79,6 +79,8 @@ const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
             <Link to="/blogs" onClick={close} className="text-foreground transition-colors">Blogs</Link>
             <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
+            <Link to="/survey" onClick={close} className="text-foreground text-left">Survey</Link>
+            <Link to="/wifi" onClick={close} className="text-foreground transition-colors">Wifi</Link>
             <button onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
             <Button onClick={() => scrollToSection("contact")} type="button">Get Started</Button>
           </div>

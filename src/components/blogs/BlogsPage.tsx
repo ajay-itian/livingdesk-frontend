@@ -297,18 +297,7 @@ const BlogsPage = () => {
             <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 pt-24 pb-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
-                    <div className="text-center mb-16 space-y-4">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
-                            <BookOpen className="w-4 h-4" />
-                            Insights & Stories
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                            The Living Desk Blog
-                        </h1>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Insights on coworking, productivity & the future of work.
-                        </p>
-                    </div>
+
 
                     {/* Content */}
                     {loading ? (

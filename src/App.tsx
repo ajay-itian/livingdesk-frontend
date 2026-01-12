@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Booking from "./components/features/bookings/Booking";
 import BlogsPage from "./components/blogs/BlogsPage";
 import Community from "./components/Community";
+import WifiCardApp from "./components/utils/WifiCustomerPortal";
+import VisitorSurveyForm from "./components/utils/VisitorSurveyForm";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/booking" element={<Booking />} />
           <Route path="/blogs" element={<BlogsPage />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/survey" element={<VisitorSurveyForm />} />
+          <Route path="/wifi" element={<WifiCardApp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
