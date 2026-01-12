@@ -30,68 +30,28 @@ const Community = () => {
 
     const upcomingEvents = [
         {
-            title: "Startup Pitch Night",
-            date: "Dec 28, 2025",
-            time: "6:00 PM - 9:00 PM",
-            category: "Networking",
-            attendees: 45,
+            title: "Lorem Ipsum Event",
+            date: "Jan 01, 2026",
+            time: "5:00 PM - 8:00 PM",
+            category: "Lorem Category",
+            attendees: 99,
             image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80",
-            description: "Watch innovative startups pitch their ideas. Network with founders and investors."
-        },
-        {
-            title: "Design Thinking Workshop",
-            date: "Jan 5, 2026",
-            time: "2:00 PM - 5:00 PM",
-            category: "Workshop",
-            attendees: 30,
-            image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
-            description: "Learn design thinking methodologies from industry experts."
-        },
-        {
-            title: "Friday Networking Social",
-            date: "Dec 27, 2025",
-            time: "5:00 PM - 7:00 PM",
-            category: "Social",
-            attendees: 60,
-            image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80",
-            description: "Unwind with fellow members over drinks and conversations."
-        },
-        {
-            title: "Digital Marketing Masterclass",
-            date: "Jan 10, 2026",
-            time: "3:00 PM - 6:00 PM",
-            category: "Learning",
-            attendees: 25,
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
-            description: "Master digital marketing strategies for your business growth."
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
         }
+
     ];
 
     const memberStories = [
+
         {
-            name: "Priya Sharma",
-            role: "Founder, TechStart",
-            image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
-            story: "The Living Desk transformed how I work. The collaborative environment helped me grow my startup from an idea to a funded company.",
-            likes: 124,
-            company: "TechStart Solutions"
-        },
-        {
-            name: "Rajesh Kumar",
-            role: "Freelance Designer",
+            name: "Lorem Ipsum",
+            role: "Dolor Sit Amet",
             image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-            story: "I've found my tribe here! The networking events connected me with clients I never would have met otherwise.",
-            likes: 89,
-            company: "RK Designs"
-        },
-        {
-            name: "Anita Desai",
-            role: "Digital Marketer",
-            image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80",
-            story: "The community here is incredibly supportive. I've learned so much from fellow members and grown my business exponentially.",
-            likes: 156,
-            company: "Growth Marketing Co"
+            story: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            likes: 123,
+            company: "Lorem Ipsum Studio"
         }
+
     ];
 
     const communityPerks = [
@@ -99,11 +59,6 @@ const Community = () => {
             icon: Network,
             title: "Member Directory",
             description: "Connect with 200+ professionals across industries"
-        },
-        {
-            icon: Calendar,
-            title: "Monthly Events",
-            description: "20+ workshops, networking sessions, and social events"
         },
         {
             icon: BookOpen,

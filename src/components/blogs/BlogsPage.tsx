@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-    Calendar, ExternalLink, Share2, Loader2,
-    BookOpen, Clock, ArrowRight, Eye, Heart
-} from "lucide-react";
+import { Calendar, ExternalLink, Share2, Loader2, BookOpen, Clock, ArrowRight, Eye, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,12 +17,12 @@ interface ExtendedBlog extends Blog {
 const BlogsPage = () => {
     // State
     const [blogs, setBlogs] = useState<ExtendedBlog[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
     // ==========================================
-    // 🔧 CONFIGURATION 
+    // 🔧 CONFIGURATION
     // ==========================================
     const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
     const API_KEY = import.meta.env.VITE_API_KEY || "";
@@ -68,7 +65,6 @@ const BlogsPage = () => {
             const mergedBlogs = s3Blogs.map(blog => {
                 const stats = blogStats[blog.id] || { views: 0, likes: 0 };
                 const localLiked = localStorage.getItem(`liked_${blog.id}`) === 'true';
-
                 return {
                     ...blog,
                     views: stats.views,
@@ -79,8 +75,7 @@ const BlogsPage = () => {
 
             // 3. Sort by Date (Newest First)
             mergedBlogs.sort(
-                (a, b) =>
-                    new Date(b.published_at || b.created_at).getTime() -
+                (a, b) => new Date(b.published_at || b.created_at).getTime() -
                     new Date(a.published_at || a.created_at).getTime()
             );
 
@@ -95,7 +90,7 @@ const BlogsPage = () => {
     };
 
     // --- API Helper: Fetch Stats ---
-    const fetchBlogStats = async (): Promise<Record<string, { views: number, likes: number }>> => {
+    const fetchBlogStats = async (): Promise<Record<string, any>> => {
         try {
             const res = await fetch(`${API_BASE}/blogs/stats/all`, {
                 headers: {
@@ -103,10 +98,12 @@ const BlogsPage = () => {
                     "x-api-key": API_KEY
                 }
             });
+
             if (!res.ok) {
                 console.error(`❌ Stats API returned ${res.status}: ${res.statusText}`);
                 return {};
             }
+
             const stats = await res.json();
             return stats;
         } catch (e) {
@@ -134,11 +131,13 @@ const BlogsPage = () => {
         e.stopPropagation();
         if (blog.isLiked) return;
 
-        setBlogs(prev => prev.map(b =>
-            b.id === blog.id
-                ? { ...b, likes: (b.likes || 0) + 1, isLiked: true }
-                : b
-        ));
+        setBlogs(prev =>
+            prev.map(b =>
+                b.id === blog.id
+                    ? { ...b, likes: (b.likes || 0) + 1, isLiked: true }
+                    : b
+            )
+        );
 
         if (blog.id) localStorage.setItem(`liked_${blog.id}`, 'true');
 
@@ -163,8 +162,18 @@ const BlogsPage = () => {
 
         const xmlText = await res.text();
         const xml = new DOMParser().parseFromString(xmlText, "text/xml");
-        const allKeys = Array.from(xml.getElementsByTagName("Key")).map(k => k.textContent || "");
 
+        // Extract S3 metadata including LastModified dates
+        const contents = Array.from(xml.getElementsByTagName("Contents"));
+        const s3Metadata = new Map();
+
+        contents.forEach(content => {
+            const key = content.getElementsByTagName("Key")[0]?.textContent || "";
+            const lastModified = content.getElementsByTagName("LastModified")[0]?.textContent || "";
+            s3Metadata.set(key, { lastModified });
+        });
+
+        const allKeys = Array.from(xml.getElementsByTagName("Key")).map(k => k.textContent || "");
         const imageSet = new Set(allKeys.filter(k => /\.(jpg|jpeg|png|webp|gif)$/i.test(k)));
         const htmlKeys = allKeys.filter((k) => k.endsWith(".html"));
 
@@ -182,17 +191,21 @@ const BlogsPage = () => {
             const fileUrl = `${bucketBase}/${key}?t=${Date.now()}`;
             const r = await fetch(fileUrl);
             if (!r.ok) return null;
+
             const html = await r.text();
-            return extractFromHTML(html, key, s3Image);
+            const s3Date = s3Metadata.get(key)?.lastModified || new Date().toISOString();
+            return extractFromHTML(html, key, s3Image, s3Date);
         });
 
         return (await Promise.all(blogPromises)).filter(Boolean) as ExtendedBlog[];
     };
 
-    const extractFromHTML = (html: string, key: string, s3Image: string | null): ExtendedBlog => {
+    const extractFromHTML = (html: string, key: string, s3Image: string | null, s3CreatedDate: string): ExtendedBlog => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
-        const getMeta = (name: string) => doc.querySelector(`meta[name="${name}"], meta[property="${name}"], meta[property="og:${name}"]`)?.getAttribute("content");
+
+        const getMeta = (name: string) =>
+            doc.querySelector(`meta[name="${name}"], meta[property="${name}"], meta[property="og:${name}"]`)?.getAttribute("content");
 
         const parts = key.split("/");
         const fileName = parts[parts.length - 1] || "";
@@ -204,10 +217,15 @@ const BlogsPage = () => {
         const id = fileName.replace(".html", "");
 
         let image = s3Image;
-        if (!image) { const featuredImg = doc.querySelector('img.featured-image') as HTMLImageElement; if (featuredImg) image = featuredImg.src; }
+        if (!image) {
+            const featuredImg = doc.querySelector('img.featured-image') as HTMLImageElement;
+            if (featuredImg) image = featuredImg.src;
+        }
         if (!image) image = getMeta("og:image") || getMeta("image");
-        if (!image) { const firstImg = doc.querySelector('img') as HTMLImageElement; if (firstImg) image = firstImg.src; }
-
+        if (!image) {
+            const firstImg = doc.querySelector('img') as HTMLImageElement;
+            if (firstImg) image = firstImg.src;
+        }
         if (!image || image.includes("onerror")) {
             let hash = 0;
             for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
@@ -215,14 +233,24 @@ const BlogsPage = () => {
         }
 
         const author = getMeta("author") || "The Living Desk Team";
-        const date = getMeta("published_time") || getMeta("date") || new Date().toISOString();
+        // Use S3 creation date instead of meta tags
+        const date = s3CreatedDate;
         const slug = fileName.replace(".html", "") || id;
         const tags = getMeta("keywords") ? getMeta("keywords")!.split(",").map((t) => t.trim()) : ["Coworking"];
 
         return {
-            id, slug, title, excerpt: description, content: description,
-            image_url: image!, author, created_at: date, published_at: date,
-            status: "published", tags, htmlUrl: key
+            id,
+            slug,
+            title,
+            excerpt: description,
+            content: description,
+            image_url: image!,
+            author,
+            created_at: date,
+            published_at: date,
+            status: "published",
+            tags,
+            htmlUrl: key
         };
     };
 
@@ -232,9 +260,11 @@ const BlogsPage = () => {
     const openBlog = (blog: ExtendedBlog) => {
         incrementView(blog);
         window.open(getPublicUrl(blog), "_blank", "noopener,noreferrer");
-        setBlogs(prev => prev.map(b =>
-            b.id === blog.id ? { ...b, views: (b.views || 0) + 1 } : b
-        ));
+        setBlogs(prev =>
+            prev.map(b =>
+                b.id === blog.id ? { ...b, views: (b.views || 0) + 1 } : b
+            )
+        );
     };
 
     const handleShare = async (e: React.MouseEvent, blog: ExtendedBlog) => {
@@ -242,41 +272,59 @@ const BlogsPage = () => {
         const url = getPublicUrl(blog);
         try {
             if (navigator.share) await navigator.share({ title: blog.title, url });
-            else { await navigator.clipboard.writeText(url); alert("Link copied!"); }
-        } catch (err) { console.error("Share failed", err); }
+            else {
+                await navigator.clipboard.writeText(url);
+                alert("Link copied!");
+            }
+        } catch (err) {
+            console.error("Share failed", err);
+        }
     };
 
-    const formatDate = (d: string) => new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-    const getReadTime = (text: string) => Math.max(3, Math.ceil(text.split(/\s+/).length / 200) + 2);
+    const formatDate = (d: string) =>
+        new Date(d).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        });
+
+    const getReadTime = (text: string) =>
+        Math.max(3, Math.ceil(text.split(/\s+/).length / 200) + 2);
 
     return (
         <>
             <Navbar />
-            <div className="pt-16 min-h-screen bg-gradient-to-b from-background via-background to-secondary/20">
-                <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5 py-12 md:py-16 border-b border-primary/10">
-                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 mb-4 border border-primary/20">
-                            <BookOpen className="w-4 h-4 text-primary" />
-                            <span className="text-primary text-sm font-semibold">Insights & Stories</span>
+            <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 pt-24 pb-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Header */}
+                    <div className="text-center mb-16 space-y-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4">
+                            <BookOpen className="w-4 h-4" />
+                            Insights & Stories
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">The Living Desk Blog</h1>
-                        <p className="text-primary/80 text-lg max-w-2xl font-medium">Insights on coworking, productivity & the future of work.</p>
+                        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                            The Living Desk Blog
+                        </h1>
+                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                            Insights on coworking, productivity & the future of work.
+                        </p>
                     </div>
-                </section>
 
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    {/* Content */}
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                            <p className="mt-4 text-muted-foreground">Fetching latest stories...</p>
+                        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                            <p className="text-muted-foreground">Fetching latest stories...</p>
                         </div>
                     ) : error ? (
-                        <div className="flex flex-col items-center justify-center py-20">
+                        <div className="text-center py-20 space-y-4">
                             <p className="text-red-500 text-lg">{error}</p>
-                            <p className="text-sm text-gray-500 mt-2">Check console (F12) for CORS/Network errors.</p>
+                            <p className="text-sm text-muted-foreground">
+                                Check console (F12) for CORS/Network errors.
+                            </p>
                         </div>
                     ) : (
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {blogs.map((blog) => (
                                 <Card
                                     key={blog.id}
@@ -285,87 +333,109 @@ const BlogsPage = () => {
                                     onMouseLeave={() => setHoveredCard(null)}
                                     className="cursor-pointer group overflow-hidden border-border/50 bg-card hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                                 >
-                                    <div className="relative h-52 overflow-hidden">
-                                        <img
-                                            src={blog.image_url}
-                                            alt={blog.title}
-                                            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
-                                            onError={(e) => { e.currentTarget.src = FALLBACK_IMAGES[0]; }}
-                                        />
-                                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/90 text-xs font-medium backdrop-blur-sm">
-                                                <Clock className="w-3 h-3" /> {getReadTime(blog.excerpt)} min
+                                    <CardContent className="p-0">
+                                        {/* Image */}
+                                        <div className="relative overflow-hidden h-56 bg-gradient-to-br from-primary/20 to-primary/5">
+                                            <img
+                                                src={blog.image_url}
+                                                alt={blog.title}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = FALLBACK_IMAGES[0];
+                                                }}
+                                            />
+                                            <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
+                                                {getReadTime(blog.excerpt)} min
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <CardContent className="p-6 space-y-4">
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                            <Calendar className="w-3.5 h-3.5 text-primary" />
-                                            <span>{formatDate(blog.published_at)}</span>
-                                        </div>
+                                        {/* Content */}
+                                        <div className="p-6 space-y-4">
+                                            {/* Meta */}
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Calendar className="w-3 h-3" />
+                                                {formatDate(blog.published_at)}
+                                            </div>
 
-                                        <h2 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-2 leading-tight">
-                                            {blog.title}
-                                        </h2>
+                                            {/* Title */}
+                                            <h3 className="text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors">
+                                                {blog.title}
+                                            </h3>
 
-                                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                                            {blog.excerpt}
-                                        </p>
+                                            {/* Excerpt */}
+                                            <p className="text-sm text-muted-foreground line-clamp-3">
+                                                {blog.excerpt}
+                                            </p>
 
-                                        <div className="flex items-center justify-between pt-4 border-t">
-                                            <div className="flex items-center gap-2">
-                                                <Button variant="secondary" size="sm" className="h-8 px-3" onClick={(e) => { e.stopPropagation(); openBlog(blog); }}>
-                                                    <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Read
-                                                </Button>
-
+                                            {/* Actions */}
+                                            <div className="flex items-center justify-between pt-4 border-t border-border/50">
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon"
-                                                    className={`h-8 w-8 transition-all duration-300 ${blog.isLiked ? 'text-red-500 bg-red-50 scale-110' : 'text-muted-foreground hover:text-red-500'}`}
-                                                    onClick={(e) => handleLike(e, blog)}
+                                                    size="sm"
+                                                    className="group/btn"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openBlog(blog);
+                                                    }}
                                                 >
-                                                    <Heart className={`w-4 h-4 ${blog.isLiked ? 'fill-current' : ''}`} />
+                                                    Read
+                                                    <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
                                                 </Button>
-                                                <span className={`text-xs font-medium ${blog.isLiked ? 'text-red-500' : 'text-muted-foreground'}`}>
-                                                    {blog.likes || 0}
-                                                </span>
 
-                                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/90 text-xs font-medium backdrop-blur-sm">
-                                                    <Eye className="w-3 h-3 text-primary" />
-                                                    {blog.views?.toLocaleString() || 0}
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className={`h-8 w-8 ${blog.isLiked ? 'text-red-500' : ''}`}
+                                                        onClick={(e) => handleLike(e, blog)}
+                                                    >
+                                                        <Heart className={`w-4 h-4 ${blog.isLiked ? 'fill-current' : ''}`} />
+                                                    </Button>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {blog.likes || 0}
+                                                    </span>
+
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {blog.views?.toLocaleString() || 0}
+                                                    </span>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        onClick={(e) => handleShare(e, blog)}
+                                                    >
+                                                        <Share2 className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </div>
-
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-muted-foreground hover:text-primary"
-                                                onClick={(e) => handleShare(e, blog)}
-                                            >
-                                                <Share2 className="w-3.5 h-3.5" />
-                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>
                             ))}
                         </div>
                     )}
-                </section>
 
-                <section className="bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5 py-16 mt-8 border-t border-primary/10">
-                    <div className="max-w-4xl mx-auto px-4 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                    {/* CTA Section */}
+                    <div className="mt-20 text-center bg-gradient-to-r from-primary/10 via-primary/5 to-background rounded-2xl p-12 border border-primary/20">
+                        <h2 className="text-3xl font-bold mb-4">
                             Ready to Transform Your Workspace?
                         </h2>
-                        <Button asChild size="lg" className="mt-6 bg-primary hover:bg-primary/90 text-primary-foreground px-8 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                            <Link to="/">
+                        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+                            Join our community of innovators and experience the future of work.
+                        </p>
+                        <Link to="/spaces">
+                            <Button size="lg" className="group">
                                 Explore Our Spaces
-                                <ArrowRight className="w-4 h-4 ml-2" />
-                            </Link>
-                        </Button>
+                                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                            </Button>
+                        </Link>
                     </div>
-                </section>
+                </div>
             </div>
         </>
     );

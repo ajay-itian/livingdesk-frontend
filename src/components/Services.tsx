@@ -51,13 +51,13 @@ const Services = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {services.map((service, index) => (
-            <Card 
+            <Card
               key={index}
               className="overflow-hidden hover:shadow-lg transition-all duration-300 group"
             >
               <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={service.image} 
+                <img
+                  src={service.image}
                   alt={`${service.title} - coworking space solution in Pimple Saudagar Pune`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
