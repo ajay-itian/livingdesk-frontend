@@ -1,13 +1,14 @@
 import { useState } from "react";
-import gallery1 from "@/assets/gallery-1.jpg";
-import gallery2 from "@/assets/gallery-2.jpg";
-import gallery3 from "@/assets/gallery-3.jpg";
-import gallery4 from "@/assets/gallery-4.jpg";
-import heroImage from "@/assets/hero-coworking.jpg";
-import privateCabin from "@/assets/private-office.jpg";
-import meetingRoom from "@/assets/meeting-room.jpg";
-import dedicatedDesk from "@/assets/dedicated-desk.jpg";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import gallery1 from "@/assets/gallery-1.webp";
+import gallery2 from "@/assets/gallery-2.webp";
+import gallery3 from "@/assets/gallery-3.webp";
+import gallery4 from "@/assets/gallery-4.webp";
+import heroImage from "@/assets/hero-coworking.webp";
+import privateCabin from "@/assets/private-office.webp";
+import meetingRoom from "@/assets/meeting-room.webp";
+import dedicatedDesk from "@/assets/dedicated-desk.webp";
+// 1. Import DialogTitle here
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 
 const Gallery = () => {
@@ -44,6 +45,7 @@ const Gallery = () => {
               <img
                 src={image.src}
                 alt={image.alt}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -57,6 +59,9 @@ const Gallery = () => {
 
         <Dialog open={selectedImage !== null} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="max-w-4xl p-0 bg-transparent border-none">
+            {/* 2. Add DialogTitle with sr-only class to hide it visually but keep it accessible */}
+            <DialogTitle className="sr-only">Gallery Image Preview</DialogTitle>
+            
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"

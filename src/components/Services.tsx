@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Users, Briefcase, Coffee } from "lucide-react";
-import privateOfficeImage from "@/assets/private-office.jpg";
-import meetingRoomImage from "@/assets/meeting-room.jpg";
-import dedicatedDeskImage from "@/assets/dedicated-desk.jpg";
-import managedOfficeImage from "@/assets/managed-office.jpg";
+import privateOfficeImage from "@/assets/private-office.webp";
+import meetingRoomImage from "@/assets/meeting-room.webp";
+import dedicatedDeskImage from "@/assets/dedicated-desk.webp";
+import managedOfficeImage from "@/assets/managed-office.webp";
 
 const services = [
   {
@@ -59,6 +59,7 @@ const Services = () => {
                 <img
                   src={service.image}
                   alt={`${service.title} - coworking space solution in Pimple Saudagar Pune`}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>

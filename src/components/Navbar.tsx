@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.jpeg";
+import logo from "@/assets/logo.webp";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,8 +107,9 @@ const Navbar: React.FC = () => {
               <button onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
               <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
               <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>
-              <Link to="/charts" onClick={close} className="text-foreground text-left">Charts</Link>
               <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
+              <Link to="/survey" onClick={close} className="text-foreground text-left">Survey</Link>
+              <Link to="/wifi" onClick={close} className="text-foreground text-left">Wifi</Link>
               <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
               <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>
             </div>

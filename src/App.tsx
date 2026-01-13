@@ -3,14 +3,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Booking from "./components/features/bookings/Booking";
-import BlogsPage from "./components/blogs/BlogsPage";
-import Community from "./components/Community";
-import WifiCardApp from "./components/utils/WifiCustomerPortal";
-import VisitorSurveyForm from "./components/utils/VisitorSurveyForm";
+
+const Booking = lazy(() => import("./components/features/bookings/Booking"));
+const BlogsPage = lazy(() => import("./components/blogs/BlogsPage"));
+const Community = lazy(() => import("./components/Community"));
+const WifiCardApp = lazy(() => import("./components/utils/WifiCustomerPortal"));
+const VisitorSurveyForm = lazy(() => import("./components/utils/VisitorSurveyForm"));
 
 const queryClient = new QueryClient();
 
@@ -20,15 +22,17 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/blogs" element={<BlogsPage />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/survey" element={<VisitorSurveyForm />} />
-          <Route path="/wifi" element={<WifiCardApp />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/blogs" element={<BlogsPage />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/survey" element={<VisitorSurveyForm />} />
+            <Route path="/wifi" element={<WifiCardApp />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

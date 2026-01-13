@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroImage from "@/assets/hero-coworking.jpg";
+import heroImage from "@/assets/hero-coworking.webp";
 
 const Hero = () => {
   const scrollToContact = () => {
@@ -11,9 +11,9 @@ const Hero = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-16">
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
-          alt="Premium coworking space in Pimple Saudagar Pune with modern workspace and office solutions" 
+        <img
+          src={heroImage}
+          alt="Premium coworking space in Pimple Saudagar Pune with modern workspace and office solutions"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
@@ -27,7 +27,7 @@ const Hero = () => {
               <span className="block text-primary">Reimagined</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-              Premium coworking spaces with private offices, dedicated desks & meeting rooms. 
+              Premium coworking spaces with private offices, dedicated desks & meeting rooms.
               Experience flexible workspace solutions designed for productivity and growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -35,16 +35,16 @@ const Hero = () => {
                 Schedule a Tour
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 onClick={() => window.open('https://www.youtube.com/shorts/CSPZWy99wzQ', '_blank')}
               >
                 Virtual Tour
               </Button>
             </div>
           </div>
-          
+
           <div className="relative w-full max-w-xs mx-auto">
             <div className="relative rounded-lg overflow-hidden shadow-2xl aspect-[9/16]">
               <iframe

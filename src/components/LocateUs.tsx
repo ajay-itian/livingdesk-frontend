@@ -1,5 +1,5 @@
 import { MapPin } from "lucide-react";
-import directionGuide from "@/assets/direction-guide.jpg";
+import directionGuide from "@/assets/direction-guide.webp";
 
 const LocateUs = () => {
   return (
@@ -48,9 +48,9 @@ const LocateUs = () => {
               <p className="text-muted-foreground mb-4">
                 Follow this hand-drawn map to easily find our location
               </p>
-              <img 
-                src={directionGuide} 
-                alt="Hand-drawn direction guide to The Living Desk" 
+              <img
+                src={directionGuide}
+                alt="Hand-drawn direction guide to The Living Desk"
                 className="w-full rounded-lg border"
               />
             </div>

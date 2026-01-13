@@ -72,7 +72,7 @@ const WifiCustomerPortal = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(currentUrl);
-        // Toast notification logic would go here
+        // Toast notification logic would go here   
     };
 
     const getWifiQrString = () => {
@@ -153,7 +153,7 @@ const WifiCustomerPortal = () => {
                                             icon={User}
                                             label="Full Name"
                                             value={guestName}
-                                            onChange={setGuestName}
+                                            onChange={(e) => setGuestName(e.target.value)}
                                             placeholder="Jane Doe"
                                             isFocused={focusedField === 'name'}
                                             onFocus={() => setFocusedField('name')}
@@ -163,7 +163,7 @@ const WifiCustomerPortal = () => {
                                             icon={Smartphone}
                                             label="Mobile Number"
                                             value={mobile}
-                                            onChange={setMobile}
+                                            onChange={(e) => setMobile(e.target.value)}
                                             placeholder="98765 43210"
                                             type="tel"
                                             isFocused={focusedField === 'mobile'}
