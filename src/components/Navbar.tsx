@@ -7,36 +7,6 @@ import logo from "@/assets/logo.webp";
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
-  
-  // --- SECRET HANDSHAKE LOGIC START ---
-  // 1. Check if we already unlocked it previously (saved in browser memory)
-  const [isAdmin, setIsAdmin] = useState(() => {
-    return localStorage.getItem("admin_unlocked") === "true";
-  });
-  const [clickCount, setClickCount] = useState(0);
-
-  // 2. The Secret Function
-  const handleSecretHandshake = (e: React.MouseEvent) => {
-    // We don't prevent default behavior (navigation), so it acts like a normal logo link.
-    
-    setClickCount((prev) => {
-      const newCount = prev + 1;
-      
-      // If clicked 5 times...
-      if (newCount >= 3) {
-        const newState = !isAdmin; // Toggle (show/hide)
-        setIsAdmin(newState);
-        localStorage.setItem("admin_unlocked", String(newState)); // Remember choice
-        alert(newState ? "Admin Mode: UNLOCKED 🔓" : "Admin Mode: LOCKED 🔒");
-        return 0; // Reset counter
-      }
-      return newCount;
-    });
-
-    // Reset counter if user stops clicking for 1 second (prevents accidental unlock)
-    setTimeout(() => setClickCount(0), 1000);
-  };
-  // --- SECRET HANDSHAKE LOGIC END ---
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -88,13 +58,11 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            {/* Added handleSecretHandshake here */}
-            <Link 
-              to="/" 
-              onClick={(e) => { 
-                handleSecretHandshake(e); 
-                setPendingScrollId(null); 
-                close(); 
+            <Link
+              to="/"
+              onClick={() => {
+                setPendingScrollId(null);
+                close();
               }}
             >
               <img src={logo} alt="The Living Desk" className="h-12 w-auto" />
@@ -111,17 +79,12 @@ const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
             <Link to="/blogs" onClick={close} className="text-foreground transition-colors">Blogs</Link>
             <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
-            
-            {/* --- HIDDEN SURVEY LINK --- */}
-            {isAdmin && (
-              <Link to="/survey" onClick={close} className="text-red-500 font-bold text-left animate-pulse">
-                Survey (Admin)
-              </Link>
-            )}
-            
             <Link to="/wifi" onClick={close} className="text-foreground transition-colors">Wifi</Link>
             <button onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
             <Button onClick={() => scrollToSection("contact")} type="button">Get Started</Button>
+
+
+
           </div>
 
           {/* Mobile Menu Button */}
@@ -144,14 +107,6 @@ const Navbar: React.FC = () => {
               <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
               <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>
               <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
-              
-              {/* --- HIDDEN SURVEY LINK (MOBILE) --- */}
-              {isAdmin && (
-                <Link to="/survey" onClick={close} className="text-red-500 font-bold text-left">
-                  Survey (Admin)
-                </Link>
-              )}
-              
               <Link to="/wifi" onClick={close} className="text-foreground text-left">Wifi</Link>
               <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
               <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>

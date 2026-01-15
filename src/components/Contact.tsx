@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { MapPin, Phone, Mail, Clock, MessageCircle, Star } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+
+// Use environment variable for API URL or fallback to localhost
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,21 +20,34 @@ const Contact = () => {
     message: ''
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setLoading(true);
+
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
+      // Sending data to your FastAPI Backend
+      const response = await fetch(`${API_URL}/api/contact/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send message');
+      }
 
       toast.success("Thank you! We'll get back to you soon.");
       setFormData({ name: '', email: '', phone: '', service: '', message: '' });
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error("Failed to send message. Please try again or contact us directly.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,6 +90,7 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
                 <div>
@@ -85,6 +101,7 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
                 <div>
@@ -95,11 +112,17 @@ const Contact = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
                 <div>
                   <Label htmlFor="service">Service Interested In</Label>
-                  <Select value={formData.service} onValueChange={handleSelectChange} required>
+                  <Select
+                    value={formData.service}
+                    onValueChange={handleSelectChange}
+                    required
+                    disabled={loading}
+                  >
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
@@ -122,9 +145,19 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
+                    disabled={loading}
                   />
                 </div>
-                <Button type="submit" className="w-full">Send Message</Button>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -195,7 +228,7 @@ const Contact = () => {
                 <MessageCircle className="mr-2 h-5 w-5" />
                 Chat on WhatsApp
               </Button>
-              
+
               <Button
                 onClick={() => window.open('https://www.google.com/maps/place/Office+607,608,609,+Vision+Flora,+Kunal+Icon+Rd,+in+front+of+PCMC+ground,+Siddhivinayak+Ginger+Society,+Siddhivinayak+Ginger,+Pimple+Saudagar,+Pune,+Pimpri-Chinchwad,+Maharashtra+411027/@18.5921498,73.7589091,17z/data=!4m8!3m7!1s0x3bc2b9a2c94a9e1d:0xe5e8d937f600f662!8m2!3d18.5921498!4d73.758909!9m1!1b1!16s%2Fg%2F11y4g5fwh4?entry=ttu', '_blank')}
                 className="w-full"

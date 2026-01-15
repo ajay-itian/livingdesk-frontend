@@ -1,4 +1,4 @@
-// pages/Booking.tsx - COMPLETE UPDATED FILE WITH ZOHO STATUS
+// pages/Booking.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -228,8 +228,6 @@ export default function Booking() {
     }
 
     const start_time = selectedTimeSlots[0];
-
-    // Add 30 minutes to the last selected slot to get the exclusive end time
     const lastSlot = selectedTimeSlots[selectedTimeSlots.length - 1];
     const end_time = addThirtyMinutes(lastSlot);
 
@@ -245,22 +243,17 @@ export default function Booking() {
       totalCharge: chargeCalc.totalCharge,
     };
 
-    // Free booking for existing customers with ≥10 hours or zero charge
+    // Free booking logic
     if (chargeCalc.totalCharge === 0) {
       setIsSubmitting(true);
       try {
         const booking = await createBookingInDatabase(bookingData);
 
-        // Enhanced success message with Zoho status
-        let toastMessage = `Booking ID: ${booking.id} - Free booking! Check your WhatsApp for confirmation`;
-
-        if (booking.zoho_sync) {
-          if (booking.zoho_sync.success) {
-            toastMessage += " (CRM synced ✓)";
-          } else {
-            console.warn("Zoho sync failed:", booking.zoho_sync.error);
-            toastMessage += " (CRM sync pending)";
-          }
+        let toastMessage = `Booking ID: ${booking.id} - Free booking! Check WhatsApp for confirmation`;
+        if (booking.zoho_sync?.success) {
+          toastMessage += " (CRM synced ✓)";
+        } else if (booking.zoho_sync?.error) {
+          console.warn("Zoho sync warning:", booking.zoho_sync.error);
         }
 
         toast({
@@ -270,7 +263,7 @@ export default function Booking() {
         resetForm();
       } catch (error: any) {
         console.error("Booking error:", error);
-        toast({ title: "Error", description: error?.message || "Failed to create booking. Please try again.", variant: "destructive" });
+        toast({ title: "Booking Failed", description: error.message, variant: "destructive" });
       } finally {
         setIsSubmitting(false);
       }
@@ -294,32 +287,23 @@ export default function Booking() {
     if (!pendingBooking) return;
     setIsSubmitting(true);
     try {
+      // 1. Mark payment complete (Best effort)
       if (paymentIntent && pendingBooking.totalCharge > 0) {
-        const res = await fetchWithApiKey(`${API_BASE}/payments/${paymentIntent.payment_id}/complete`, {
-          method: "PATCH",
-        });
-        if (!res.ok) {
-          let msg = "Failed to mark payment as completed";
-          try {
-            const err = await res.json();
-            msg = err?.message || msg;
-          } catch { }
-          throw new Error(msg);
+        try {
+          await fetchWithApiKey(`${API_BASE}/payments/${paymentIntent.payment_id}/complete`, {
+            method: "PATCH",
+          });
+        } catch (e) {
+          console.warn("Could not mark payment as complete in DB, proceeding to booking anyway.", e);
         }
       }
 
+      // 2. Create the booking
       const booking = await createBookingInDatabase(pendingBooking);
 
-      // Enhanced success message with Zoho status
-      let toastMessage = `Booking ID: ${booking.id}. You'll receive confirmation shortly on WhatsApp.`;
-
-      if (booking.zoho_sync) {
-        if (booking.zoho_sync.success) {
-          toastMessage += " (CRM synced ✓)";
-        } else {
-          console.warn("Zoho sync failed:", booking.zoho_sync.error);
-          toastMessage += " (CRM sync pending)";
-        }
+      let toastMessage = `Booking ID: ${booking.id}. Confirmation sent to WhatsApp.`;
+      if (booking.zoho_sync?.success) {
+        toastMessage += " (CRM synced ✓)";
       }
 
       toast({
@@ -331,8 +315,8 @@ export default function Booking() {
     } catch (error: any) {
       console.error("Booking error:", error);
       toast({
-        title: "Could not confirm booking",
-        description: error?.message || "Please try again or contact support.",
+        title: "Booking Failed",
+        description: error.message || "Could not finalize booking. Please contact support.",
         variant: "destructive",
       });
     } finally {
@@ -346,20 +330,11 @@ export default function Booking() {
     setChargeInfo(null);
     setPendingBooking(null);
     setPaymentIntent(null);
+    setDisabledSlots([]);
 
+    // Refresh availability if room/date still selected (though form reset clears them)
     if (selectedRoomId && selectedDateStr) {
-      (async () => {
-        try {
-          const url = new URL(`${API_BASE}/bookings/availability`);
-          url.searchParams.set("room_id", String(selectedRoomId));
-          url.searchParams.set("date", selectedDateStr);
-          const res = await fetch(url.toString());
-          if (res.ok) {
-            const data: AvailabilityResponse = await res.json();
-            setDisabledSlots(data.disabled_slots || []);
-          }
-        } catch { }
-      })();
+      // Logic to refresh if needed
     }
   };
 
@@ -399,6 +374,7 @@ export default function Booking() {
     }
   }
 
+  // ✅ UPDATED: Robust Error Handling for FastAPI
   async function createBookingInDatabase(bookingData: PendingBooking): Promise<BookingResponse> {
     const response = await fetchWithApiKey(`${API_BASE}/bookings`, {
       method: "POST",
@@ -416,8 +392,25 @@ export default function Booking() {
       let message = "Failed to create booking";
       try {
         const errorData = await response.json();
-        message = errorData?.message || errorData?.detail?.message || message;
-      } catch { }
+
+        // FastAPI Error Handling Logic
+        if (typeof errorData.detail === 'string') {
+          // Standard HTTP Exception (e.g. 409 Conflict, 500 Server Error)
+          message = errorData.detail;
+        } else if (Array.isArray(errorData.detail)) {
+          // Validation Error (422) - Extract first error message
+          const firstError = errorData.detail[0];
+          message = firstError?.msg || "Invalid booking data";
+          if (firstError?.loc) {
+            message += ` (${firstError.loc.join('.')})`;
+          }
+        } else if (errorData.message) {
+          // Fallback for other frameworks
+          message = errorData.message;
+        }
+      } catch (e) {
+        console.error("Could not parse error response", e);
+      }
       throw new Error(message);
     }
 

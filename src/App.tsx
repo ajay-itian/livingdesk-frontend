@@ -30,6 +30,7 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/survey" element={<VisitorSurveyForm />} />
             <Route path="/wifi" element={<WifiCardApp />} />
+            <Route path="/visitor-survey" element={<VisitorSurveyForm />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

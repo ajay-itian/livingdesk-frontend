@@ -4,6 +4,7 @@ import privateOfficeImage from "@/assets/private-office.webp";
 import meetingRoomImage from "@/assets/meeting-room.webp";
 import dedicatedDeskImage from "@/assets/dedicated-desk.webp";
 import managedOfficeImage from "@/assets/managed-office.webp";
+import heroImage from "@/assets/hero-coworking.webp";
 
 const services = [
   {
@@ -34,7 +35,7 @@ const services = [
     icon: Building2,
     title: "Managed Office",
     description: "Fully managed office solutions with complete setup, maintenance, and premium services.",
-    image: managedOfficeImage,
+    image: heroImage,
   },
 ];
 

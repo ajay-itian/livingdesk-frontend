@@ -5,21 +5,21 @@ import {
     Smartphone,
     CheckCircle2,
     Loader2,
-    QrCode,
     Copy,
     Router,
     KeyRound,
     Network,
     ArrowRight,
     ShieldCheck,
-    Sparkles
+    Sparkles,
+    Zap
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import axios from 'axios';
 import Navbar from "@/components/Navbar";
 
 // Ensure this matches your FastAPI address
-const API_URL = "http://localhost:8000/wifi";
+const API_URL = "http://localhost:8000/api/wifi";
 
 const WifiCustomerPortal = () => {
     const [step, setStep] = useState(1);
@@ -30,34 +30,35 @@ const WifiCustomerPortal = () => {
     const [loading, setLoading] = useState(false);
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
+    // UI State for the connect button feedback
+    const [connectStatus, setConnectStatus] = useState<'idle' | 'copied'>('idle');
+
     const cardRef = useRef(null);
     const currentUrl = typeof window !== 'undefined' ? window.location.href : 'http://localhost:3000';
 
     const handleLogin = async () => {
-        if (mobile.length < 10) return; // Add better validation UI in production
+        if (mobile.length < 10) return;
         setLoading(true);
 
-        // Simulate network delay for effect if API is instant
+        // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         try {
-            // --- REAL API CALL ---
             const res = await axios.post(`${API_URL}/guest/connect`, {
                 guest_name: guestName,
                 mobile_number: mobile,
-                network_selected: network
+                network_name: network
             });
 
             if (res.data && res.data.wifi_details) {
                 setWifiData(res.data.wifi_details);
                 setStep(2);
             } else {
-                // Fallback for demo purposes if API isn't running
                 throw new Error("No data");
             }
         } catch (err) {
             console.error("Connection Error:", err);
-            // Fallback Mock Data for UI Demonstration
+            // Fallback Mock Data
             const mockData = {
                 ssid: `TLD_Guest_${network}`,
                 password: Math.random().toString(36).slice(-8).toUpperCase(),
@@ -72,12 +73,50 @@ const WifiCustomerPortal = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(currentUrl);
-        // Toast notification logic would go here   
     };
 
     const getWifiQrString = () => {
         if (!wifiData) return "";
+        // Standard WIFI URI Scheme
         return `WIFI:S:${wifiData.ssid};T:WPA;P:${wifiData.password};;`;
+    };
+
+    // --- UPDATED DIRECT CONNECT LOGIC ---
+    const handleDirectConnect = async () => {
+        if (!wifiData) return;
+
+        // 1. Always copy the password to clipboard first (Best UX for iOS/Desktop)
+        try {
+            await navigator.clipboard.writeText(wifiData.password);
+            setConnectStatus('copied');
+
+            // Reset button text after 3 seconds
+            setTimeout(() => setConnectStatus('idle'), 3000);
+        } catch (err) {
+            console.error("Clipboard failed", err);
+        }
+
+        // 2. Attempt to launch the WiFi URI Scheme (Works on some Androids)
+        const wifiString = getWifiQrString();
+        window.location.href = wifiString;
+
+        // 3. Show instruction alert if browser blocks the link
+        // We use a small timeout to let the browser attempt the link first
+        setTimeout(() => {
+            // Check if we are on a mobile device roughly
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (!isMobile) {
+                alert(`Password Copied: "${wifiData.password}"\n\nOn a computer, you must manually select the network "${wifiData.ssid}" and paste the password.`);
+            } else {
+                // Determine OS for specific instructions
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isIOS) {
+                    alert(`Password Copied!\n\niPhones do not allow direct web connections. Please open Settings > WiFi, select "${wifiData.ssid}" and paste the password.`);
+                }
+                // On Android, if the window.location didn't work, this alert helps
+            }
+        }, 500);
     };
 
     return (
@@ -94,7 +133,7 @@ const WifiCustomerPortal = () => {
 
                 <div className="w-full max-w-5xl z-10 grid lg:grid-cols-12 gap-6 items-start">
 
-                    {/* --- LEFT PANEL (Main Content) --- */}
+                    {/* --- LEFT PANEL --- */}
                     <div className="lg:col-span-8 w-full">
                         <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10 relative overflow-hidden transition-all duration-500">
 
@@ -251,8 +290,32 @@ const WifiCustomerPortal = () => {
                                                     </div>
                                                 </div>
 
+                                                {/* --- DIRECT CONNECT BUTTON --- */}
+                                                <button
+                                                    onClick={handleDirectConnect}
+                                                    className={`
+                                                        w-full mt-6 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95
+                                                        ${connectStatus === 'copied'
+                                                            ? 'bg-green-600 text-white'
+                                                            : 'bg-gray-900 hover:bg-black text-white'}
+                                                    `}
+                                                >
+                                                    {connectStatus === 'copied' ? (
+                                                        <>
+                                                            <CheckCircle2 size={18} />
+                                                            <span className="font-semibold">Password Copied!</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Zap size={18} className="text-yellow-400 fill-yellow-400" />
+                                                            <span className="font-semibold">Click to Connect</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                                {/* ----------------------------------- */}
+
                                                 {/* QR Code Section */}
-                                                <div className="mt-8 flex items-center gap-5">
+                                                <div className="mt-8 flex items-center gap-5 pt-6 border-t border-gray-100 border-dashed">
                                                     <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100">
                                                         <QRCode
                                                             value={getWifiQrString()}
@@ -263,7 +326,8 @@ const WifiCustomerPortal = () => {
                                                     <div className="flex-1">
                                                         <p className="font-bold text-gray-900 text-sm">Scan to Connect</p>
                                                         <p className="text-gray-500 text-xs mt-1 leading-relaxed">
-                                                            Open your camera and scan this code to join <strong>{wifiData?.network_name}</strong> instantly.
+                                                            Open camera or Google Lens. <br />
+                                                            <span className="text-[10px] opacity-70">(iOS users: if link fails, paste password from clipboard)</span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -289,7 +353,6 @@ const WifiCustomerPortal = () => {
                     {/* --- RIGHT PANEL (Helper) --- */}
                     <div className="lg:col-span-4 w-full h-full">
                         <div className="bg-white/40 backdrop-blur-md border border-white/60 rounded-3xl p-8 h-full flex flex-col justify-center items-center text-center shadow-sm">
-
                             <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
                                 {step === 1 ? <Smartphone className="text-teal-600 w-8 h-8" /> : <Sparkles className="text-teal-600 w-8 h-8" />}
                             </div>
