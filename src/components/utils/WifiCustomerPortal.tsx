@@ -1,161 +1,111 @@
 import React, { useState, useRef } from 'react';
 import {
-    Wifi,
-    User,
-    Smartphone,
-    CheckCircle2,
-    Loader2,
-    Copy,
-    Router,
-    KeyRound,
-    Network,
-    ArrowRight,
-    ShieldCheck,
-    Sparkles,
-    Zap
+    Wifi, User, Smartphone, Loader2, Copy,
+    Router, KeyRound, Network, ArrowRight, Sparkles, Zap
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
-import axios from 'axios';
 import Navbar from "@/components/Navbar";
+import { apiClient } from "@/lib/api";
 
-// Ensure this matches your FastAPI address
-const API_URL = "http://localhost:8000/api/wifi";
+// 1. Define Types for API Responses
+interface WifiDetails {
+    ssid: string;
+    password: string;
+}
+
+interface ConnectResponse {
+    message?: string;
+    wifi_details: WifiDetails;
+}
 
 const WifiCustomerPortal = () => {
     const [step, setStep] = useState(1);
     const [network, setNetwork] = useState('Airtel');
     const [guestName, setGuestName] = useState('');
     const [mobile, setMobile] = useState('');
-    const [wifiData, setWifiData] = useState<any>(null);
+
+    const [wifiData, setWifiData] = useState<WifiDetails | null>(null);
+
     const [loading, setLoading] = useState(false);
     const [focusedField, setFocusedField] = useState<string | null>(null);
-
-    // UI State for the connect button feedback
     const [connectStatus, setConnectStatus] = useState<'idle' | 'copied'>('idle');
 
     const cardRef = useRef(null);
     const currentUrl = typeof window !== 'undefined' ? window.location.href : 'http://localhost:3000';
 
     const handleLogin = async () => {
-        if (mobile.length < 10) return;
+        if (mobile.length < 10 || guestName.length < 3) {
+            alert("Please enter a valid name and mobile number");
+            return;
+        }
         setLoading(true);
 
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         try {
-            const res = await axios.post(`${API_URL}/guest/connect`, {
+            // 2. Call API (The generic <ConnectResponse> ensures type safety)
+            const response = await apiClient.post<ConnectResponse>('/wifi/guest/connect', {
                 guest_name: guestName,
                 mobile_number: mobile,
                 network_name: network
             });
 
-            if (res.data && res.data.wifi_details) {
-                setWifiData(res.data.wifi_details);
+            // 3. Since apiClient now returns the parsed JSON directly:
+            if (response && response.wifi_details) {
+                setWifiData(response.wifi_details);
                 setStep(2);
             } else {
-                throw new Error("No data");
+                throw new Error("Invalid response from server");
             }
-        } catch (err) {
-            console.error("Connection Error:", err);
-            // Fallback Mock Data
-            const mockData = {
-                ssid: `TLD_Guest_${network}`,
-                password: Math.random().toString(36).slice(-8).toUpperCase(),
-                network_name: network
-            };
-            setWifiData(mockData);
-            setStep(2);
+
+        } catch (err: any) {
+            console.error("Login Error:", err);
+            // 4. This now works because lib/api.ts constructs 'err.response'
+            const errorMsg = err.response?.data?.detail || err.message || "Unable to fetch credentials.";
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
     };
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(currentUrl);
-    };
-
-    const getWifiQrString = () => {
-        if (!wifiData) return "";
-        // Standard WIFI URI Scheme
-        return `WIFI:S:${wifiData.ssid};T:WPA;P:${wifiData.password};;`;
-    };
-
-    // --- UPDATED DIRECT CONNECT LOGIC ---
     const handleDirectConnect = async () => {
         if (!wifiData) return;
-
-        // 1. Always copy the password to clipboard first (Best UX for iOS/Desktop)
         try {
             await navigator.clipboard.writeText(wifiData.password);
             setConnectStatus('copied');
-
-            // Reset button text after 3 seconds
             setTimeout(() => setConnectStatus('idle'), 3000);
         } catch (err) {
             console.error("Clipboard failed", err);
         }
 
-        // 2. Attempt to launch the WiFi URI Scheme (Works on some Androids)
-        const wifiString = getWifiQrString();
+        // Android/iOS WiFi URI Scheme
+        // Format: WIFI:S:SSID;T:WPA;P:PASSWORD;;
+        const wifiString = `WIFI:S:${wifiData.ssid};T:WPA;P:${wifiData.password};;`;
         window.location.href = wifiString;
-
-        // 3. Show instruction alert if browser blocks the link
-        // We use a small timeout to let the browser attempt the link first
-        setTimeout(() => {
-            // Check if we are on a mobile device roughly
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-            if (!isMobile) {
-                alert(`Password Copied: "${wifiData.password}"\n\nOn a computer, you must manually select the network "${wifiData.ssid}" and paste the password.`);
-            } else {
-                // Determine OS for specific instructions
-                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                if (isIOS) {
-                    alert(`Password Copied!\n\niPhones do not allow direct web connections. Please open Settings > WiFi, select "${wifiData.ssid}" and paste the password.`);
-                }
-                // On Android, if the window.location didn't work, this alert helps
-            }
-        }, 500);
     };
 
     return (
         <>
             <Navbar />
-            <div className="min-h-screen relative overflow-hidden bg-[#F8FAFC] font-sans selection:bg-teal-100 selection:text-teal-900 flex items-center justify-center p-4" style={{ marginTop: '5rem' }}>
-
-                {/* Animated Background Blobs */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-                    <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-                    <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-                </div>
+            <div className="min-h-screen relative overflow-hidden bg-[#F8FAFC] font-sans flex items-center justify-center p-4" style={{ marginTop: '5rem' }}>
 
                 <div className="w-full max-w-5xl z-10 grid lg:grid-cols-12 gap-6 items-start">
 
-                    {/* --- LEFT PANEL --- */}
+                    {/* LEFT PANEL */}
                     <div className="lg:col-span-8 w-full">
                         <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10 relative overflow-hidden transition-all duration-500">
 
-                            {/* Header */}
                             <div className="mb-8">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-[11px] font-bold uppercase tracking-wider">
-                                        <ShieldCheck className="w-3 h-3" /> Secure Portal
-                                    </span>
-                                </div>
                                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                                     The Living Desk
                                 </h1>
                                 <p className="text-gray-500 mt-2 text-lg">
-                                    {step === 1 ? "Connect to our high-speed guest network." : "You are now connected."}
+                                    {step === 1 ? "Connect to our high-speed guest network." : "Here are your access details."}
                                 </p>
                             </div>
 
                             {step === 1 ? (
-                                /* --- STEP 1: FORM --- */
+                                // --- STEP 1: INPUT FORM ---
                                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    {/* Network Selector */}
+                                    {/* Network Selection */}
                                     <div className="space-y-3">
                                         <label className="text-sm font-semibold text-gray-700 ml-1">Select Provider</label>
                                         <div className="grid grid-cols-2 gap-4">
@@ -166,8 +116,8 @@ const WifiCustomerPortal = () => {
                                                     className={`
                                                     relative p-4 rounded-2xl border transition-all duration-300 flex items-center justify-center gap-3
                                                     ${network === net
-                                                            ? 'bg-teal-50 border-teal-200 ring-2 ring-teal-500/20 shadow-lg shadow-red-500/10'
-                                                            : 'bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50 shadow-sm'}
+                                                            ? 'bg-teal-50 border-teal-200 ring-2 ring-teal-500/20 shadow-lg'
+                                                            : 'bg-white border-gray-100 hover:bg-gray-50'}
                                                 `}
                                                 >
                                                     <div className={`p-2 rounded-full ${network === net ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
@@ -176,23 +126,18 @@ const WifiCustomerPortal = () => {
                                                     <span className={`font-semibold ${network === net ? 'text-teal-900' : 'text-gray-600'}`}>
                                                         {net} Fiber
                                                     </span>
-                                                    {network === net && (
-                                                        <div className="absolute top-2 right-2 text-teal-500">
-                                                            <CheckCircle2 size={16} />
-                                                        </div>
-                                                    )}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Inputs */}
+                                    {/* User Inputs */}
                                     <div className="space-y-5">
                                         <InputField
                                             icon={User}
                                             label="Full Name"
                                             value={guestName}
-                                            onChange={(e) => setGuestName(e.target.value)}
+                                            onChange={(e: any) => setGuestName(e.target.value)}
                                             placeholder="Jane Doe"
                                             isFocused={focusedField === 'name'}
                                             onFocus={() => setFocusedField('name')}
@@ -202,7 +147,7 @@ const WifiCustomerPortal = () => {
                                             icon={Smartphone}
                                             label="Mobile Number"
                                             value={mobile}
-                                            onChange={(e) => setMobile(e.target.value)}
+                                            onChange={(e: any) => setMobile(e.target.value)}
                                             placeholder="98765 43210"
                                             type="tel"
                                             isFocused={focusedField === 'mobile'}
@@ -219,13 +164,13 @@ const WifiCustomerPortal = () => {
                                         flex items-center justify-center gap-3 transition-all duration-300 transform active:scale-[0.98]
                                         ${loading
                                                 ? 'bg-gray-400 cursor-wait'
-                                                : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 shadow-teal-500/20 hover:shadow-teal-500/30'}
+                                                : 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500'}
                                     `}
                                     >
                                         {loading ? (
                                             <>
                                                 <Loader2 className="animate-spin w-5 h-5" />
-                                                <span>Generating Access...</span>
+                                                <span>Fetching Credentials...</span>
                                             </>
                                         ) : (
                                             <>
@@ -236,61 +181,58 @@ const WifiCustomerPortal = () => {
                                     </button>
                                 </div>
                             ) : (
-                                /* --- STEP 2: TICKET CARD --- */
+                                // --- STEP 2: CREDENTIALS DISPLAY ---
                                 <div className="animate-in fade-in zoom-in duration-500 w-full flex flex-col items-center">
-
                                     <div className="w-full max-w-md" ref={cardRef}>
-                                        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 relative group hover:shadow-3xl transition-shadow duration-500">
-
-                                            {/* Ticket Header */}
+                                        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 relative group">
+                                            {/* Card Header */}
                                             <div className="bg-gray-900 p-6 flex justify-between items-center relative overflow-hidden">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
                                                 <div className="relative z-10">
                                                     <h2 className="text-white font-bold text-xl tracking-tight">WiFi Access Pass</h2>
-                                                    <p className="text-teal-400 text-xs font-mono mt-1 uppercase tracking-widest">Valid for 24 Hours</p>
                                                 </div>
                                                 <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
                                                     <Wifi className="text-teal-400" size={20} />
                                                 </div>
                                             </div>
 
-                                            {/* Ticket Body */}
-                                            <div className="p-8 relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed">
+                                            {/* Card Body - Displaying Fetched Data */}
+                                            <div className="p-8">
 
-                                                {/* Credentials */}
-                                                <div className="space-y-6">
-                                                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                                            <Network size={14} />
-                                                            <span className="text-[10px] font-bold uppercase tracking-widest">Network SSID</span>
-                                                        </div>
-                                                        <div className="text-xl font-bold text-gray-900">
-                                                            {wifiData?.ssid}
-                                                        </div>
+                                                {/* SSID DISPLAY */}
+                                                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6">
+                                                    <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                                        <Network size={14} />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest">Network Name (SSID)</span>
                                                     </div>
-
-                                                    <div className="group/pass relative">
-                                                        <div className="bg-teal-50 rounded-2xl p-5 border border-teal-100 transition-colors group-hover/pass:border-teal-300">
-                                                            <div className="flex items-center gap-2 text-teal-600 mb-2">
-                                                                <KeyRound size={14} />
-                                                                <span className="text-[10px] font-bold uppercase tracking-widest">Password</span>
-                                                            </div>
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-2xl font-mono font-bold text-teal-900 tracking-wider">
-                                                                    {wifiData?.password}
-                                                                </span>
-                                                                <button
-                                                                    onClick={() => { navigator.clipboard.writeText(wifiData?.password); alert('Password Copied') }}
-                                                                    className="p-2 hover:bg-white rounded-lg text-teal-600 transition-colors"
-                                                                >
-                                                                    <Copy size={18} />
-                                                                </button>
-                                                            </div>
-                                                        </div>
+                                                    <div className="text-xl font-bold text-gray-900">
+                                                        {wifiData?.ssid}
                                                     </div>
                                                 </div>
 
-                                                {/* --- DIRECT CONNECT BUTTON --- */}
+                                                {/* PASSWORD DISPLAY */}
+                                                <div className="bg-teal-50 rounded-2xl p-5 border border-teal-100">
+                                                    <div className="flex items-center gap-2 text-teal-600 mb-2">
+                                                        <KeyRound size={14} />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest">Password</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-2xl font-mono font-bold text-teal-900 tracking-wider">
+                                                            {wifiData?.password}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (wifiData?.password) {
+                                                                    navigator.clipboard.writeText(wifiData.password);
+                                                                    alert('Password Copied');
+                                                                }
+                                                            }}
+                                                            className="p-2 hover:bg-white rounded-lg text-teal-600 transition-colors"
+                                                        >
+                                                            <Copy size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                                 <button
                                                     onClick={handleDirectConnect}
                                                     className={`
@@ -301,10 +243,7 @@ const WifiCustomerPortal = () => {
                                                     `}
                                                 >
                                                     {connectStatus === 'copied' ? (
-                                                        <>
-                                                            <CheckCircle2 size={18} />
-                                                            <span className="font-semibold">Password Copied!</span>
-                                                        </>
+                                                        <span>Password Copied!</span>
                                                     ) : (
                                                         <>
                                                             <Zap size={18} className="text-yellow-400 fill-yellow-400" />
@@ -312,29 +251,6 @@ const WifiCustomerPortal = () => {
                                                         </>
                                                     )}
                                                 </button>
-                                                {/* ----------------------------------- */}
-
-                                                {/* QR Code Section */}
-                                                <div className="mt-8 flex items-center gap-5 pt-6 border-t border-gray-100 border-dashed">
-                                                    <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100">
-                                                        <QRCode
-                                                            value={getWifiQrString()}
-                                                            size={80}
-                                                            viewBox={`0 0 256 256`}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="font-bold text-gray-900 text-sm">Scan to Connect</p>
-                                                        <p className="text-gray-500 text-xs mt-1 leading-relaxed">
-                                                            Open camera or Google Lens. <br />
-                                                            <span className="text-[10px] opacity-70">(iOS users: if link fails, paste password from clipboard)</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Decorative Punch Holes */}
-                                                <div className="absolute -left-3 top-1/2 w-6 h-6 bg-[#F8FAFC] rounded-full"></div>
-                                                <div className="absolute -right-3 top-1/2 w-6 h-6 bg-[#F8FAFC] rounded-full"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -350,10 +266,10 @@ const WifiCustomerPortal = () => {
                         </div>
                     </div>
 
-                    {/* --- RIGHT PANEL (Helper) --- */}
+                    {/* RIGHT PANEL (Helper) */}
                     <div className="lg:col-span-4 w-full h-full">
                         <div className="bg-white/40 backdrop-blur-md border border-white/60 rounded-3xl p-8 h-full flex flex-col justify-center items-center text-center shadow-sm">
-                            <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                            <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mb-6">
                                 {step === 1 ? <Smartphone className="text-teal-600 w-8 h-8" /> : <Sparkles className="text-teal-600 w-8 h-8" />}
                             </div>
 
@@ -361,28 +277,16 @@ const WifiCustomerPortal = () => {
                                 {step === 1 ? "Mobile Access" : "You're Online!"}
                             </h3>
 
-                            <p className="text-gray-500 text-sm mb-8 leading-relaxed px-4">
-                                {step === 1
-                                    ? "Scan the QR code below to open this portal directly on your mobile device."
-                                    : "Enjoy high-speed connection. Please adhere to community guidelines while browsing."
-                                }
-                            </p>
-
-                            <div className="bg-white p-4 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-6 group transition-transform hover:scale-105 duration-300">
+                            <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 mb-6 group transition-transform hover:scale-105 duration-300">
                                 <QRCode
-                                    value={step === 1 ? currentUrl : getWifiQrString()}
+                                    value={
+                                        step === 1
+                                            ? currentUrl
+                                            : `WIFI:S:${wifiData?.ssid};T:WPA;P:${wifiData?.password};;`
+                                    }
                                     size={140}
                                 />
                             </div>
-
-                            {step === 1 && (
-                                <button
-                                    onClick={copyToClipboard}
-                                    className="text-xs font-semibold text-gray-500 hover:text-teal-600 flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white transition-all"
-                                >
-                                    <Copy size={14} /> Copy Portal Link
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -391,12 +295,7 @@ const WifiCustomerPortal = () => {
     );
 };
 
-// Reusable Input Component
-const InputField = ({
-    icon: Icon, label, isFocused, ...props
-}: {
-    icon: any, label: string, isFocused: boolean | null, [key: string]: any
-}) => (
+const InputField = ({ icon: Icon, label, isFocused, ...props }: any) => (
     <div className="group">
         <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1 transition-colors group-hover:text-teal-700">
             {label}

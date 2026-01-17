@@ -2,18 +2,21 @@
 
 /**
  * Get API base URL from environment
+ * Supports Vite (import.meta.env) and standard Node/Next.js (process.env)
  */
 const getApiBase = (): string => {
+  // Check for Vite
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) {
-    // Remove trailing slash from base if present to avoid double slashes later
     return import.meta.env.VITE_API_BASE.replace(/\/$/, '');
   }
+  // Check for Next.js / Node
+  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_BASE) {
+    return process.env.NEXT_PUBLIC_API_BASE.replace(/\/$/, '');
+  }
+
   return 'http://localhost:8000/api'; // Default fallback
 };
 
-/**
- * Get API key from environment
- */
 const getApiKey = (): string | null => {
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_KEY) {
     return import.meta.env.VITE_API_KEY;
@@ -25,18 +28,11 @@ export const API_BASE = getApiBase();
 const API_KEY = getApiKey();
 
 /**
- * Helper to ensure correct URL formatting.
- * UPDATED: No longer forces trailing slashes. Relies on Backend redirects.
+ * Ensures endpoints start with a slash and do not have double slashes when combined
  */
 const normalizeEndpoint = (endpoint: string): string => {
   const [path, query] = endpoint.split('?');
-
-  // Ensure path starts with /
   let safePath = path.startsWith('/') ? path : `/${path}`;
-
-  // Removed the logic that forced a trailing slash. 
-  // We now rely on the Backend 'redirect_slashes=True' to handle mismatches.
-
   return query ? `${safePath}?${query}` : safePath;
 };
 
@@ -53,9 +49,13 @@ export const fetchWithApiKey = async (
     headers.set('Content-Type', 'application/json');
   }
 
-  // Ensure consistent API Key header
   if (API_KEY) {
+    // Standard Custom Header for FastAPI
     headers.set('Api-Key', API_KEY);
+
+    // AWS API Gateway often requires 'x-api-key' specifically. 
+    // Adding both ensures compatibility with both local FastAPI and AWS Gateway auth.
+    headers.set('x-api-key', API_KEY);
   }
 
   return fetch(url, {
@@ -65,36 +65,51 @@ export const fetchWithApiKey = async (
 };
 
 /**
- * Type-safe API client
+ * Helper to parse error response and throw it in a structure 
+ * that matches what the frontend expects (err.response.data).
  */
+const handleResponse = async (response: Response) => {
+  if (!response.ok) {
+    let errorData: any;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { detail: response.statusText };
+    }
+
+    // Create a custom error object that mimics Axios error structure
+    const error: any = new Error(errorData.detail || `HTTP Error ${response.status}`);
+    error.response = {
+      data: errorData,
+      status: response.status,
+      statusText: response.statusText
+    };
+    throw error;
+  }
+
+  // Return null if status is 204 (No Content), otherwise parse JSON
+  if (response.status === 204) return null;
+  return response.json();
+};
+
 export const apiClient = {
   async get<T>(endpoint: string): Promise<T> {
     const safeEndpoint = normalizeEndpoint(endpoint);
     const fullUrl = `${API_BASE}${safeEndpoint}`;
-
-    // Debug log to see exactly what is being requested
-    // console.log(`📡 GET Request: ${fullUrl}`);
-
+    // console.log(`📡 GET Request: ${fullUrl}`); 
     const response = await fetchWithApiKey(fullUrl);
-
-    if (!response.ok) {
-      console.error(`GET ${safeEndpoint} failed:`, response.status, response.statusText);
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async post<T>(endpoint: string, data: any): Promise<T> {
     const safeEndpoint = normalizeEndpoint(endpoint);
-    const response = await fetchWithApiKey(`${API_BASE}${safeEndpoint}`, {
+    const fullUrl = `${API_BASE}${safeEndpoint}`;
+    // console.log(`📡 POST Request: ${fullUrl}`);
+    const response = await fetchWithApiKey(fullUrl, {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      console.error(`POST ${safeEndpoint} failed:`, response.status);
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async patch<T>(endpoint: string, data?: any): Promise<T> {
@@ -103,10 +118,7 @@ export const apiClient = {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     });
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async delete(endpoint: string): Promise<void> {
@@ -114,8 +126,6 @@ export const apiClient = {
     const response = await fetchWithApiKey(`${API_BASE}${safeEndpoint}`, {
       method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
+    return handleResponse(response);
   },
 };

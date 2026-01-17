@@ -28,7 +28,7 @@ const BlogsPage = () => {
     const API_KEY = import.meta.env.VITE_API_KEY || "";
 
     // ✅ UPDATED S3 CONFIGURATION
-    const S3_BUCKET = "thelivingdesk-backend-blogs-313701249911";
+    const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
     const S3_REGION = "ap-south-1";
     const S3_PREFIX = "blogs/";
     const bucketBase = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
@@ -233,8 +233,31 @@ const BlogsPage = () => {
         }
 
         const author = getMeta("author") || "The Living Desk Team";
-        // Use S3 creation date instead of meta tags
-        const date = s3CreatedDate;
+
+        // --- UPDATED DATE LOGIC ---
+        // 1. Try standard meta tags usually found in blogs
+        let internalDate = getMeta("article:published_time") ||
+            getMeta("date") ||
+            getMeta("pubdate") ||
+            getMeta("og:updated_time");
+
+        // 2. Fallback: Try looking for a <time> tag
+        if (!internalDate) {
+            const timeElement = doc.querySelector("time");
+            if (timeElement) {
+                internalDate = timeElement.getAttribute("datetime") || timeElement.textContent;
+            }
+        }
+
+        // 3. Validation: If we found a date string, check if it's valid
+        let finalDate = s3CreatedDate;
+        if (internalDate) {
+            const parsed = new Date(internalDate);
+            if (!isNaN(parsed.getTime())) {
+                finalDate = parsed.toISOString();
+            }
+        }
+
         const slug = fileName.replace(".html", "") || id;
         const tags = getMeta("keywords") ? getMeta("keywords")!.split(",").map((t) => t.trim()) : ["Coworking"];
 
@@ -246,8 +269,8 @@ const BlogsPage = () => {
             content: description,
             image_url: image!,
             author,
-            created_at: date,
-            published_at: date,
+            created_at: finalDate, // Using the resolved date
+            published_at: finalDate, // Using the resolved date
             status: "published",
             tags,
             htmlUrl: key

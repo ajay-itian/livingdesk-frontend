@@ -7,9 +7,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Phone, Mail, Clock, MessageCircle, Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
-// Use environment variable for API URL or fallback to localhost
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { apiClient } from "@/lib/api"; // Import the shared API client
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -27,25 +25,21 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      // Sending data to your FastAPI Backend
-      const response = await fetch(`${API_URL}/api/contact/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to send message');
-      }
+      // Use apiClient.post
+      // The base URL (/api) is handled automatically. 
+      // We just pass the endpoint '/contact/'.
+      await apiClient.post('/contact/', formData);
 
       toast.success("Thank you! We'll get back to you soon.");
       setFormData({ name: '', email: '', phone: '', service: '', message: '' });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error("Failed to send message. Please try again or contact us directly.");
+
+    } catch (err: any) {
+      console.error('Error sending message:', err);
+
+      // Extract specific error message from the backend response if available
+      const errorMessage = err.response?.data?.detail || "Failed to send message. Please try again.";
+      toast.error(errorMessage);
+
     } finally {
       setLoading(false);
     }

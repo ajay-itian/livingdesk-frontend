@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, Users, Calendar, Send, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import Navbar from "@/components/Navbar";
+import { apiClient } from "@/lib/api";
 
 interface FormData {
     name: string;
@@ -36,24 +37,20 @@ const VisitorSurveyForm = () => {
         setLoading(true);
         setError('');
 
-        // Simulate network delay for UI demonstration
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/visitor/survey`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) throw new Error('Failed to submit survey');
+            // 1. Use apiClient (Handles Base URL, JSON stringifying, and Headers automatically)
+            // Note: We remove '/api' from the path because API_BASE usually includes it.
+            await apiClient.post('/visitor/survey', formData);
 
             setSuccess(true);
             setFormData({ name: '', email: '', phone_number: '', address: '', team_size: '', expected_date: '' });
 
-        } catch (err) {
-            console.error(err);
-            setSuccess(true); // Remove this in production if you want real error handling
+        } catch (err: any) {
+            console.error("Survey Error:", err);
+
+            // 2. Extract error message safely using the enhanced error object from lib/api
+            const errorMessage = err.response?.data?.detail || err.message || 'Failed to submit survey. Please try again.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -61,9 +58,9 @@ const VisitorSurveyForm = () => {
 
     if (success) {
         return (
-            <> {/* <--- WRAPPED IN FRAGMENT */}
+            <>
                 <Navbar />
-                <div className="min-h-screen  relative overflow-hidden bg-[#F8FAFC] font-sans selection:bg-teal-100 selection:text-teal-900 flex items-center justify-center p-4" style={{ marginTop: '5rem' }}>
+                <div className="min-h-screen relative overflow-hidden bg-[#F8FAFC] font-sans selection:bg-teal-100 selection:text-teal-900 flex items-center justify-center p-4" style={{ marginTop: '5rem' }}>
                     <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 text-center animate-in fade-in zoom-in duration-500">
                         <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <CheckCircle2 className="w-10 h-10 text-emerald-500" />
@@ -85,7 +82,7 @@ const VisitorSurveyForm = () => {
     }
 
     return (
-        <> {/* <--- WRAPPED IN FRAGMENT */}
+        <>
             <Navbar />
             <div className="min-h-screen mt-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans selection:bg-indigo-100 selection:text-indigo-900">
                 {/* Background Decorative Elements */}
@@ -109,7 +106,7 @@ const VisitorSurveyForm = () => {
                     </div>
 
                     {error && (
-                        <div className="mx-8 mt-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
+                        <div className="mx-8 mt-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2 animate-in slide-in-from-top-2">
                             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             {error}
                         </div>
