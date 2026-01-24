@@ -98,7 +98,12 @@ const Contact = () => {
                     disabled={loading}
                   />
                 </div>
-                <div>
+
+                {/* Modified Phone Input Section */}
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
+                    +91
+                  </span>
                   <Input
                     name="phone"
                     type="tel"
@@ -107,8 +112,10 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    className="pl-10" // Added padding to prevent text overlap with +91
                   />
                 </div>
+
                 <div>
                   <Label htmlFor="service">Service Interested In</Label>
                   <Select

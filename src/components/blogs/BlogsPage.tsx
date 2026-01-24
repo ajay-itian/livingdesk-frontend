@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, ExternalLink, Share2, Loader2, BookOpen, Clock, ArrowRight, Eye, Heart } from "lucide-react";
+import { Calendar, Share2, Loader2, Clock, ArrowRight, Eye, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,13 +27,11 @@ const BlogsPage = () => {
     const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
     const API_KEY = import.meta.env.VITE_API_KEY || "";
 
-    // ✅ UPDATED S3 CONFIGURATION
     const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
     const S3_REGION = "ap-south-1";
     const S3_PREFIX = "blogs/";
     const bucketBase = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
 
-    // Fallback images (prevents "Same Image" bug)
     const FALLBACK_IMAGES = [
         "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
         "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800",
@@ -57,9 +55,6 @@ const BlogsPage = () => {
                 fetchS3Blogs(),
                 fetchBlogStats()
             ]);
-
-            console.log("📊 Blog Stats from API:", blogStats);
-            console.log("📁 S3 Blogs:", s3Blogs.map(b => ({ id: b.id, title: b.title })));
 
             // 2. Merge Data
             const mergedBlogs = s3Blogs.map(blog => {
@@ -99,26 +94,31 @@ const BlogsPage = () => {
                 }
             });
 
-            if (!res.ok) {
-                console.error(`❌ Stats API returned ${res.status}: ${res.statusText}`);
-                return {};
-            }
-
-            const stats = await res.json();
-            return stats;
+            if (!res.ok) return {};
+            return await res.json();
         } catch (e) {
             console.error("❌ Failed to fetch stats:", e);
             return {};
         }
     };
 
-    // --- Action: Increment View ---
+    // --- Action: Increment View (Optimistic) ---
     const incrementView = async (blog: ExtendedBlog) => {
+        // 1. Optimistic Update
+        setBlogs(prev =>
+            prev.map(b =>
+                b.id === blog.id ? { ...b, views: (b.views || 0) + 1 } : b
+            )
+        );
+
+        // 2. API Call (Background)
         try {
             if (blog.id) {
+                // Use keepalive:true because we are opening a new tab/window
                 fetch(`${API_BASE}/blogs/${blog.id}/view`, {
                     method: "POST",
-                    headers: { "x-api-key": API_KEY }
+                    headers: { "x-api-key": API_KEY },
+                    keepalive: true
                 });
             }
         } catch (e) {
@@ -126,11 +126,12 @@ const BlogsPage = () => {
         }
     };
 
-    // --- Action: Handle Like ---
+    // --- Action: Handle Like (Optimistic) ---
     const handleLike = async (e: React.MouseEvent, blog: ExtendedBlog) => {
         e.stopPropagation();
         if (blog.isLiked) return;
 
+        // 1. Optimistic Update
         setBlogs(prev =>
             prev.map(b =>
                 b.id === blog.id
@@ -139,8 +140,10 @@ const BlogsPage = () => {
             )
         );
 
+        // 2. Save to Local Storage
         if (blog.id) localStorage.setItem(`liked_${blog.id}`, 'true');
 
+        // 3. API Call
         try {
             if (blog.id) {
                 await fetch(`${API_BASE}/blogs/${blog.id}/like`, {
@@ -150,20 +153,19 @@ const BlogsPage = () => {
             }
         } catch (err) {
             console.error("❌ Failed to like:", err);
+            // Optional: Revert state if necessary, but rarely needed for likes
         }
     };
 
     // --- S3 Parsing Logic ---
     const fetchS3Blogs = async (): Promise<ExtendedBlog[]> => {
-        // Fetch XML list of objects
         const listUrl = `${bucketBase}?list-type=2&prefix=${S3_PREFIX}&t=${Date.now()}`;
         const res = await fetch(listUrl);
-        if (!res.ok) throw new Error(`Unable to access S3 Bucket. Check CORS/Permissions. Status: ${res.status}`);
+        if (!res.ok) throw new Error(`Unable to access S3 Bucket.`);
 
         const xmlText = await res.text();
         const xml = new DOMParser().parseFromString(xmlText, "text/xml");
 
-        // Extract S3 metadata including LastModified dates
         const contents = Array.from(xml.getElementsByTagName("Contents"));
         const s3Metadata = new Map();
 
@@ -222,10 +224,6 @@ const BlogsPage = () => {
             if (featuredImg) image = featuredImg.src;
         }
         if (!image) image = getMeta("og:image") || getMeta("image");
-        if (!image) {
-            const firstImg = doc.querySelector('img') as HTMLImageElement;
-            if (firstImg) image = firstImg.src;
-        }
         if (!image || image.includes("onerror")) {
             let hash = 0;
             for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
@@ -233,61 +231,42 @@ const BlogsPage = () => {
         }
 
         const author = getMeta("author") || "The Living Desk Team";
+        let internalDate = getMeta("article:published_time") || getMeta("date") || getMeta("pubdate");
 
-        // --- UPDATED DATE LOGIC ---
-        // 1. Try standard meta tags usually found in blogs
-        let internalDate = getMeta("article:published_time") ||
-            getMeta("date") ||
-            getMeta("pubdate") ||
-            getMeta("og:updated_time");
-
-        // 2. Fallback: Try looking for a <time> tag
         if (!internalDate) {
             const timeElement = doc.querySelector("time");
-            if (timeElement) {
-                internalDate = timeElement.getAttribute("datetime") || timeElement.textContent;
-            }
+            if (timeElement) internalDate = timeElement.getAttribute("datetime") || timeElement.textContent;
         }
 
-        // 3. Validation: If we found a date string, check if it's valid
         let finalDate = s3CreatedDate;
         if (internalDate) {
             const parsed = new Date(internalDate);
-            if (!isNaN(parsed.getTime())) {
-                finalDate = parsed.toISOString();
-            }
+            if (!isNaN(parsed.getTime())) finalDate = parsed.toISOString();
         }
 
-        const slug = fileName.replace(".html", "") || id;
         const tags = getMeta("keywords") ? getMeta("keywords")!.split(",").map((t) => t.trim()) : ["Coworking"];
 
         return {
             id,
-            slug,
+            slug: fileName.replace(".html", ""),
             title,
             excerpt: description,
             content: description,
             image_url: image!,
             author,
-            created_at: finalDate, // Using the resolved date
-            published_at: finalDate, // Using the resolved date
+            created_at: finalDate,
+            published_at: finalDate,
             status: "published",
             tags,
             htmlUrl: key
         };
     };
 
-    // --- Interaction Handlers ---
     const getPublicUrl = (blog: ExtendedBlog) => `${bucketBase}/${blog.htmlUrl}`;
 
     const openBlog = (blog: ExtendedBlog) => {
         incrementView(blog);
         window.open(getPublicUrl(blog), "_blank", "noopener,noreferrer");
-        setBlogs(prev =>
-            prev.map(b =>
-                b.id === blog.id ? { ...b, views: (b.views || 0) + 1 } : b
-            )
-        );
     };
 
     const handleShare = async (e: React.MouseEvent, blog: ExtendedBlog) => {
@@ -305,24 +284,15 @@ const BlogsPage = () => {
     };
 
     const formatDate = (d: string) =>
-        new Date(d).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric"
-        });
+        new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 
-    const getReadTime = (text: string) =>
-        Math.max(3, Math.ceil(text.split(/\s+/).length / 200) + 2);
+    const getReadTime = (text: string) => Math.max(3, Math.ceil(text.split(/\s+/).length / 200) + 2);
 
     return (
         <>
             <Navbar />
             <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 pt-24 pb-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
-
-
-                    {/* Content */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 space-y-4">
                             <Loader2 className="w-12 h-12 animate-spin text-primary" />
@@ -331,9 +301,6 @@ const BlogsPage = () => {
                     ) : error ? (
                         <div className="text-center py-20 space-y-4">
                             <p className="text-red-500 text-lg">{error}</p>
-                            <p className="text-sm text-muted-foreground">
-                                Check console (F12) for CORS/Network errors.
-                            </p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -346,15 +313,12 @@ const BlogsPage = () => {
                                     className="cursor-pointer group overflow-hidden border-border/50 bg-card hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                                 >
                                     <CardContent className="p-0">
-                                        {/* Image */}
                                         <div className="relative overflow-hidden h-56 bg-gradient-to-br from-primary/20 to-primary/5">
                                             <img
                                                 src={blog.image_url}
                                                 alt={blog.title}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = FALLBACK_IMAGES[0];
-                                                }}
+                                                onError={(e) => { e.currentTarget.src = FALLBACK_IMAGES[0]; }}
                                             />
                                             <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
@@ -362,35 +326,22 @@ const BlogsPage = () => {
                                             </div>
                                         </div>
 
-                                        {/* Content */}
                                         <div className="p-6 space-y-4">
-                                            {/* Meta */}
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <Calendar className="w-3 h-3" />
                                                 {formatDate(blog.published_at)}
                                             </div>
 
-                                            {/* Title */}
                                             <h3 className="text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors">
                                                 {blog.title}
                                             </h3>
 
-                                            {/* Excerpt */}
                                             <p className="text-sm text-muted-foreground line-clamp-3">
                                                 {blog.excerpt}
                                             </p>
 
-                                            {/* Actions */}
                                             <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="group/btn"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openBlog(blog);
-                                                    }}
-                                                >
+                                                <Button variant="ghost" size="sm" className="group/btn" onClick={(e) => { e.stopPropagation(); openBlog(blog); }}>
                                                     Read
                                                     <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
                                                 </Button>
@@ -404,23 +355,14 @@ const BlogsPage = () => {
                                                     >
                                                         <Heart className={`w-4 h-4 ${blog.isLiked ? 'fill-current' : ''}`} />
                                                     </Button>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {blog.likes || 0}
-                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">{blog.likes || 0}</span>
 
                                                     <Button variant="ghost" size="icon" className="h-8 w-8">
                                                         <Eye className="w-4 h-4" />
                                                     </Button>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {blog.views?.toLocaleString() || 0}
-                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">{blog.views?.toLocaleString() || 0}</span>
 
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        onClick={(e) => handleShare(e, blog)}
-                                                    >
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => handleShare(e, blog)}>
                                                         <Share2 className="w-4 h-4" />
                                                     </Button>
                                                 </div>
@@ -432,11 +374,8 @@ const BlogsPage = () => {
                         </div>
                     )}
 
-                    {/* CTA Section */}
                     <div className="mt-20 text-center bg-gradient-to-r from-primary/10 via-primary/5 to-background rounded-2xl p-12 border border-primary/20">
-                        <h2 className="text-3xl font-bold mb-4">
-                            Ready to Transform Your Workspace?
-                        </h2>
+                        <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Workspace?</h2>
                         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
                             Join our community of innovators and experience the future of work.
                         </p>

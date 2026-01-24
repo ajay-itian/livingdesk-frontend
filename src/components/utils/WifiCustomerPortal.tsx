@@ -18,9 +18,17 @@ interface ConnectResponse {
     wifi_details: WifiDetails;
 }
 
+// 2. Define Providers
+// CRITICAL: The 'id' must exist in your Database under 'network_name'
+const PROVIDERS = [
+    { id: 'CITYLINK', label: 'Citylink', display: 'Citylink Fiber' }, // Moved to top as default since it exists in DB
+    { id: 'AIRTEL', label: 'Airtel', display: 'Airtel Fiber' }        // Will crash if not added to DB
+];
+
 const WifiCustomerPortal = () => {
+    // Default to 'CITYLINK' to avoid the "NoneType" error on initial test
     const [step, setStep] = useState(1);
-    const [network, setNetwork] = useState('Airtel');
+    const [network, setNetwork] = useState(PROVIDERS[0].id);
     const [guestName, setGuestName] = useState('');
     const [mobile, setMobile] = useState('');
 
@@ -41,14 +49,18 @@ const WifiCustomerPortal = () => {
         setLoading(true);
 
         try {
-            // 2. Call API (The generic <ConnectResponse> ensures type safety)
+            console.log("Sending Payload:", {
+                guest_name: guestName,
+                mobile_number: mobile,
+                network_name: network
+            });
+
             const response = await apiClient.post<ConnectResponse>('/wifi/guest/connect', {
                 guest_name: guestName,
                 mobile_number: mobile,
                 network_name: network
             });
 
-            // 3. Since apiClient now returns the parsed JSON directly:
             if (response && response.wifi_details) {
                 setWifiData(response.wifi_details);
                 setStep(2);
@@ -58,9 +70,14 @@ const WifiCustomerPortal = () => {
 
         } catch (err: any) {
             console.error("Login Error:", err);
-            // 4. This now works because lib/api.ts constructs 'err.response'
-            const errorMsg = err.response?.data?.detail || err.message || "Unable to fetch credentials.";
-            alert(errorMsg);
+            // Improved error messaging for the user
+            const backendDetail = err.response?.data?.detail;
+            if (backendDetail && backendDetail.includes("NoneType")) {
+                alert("System Error: The selected network is not configured in the database.");
+            } else {
+                const errorMsg = backendDetail || err.message || "Unable to fetch credentials.";
+                alert(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -77,7 +94,6 @@ const WifiCustomerPortal = () => {
         }
 
         // Android/iOS WiFi URI Scheme
-        // Format: WIFI:S:SSID;T:WPA;P:PASSWORD;;
         const wifiString = `WIFI:S:${wifiData.ssid};T:WPA;P:${wifiData.password};;`;
         window.location.href = wifiString;
     };
@@ -109,22 +125,22 @@ const WifiCustomerPortal = () => {
                                     <div className="space-y-3">
                                         <label className="text-sm font-semibold text-gray-700 ml-1">Select Provider</label>
                                         <div className="grid grid-cols-2 gap-4">
-                                            {['Airtel', 'Citylink'].map((net) => (
+                                            {PROVIDERS.map((provider) => (
                                                 <button
-                                                    key={net}
-                                                    onClick={() => setNetwork(net)}
+                                                    key={provider.id}
+                                                    onClick={() => setNetwork(provider.id)}
                                                     className={`
                                                     relative p-4 rounded-2xl border transition-all duration-300 flex items-center justify-center gap-3
-                                                    ${network === net
+                                                    ${network === provider.id
                                                             ? 'bg-teal-50 border-teal-200 ring-2 ring-teal-500/20 shadow-lg'
                                                             : 'bg-white border-gray-100 hover:bg-gray-50'}
                                                 `}
                                                 >
-                                                    <div className={`p-2 rounded-full ${network === net ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                                    <div className={`p-2 rounded-full ${network === provider.id ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
                                                         <Router size={18} />
                                                     </div>
-                                                    <span className={`font-semibold ${network === net ? 'text-teal-900' : 'text-gray-600'}`}>
-                                                        {net} Fiber
+                                                    <span className={`font-semibold ${network === provider.id ? 'text-teal-900' : 'text-gray-600'}`}>
+                                                        {provider.display}
                                                     </span>
                                                 </button>
                                             ))}
@@ -185,7 +201,6 @@ const WifiCustomerPortal = () => {
                                 <div className="animate-in fade-in zoom-in duration-500 w-full flex flex-col items-center">
                                     <div className="w-full max-w-md" ref={cardRef}>
                                         <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 relative group">
-                                            {/* Card Header */}
                                             <div className="bg-gray-900 p-6 flex justify-between items-center relative overflow-hidden">
                                                 <div className="relative z-10">
                                                     <h2 className="text-white font-bold text-xl tracking-tight">WiFi Access Pass</h2>
@@ -195,10 +210,7 @@ const WifiCustomerPortal = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Card Body - Displaying Fetched Data */}
                                             <div className="p-8">
-
-                                                {/* SSID DISPLAY */}
                                                 <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6">
                                                     <div className="flex items-center gap-2 text-gray-400 mb-1">
                                                         <Network size={14} />
@@ -209,7 +221,6 @@ const WifiCustomerPortal = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* PASSWORD DISPLAY */}
                                                 <div className="bg-teal-50 rounded-2xl p-5 border border-teal-100">
                                                     <div className="flex items-center gap-2 text-teal-600 mb-2">
                                                         <KeyRound size={14} />
@@ -272,11 +283,9 @@ const WifiCustomerPortal = () => {
                             <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full flex items-center justify-center mb-6">
                                 {step === 1 ? <Smartphone className="text-teal-600 w-8 h-8" /> : <Sparkles className="text-teal-600 w-8 h-8" />}
                             </div>
-
                             <h3 className="text-xl font-bold text-gray-900 mb-3">
                                 {step === 1 ? "Mobile Access" : "You're Online!"}
                             </h3>
-
                             <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 mb-6 group transition-transform hover:scale-105 duration-300">
                                 <QRCode
                                     value={

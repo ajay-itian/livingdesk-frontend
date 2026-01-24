@@ -12,8 +12,8 @@ const Footer = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Admin credentials
-  const ADMIN_USERNAME = "thelivingdesk@admin.com";
-  const ADMIN_PASSWORD = "living2026";
+  const ADMIN_USERNAME = "livingdesk@admin.com";
+  const ADMIN_PASSWORD = "livingdesk2026";
 
   // Method 1: Logo Click Pattern (Triple Click)
   const handleLogoClick = () => {
@@ -247,7 +247,7 @@ const Footer = () => {
                   onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                   onKeyPress={handleKeyPress}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-800"
-                  placeholder="thelivingdesk@admin.com"
+                  placeholder="enter the admin email"
                   disabled={isLoading}
                   autoComplete="username"
                 />
