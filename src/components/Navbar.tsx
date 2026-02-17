@@ -7,9 +7,56 @@ import logo from "@/assets/logo.webp";
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  const [isInOfficePremises, setIsInOfficePremises] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Office location coordinates
+  const OFFICE_LAT = 18.5921498;
+  const OFFICE_LNG = 73.8001093;
+  const OFFICE_RADIUS = 500; // meters - adjust this based on your office size
+
+  // Calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Distance in meters
+  };
+
+  // Check user location on component mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const distance = calculateDistance(
+            latitude,
+            longitude,
+            OFFICE_LAT,
+            OFFICE_LNG
+          );
+
+          console.log(`Distance from office: ${distance.toFixed(2)} meters`);
+          setIsInOfficePremises(distance <= OFFICE_RADIUS);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          // User denied location or error occurred - hide wifi link
+          setIsInOfficePremises(false);
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     setIsOpen(false);
@@ -79,12 +126,11 @@ const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
             <Link to="/blogs" onClick={close} className="text-foreground transition-colors">Blogs</Link>
             <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
-            <Link to="/wifi" onClick={close} className="text-foreground transition-colors">Wifi</Link>
+            {isInOfficePremises && (
+              <Link to="/wifi" onClick={close} className="text-foreground transition-colors">Wifi</Link>
+            )}
             <button onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
             <Button onClick={() => scrollToSection("contact")} type="button">Get Started</Button>
-
-
-
           </div>
 
           {/* Mobile Menu Button */}
@@ -107,7 +153,9 @@ const Navbar: React.FC = () => {
               <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
               <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>
               <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
-              <Link to="/wifi" onClick={close} className="text-foreground text-left">Wifi</Link>
+              {isInOfficePremises && (
+                <Link to="/wifi" onClick={close} className="text-foreground text-left">Wifi</Link>
+              )}
               <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
               <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>
             </div>
