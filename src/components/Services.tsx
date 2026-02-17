@@ -1,12 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Users, Briefcase, Coffee } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import privateOfficeImage from "@/assets/private-office.webp";
 import meetingRoomImage from "@/assets/meeting-room.webp";
 import dedicatedDeskImage from "@/assets/dedicated-desk.webp";
-import managedOfficeImage from "@/assets/managed-office.webp";
-import heroImage from "@/assets/hero-coworking.webp";
+import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
 
-const services = [
+// Define interface for Service item (optional if using TypeScript)
+interface ServiceItem {
+  icon: any;
+  title: string;
+  description: string;
+  image: string;
+  path?: string; // Optional path property
+}
+
+const services: ServiceItem[] = [
   {
     icon: Building2,
     title: "Private Offices",
@@ -35,11 +44,14 @@ const services = [
     icon: Building2,
     title: "Managed Office",
     description: "Fully managed office solutions with complete setup, maintenance, and premium services.",
-    image: heroImage,
+    image: VTPAltitude,
+    path: "/managed-offices", // 2. Add the path here
   },
 ];
 
 const Services = () => {
+  const navigate = useNavigate(); // 3. Initialize hook
+
   return (
     <section id="services" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
@@ -54,7 +66,10 @@ const Services = () => {
           {services.map((service, index) => (
             <Card
               key={index}
-              className="overflow-hidden hover:shadow-lg transition-all duration-300 group"
+              // 4. Handle click navigation
+              onClick={() => service.path && navigate(service.path)}
+              className={`overflow-hidden hover:shadow-lg transition-all duration-300 group ${service.path ? "cursor-pointer hover:ring-2 ring-primary/50" : ""
+                }`}
             >
               <div className="relative h-48 overflow-hidden">
                 <img

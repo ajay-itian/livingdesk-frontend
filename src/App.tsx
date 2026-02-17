@@ -13,6 +13,7 @@ const BlogsPage = lazy(() => import("./components/blogs/BlogsPage"));
 const Community = lazy(() => import("./components/Community"));
 const WifiCardApp = lazy(() => import("./components/utils/WifiCustomerPortal"));
 const VisitorSurveyForm = lazy(() => import("./components/utils/VisitorSurveyForm"));
+const ManagedOffices = lazy(() => import("./components/features/offices/ManagedOffices"));
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/survey" element={<VisitorSurveyForm />} />
             <Route path="/wifi" element={<WifiCardApp />} />
             <Route path="/visitor-survey" element={<VisitorSurveyForm />} />
+            <Route path="/managed-offices" element={<ManagedOffices />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

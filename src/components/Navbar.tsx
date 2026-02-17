@@ -121,6 +121,7 @@ const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection("home")} className="text-foreground transition-colors">Home</button>
             <button onClick={() => scrollToSection("services")} className="text-foreground transition-colors">Services</button>
             <Link to="/booking" onClick={close} className="text-foreground transition-colors">Booking</Link>
+            <Link to="/managed-offices" onClick={close} className="text-foreground text-left">Managed Offices</Link>
             <button onClick={() => scrollToSection("pricing")} className="text-foreground transition-colors">Pricing</button>
             <button onClick={() => scrollToSection("gallery")} className="text-foreground transition-colors">Gallery</button>
             <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
@@ -149,6 +150,7 @@ const Navbar: React.FC = () => {
               <button onClick={() => scrollToSection("services")} className="text-foreground text-left">Services</button>
               <Link to="/booking" onClick={close} className="text-foreground text-left">Booking</Link>
               <button onClick={() => scrollToSection("pricing")} className="text-foreground text-left">Pricing</button>
+              <Link to="/managed-offices" onClick={close} className="text-foreground text-left">Managed Offices</Link>
               <button onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
               <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
               <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>

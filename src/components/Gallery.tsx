@@ -7,6 +7,8 @@ import heroImage from "@/assets/hero-coworking.webp";
 import privateCabin from "@/assets/private-office.webp";
 import meetingRoom from "@/assets/meeting-room.webp";
 import dedicatedDesk from "@/assets/dedicated-desk.webp";
+import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
+
 // 1. Import DialogTitle here
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
@@ -61,7 +63,7 @@ const Gallery = () => {
           <DialogContent className="max-w-4xl p-0 bg-transparent border-none">
             {/* 2. Add DialogTitle with sr-only class to hide it visually but keep it accessible */}
             <DialogTitle className="sr-only">Gallery Image Preview</DialogTitle>
-            
+
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
