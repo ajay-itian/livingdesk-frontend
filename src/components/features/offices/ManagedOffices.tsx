@@ -52,9 +52,9 @@ const locations: OfficeLocation[] = [
         name: 'VTP Altitude',
         address: '18/6, Aundh - Ravet BRTS Rd, Pawar Nagar, Mangal Nagar, Wakad, Pune 411033',
         image: VTPAltitude,
-        capacity: '30 - 35 Seats',
-        size: '580 sq.ft',
-        amenities: ['High-Speed Wifi', 'Conference Rooms', 'Valet Parking'],
+        capacity: '20 - 25 Seats - 1 Cabin',
+        size: '880 sq.ft',
+        amenities: ['High-Speed Wifi', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
         price: 'Starting ₹6,500/seat',
         gallery: [
             VTPAltitude, VTPAltitude4, featureplan, VTPAltitude1,

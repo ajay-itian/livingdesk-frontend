@@ -223,7 +223,12 @@ const Contact = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button
-                onClick={() => window.open('https://web.whatsapp.com/send?phone=917066002650&text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.', '_blank')}
+                onClick={() =>
+                  window.open(
+                    "https://wa.me/917066002650?text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.",
+                    "_blank"
+                  )
+                }
                 className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
