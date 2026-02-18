@@ -223,17 +223,25 @@ const Contact = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button
-                onClick={() =>
-                  window.open(
-                    "https://wa.me/917066002650?text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.",
-                    "_blank"
-                  )
-                }
+                onClick={() => {
+                  const phone = "917066002650";
+                  const msg = "Hello! I'm interested in your coworking space.";
+                  const encoded = encodeURIComponent(msg);
+
+                  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+                  if (isMobile) {
+                    window.location.href = `whatsapp://send?phone=${phone}&text=${encoded}`;
+                  } else {
+                    window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank");
+                  }
+                }}
                 className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
                 Chat on WhatsApp
               </Button>
+
 
               <Button
                 onClick={() => window.open('https://www.google.com/maps/place/Office+607,608,609,+Vision+Flora,+Kunal+Icon+Rd,+in+front+of+PCMC+ground,+Siddhivinayak+Ginger+Society,+Siddhivinayak+Ginger,+Pimple+Saudagar,+Pune,+Pimpri-Chinchwad,+Maharashtra+411027/@18.5921498,73.7589091,17z/data=!4m8!3m7!1s0x3bc2b9a2c94a9e1d:0xe5e8d937f600f662!8m2!3d18.5921498!4d73.758909!9m1!1b1!16s%2Fg%2F11y4g5fwh4?entry=ttu', '_blank')}
