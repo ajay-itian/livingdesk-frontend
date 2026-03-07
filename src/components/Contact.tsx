@@ -47,8 +47,7 @@ const Contact = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
+      ...prev, [e.target.name]: e.target.value
     }));
   };
 
@@ -187,9 +186,12 @@ const Contact = () => {
                   Phone
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <a href="tel:+917066002650" className="text-muted-foreground hover:text-primary">
+              <CardContent className="flex flex-col space-y-2">
+                <a href="tel:+917066002650" className="text-muted-foreground hover:text-primary transition-colors inline-block">
                   +91 70660 02650
+                </a>
+                <a href="tel:+919595910945" className="text-muted-foreground hover:text-primary transition-colors inline-block">
+                  +91 95959 10945
                 </a>
               </CardContent>
             </Card>
@@ -224,7 +226,7 @@ const Contact = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button
                 onClick={() => {
-                  const phone = "917066002650";
+                  const phone = "917066002650"; // Primary number for WhatsApp
                   const msg = "Hello! I'm interested in your coworking space.";
                   const encoded = encodeURIComponent(msg);
 
