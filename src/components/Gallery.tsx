@@ -3,11 +3,11 @@ import gallery1 from "@/assets/gallery-1.webp";
 import gallery2 from "@/assets/gallery-2.webp";
 import gallery3 from "@/assets/gallery-3.webp";
 import gallery4 from "@/assets/gallery-4.webp";
-import heroImage from "@/assets/hero-coworking.webp";
-import privateCabin from "@/assets/private-office.webp";
-import meetingRoom from "@/assets/meeting-room.webp";
-import dedicatedDesk from "@/assets/dedicated-desk.webp";
-import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
+import Cabin1 from '@/assets/CABIN_1.webp';
+import hot_desk from '@/assets/hot_desk.webp';
+import balcony from '@/assets/balcony.webp';
+import cover_view from '@/assets/cover_view.webp';
+
 
 // 1. Import DialogTitle here
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -21,10 +21,10 @@ const Gallery = () => {
     { src: gallery2, alt: "The Living Desk workspace view 2" },
     { src: gallery3, alt: "The Living Desk workspace view 3" },
     { src: gallery4, alt: "The Living Desk workspace view 4" },
-    { src: heroImage, alt: "The Living Desk modern coworking space" },
-    { src: privateCabin, alt: "Private office cabin" },
-    { src: meetingRoom, alt: "Meeting room facilities" },
-    { src: dedicatedDesk, alt: "Dedicated desk workspace" },
+    { src: Cabin1, alt: "The Living Desk modern coworking space" },
+    { src: hot_desk, alt: "Private office cabin" },
+    { src: balcony, alt: "Meeting room facilities" },
+    { src: cover_view, alt: "Dedicated desk workspace" },
   ];
 
   return (

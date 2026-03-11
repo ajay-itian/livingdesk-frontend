@@ -5,6 +5,15 @@ import privateOfficeImage from "@/assets/private-office.webp";
 import meetingRoomImage from "@/assets/meeting-room.webp";
 import dedicatedDeskImage from "@/assets/dedicated-desk.webp";
 import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
+import gallery1 from "@/assets/gallery-1.webp";
+import gallery2 from "@/assets/gallery-2.webp";
+import gallery3 from "@/assets/gallery-3.webp";
+import gallery4 from "@/assets/gallery-4.webp";
+import Cabin1 from '@/assets/CABIN_1.webp';
+import Cabin2 from '@/assets/CABIN_2.webp';
+import Cabin3 from '@/assets/CABIN_3.webp';
+import Conferenece from '@/assets/CONFERENECE.webp';
+import hot_desk from '@/assets/hot_desk.webp';
 
 // Define interface for Service item (optional if using TypeScript)
 interface ServiceItem {
@@ -20,25 +29,25 @@ const services: ServiceItem[] = [
     icon: Building2,
     title: "Private Offices",
     description: "Fully furnished private office spaces for teams of all sizes with 24/7 access and premium amenities.",
-    image: privateOfficeImage,
+    image: Cabin2,
   },
   {
     icon: Users,
     title: "Meeting Rooms",
     description: "Professional meeting rooms equipped with the latest technology for presentations and collaborations.",
-    image: meetingRoomImage,
+    image: Cabin1,
   },
   {
     icon: Briefcase,
     title: "Dedicated Desks",
     description: "Your own dedicated desk in our vibrant coworking community with all the amenities you need.",
-    image: dedicatedDeskImage,
+    image: Cabin3,
   },
   {
     icon: Coffee,
     title: "Hot Desks",
     description: "Flexible hot desk workspace solutions perfect for freelancers and remote workers.",
-    image: privateOfficeImage,
+    image: hot_desk,
   },
   {
     icon: Building2,

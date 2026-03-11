@@ -30,6 +30,15 @@ import VTPInner3 from '@/assets/VTP/VTP_Inner3.webp';
 import VTPInner4 from '@/assets/VTP/VTP_Inner4.webp';
 import VTPInner5 from '@/assets/VTP/VTP_Inner02.webp';
 
+import Punawale1 from '@/assets/PUNAWALE/Sai_Punawale.webp'
+import Punawale2 from '@/assets/PUNAWALE/PUNAWALE_1.webp'
+import Punawale3 from '@/assets/PUNAWALE/PUNAWALE_2.webp'
+import Punawale4 from '@/assets/PUNAWALE/PUNAWALE_3.webp'
+import Punawale5 from '@/assets/PUNAWALE/PUNAWALE_4.webp'
+import Punawale6 from '@/assets/PUNAWALE/PUNAWALE_5.webp'
+import Punawale7 from '@/assets/PUNAWALE/PUNAWALE_6.webp'
+
+
 // --- Types ---
 interface OfficeLocation {
     id: string;
@@ -60,6 +69,21 @@ const locations: OfficeLocation[] = [
             VTPAltitude, VTPAltitude4, featureplan, VTPAltitude1,
             VTPInner1, VTPInner2, VTPInner3, VTPInner4,
             VTPInner5, VTPAltitude2, VTPAltitude3
+        ]
+    },
+    {
+        id: 'punawale-01',
+        area: 'Punawale',
+        name: 'Sai Millenium',
+        address: 'service road, 585, Mumbai Pune Bypass Rd Flyover, Kate Wasti, Punawale, Dattwadi, Maharashtra 411033',
+        image: Punawale1,
+        capacity: '50 Seats',
+        size: '2000 sq.ft',
+        amenities: ['High-Speed Wifi', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
+        price: 'Starting ₹6,500/seat',
+        gallery: [
+            Punawale1, Punawale2, Punawale3, Punawale4,
+            Punawale5, Punawale6, Punawale7
         ]
     },
 ];
