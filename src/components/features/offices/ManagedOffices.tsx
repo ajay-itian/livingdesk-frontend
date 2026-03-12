@@ -9,13 +9,13 @@ import {
     ChevronLeft,
     ChevronRight,
     MessageCircle,
-    CalendarCheck,
-    CheckCircle2
+    CheckCircle2,
+    Play // <-- Added Play icon for video thumbnails
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button'; // Assumes Shadcn UI
+import { Button } from '@/components/ui/button';
 
 // Images
 import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
@@ -30,21 +30,24 @@ import VTPInner3 from '@/assets/VTP/VTP_Inner3.webp';
 import VTPInner4 from '@/assets/VTP/VTP_Inner4.webp';
 import VTPInner5 from '@/assets/VTP/VTP_Inner02.webp';
 
-import Punawale1 from '@/assets/PUNAWALE/Sai_Punawale.webp'
-import Punawale2 from '@/assets/PUNAWALE/PUNAWALE_1.webp'
-import Punawale3 from '@/assets/PUNAWALE/PUNAWALE_2.webp'
-import Punawale4 from '@/assets/PUNAWALE/PUNAWALE_3.webp'
-import Punawale5 from '@/assets/PUNAWALE/PUNAWALE_4.webp'
-import Punawale6 from '@/assets/PUNAWALE/PUNAWALE_5.webp'
-import Punawale7 from '@/assets/PUNAWALE/PUNAWALE_6.webp'
+import Punawale1 from '@/assets/PUNAWALE/Sai_Punawale.webp';
+import Punawale2 from '@/assets/PUNAWALE/PUNAWALE_1.webp';
+import Punawale3 from '@/assets/PUNAWALE/PUNAWALE_2.webp';
+import Punawale4 from '@/assets/PUNAWALE/PUNAWALE_3.webp';
+import Punawale5 from '@/assets/PUNAWALE/PUNAWALE_4.webp';
+import Punawale6 from '@/assets/PUNAWALE/PUNAWALE_5.webp';
+import Punawale7 from '@/assets/PUNAWALE/PUNAWALE_6.webp';
 
-//BANER
-import Baner1 from '@/assets/BANER/YBZ_1.webp'
-import Baner2 from '@/assets/BANER/YBZ_2.webp'
-import Baner3 from '@/assets/BANER/FLOOR_YBZ.webp'
-import Baner4 from '@/assets/BANER/VIRTUAL_MAPS_YBZ.webp'
-import Baner5 from '@/assets/BANER/LOCATION_YBZ.webp'
+// BANER
+import Baner1 from '@/assets/BANER/YBZ_1.webp';
+import Baner2 from '@/assets/BANER/YBZ_2.webp';
 
+import Baner4 from '@/assets/BANER/VIRTUAL_MAPS_YBZ.webp';
+import Baner5 from '@/assets/BANER/LOCATION_YBZ.webp';
+
+// --- ADD YOUR VIDEO IMPORT HERE ---
+// Make sure to rename 'baner_video.mp4' to your actual video file name
+import BanerVideo from '@/assets/BANER/YBZ_VIDEO.mp4';
 
 
 // --- Types ---
@@ -60,6 +63,11 @@ interface OfficeLocation {
     price: string;
     gallery: string[];
 }
+
+// Helper to determine if a file is a video
+const isVideo = (url: string) => {
+    return typeof url === 'string' && /\.(mp4|webm|ogg)/i.test(url);
+};
 
 // --- Data ---
 const locations: OfficeLocation[] = [
@@ -94,7 +102,6 @@ const locations: OfficeLocation[] = [
             Punawale5, Punawale6, Punawale7
         ]
     },
-
     {
         id: 'baner-01',
         area: 'Baner',
@@ -106,8 +113,8 @@ const locations: OfficeLocation[] = [
         amenities: ['High-Speed Wifi', 'Near Metro Station', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
         price: 'Starting ₹6,500/seat',
         gallery: [
-            Baner1, Baner2, Baner3, Baner4, Baner5,
-
+            // <-- Added Video to the start of the Baner Gallery
+            Baner1, Baner2, Baner4, Baner5, BanerVideo
         ]
     },
 ];
@@ -180,8 +187,7 @@ const ManagedOffice: React.FC = () => {
 
                 {/* --- Hero / Header Section --- */}
                 <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px][mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
                     <div className="relative max-w-4xl mx-auto text-center z-10">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-xs font-semibold uppercase tracking-wider mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -195,10 +201,6 @@ const ManagedOffice: React.FC = () => {
                                 </svg>
                             </span>
                         </h1>
-                        {/* <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                            Strategically located in Pune's IT heartlands. Experience premium amenities,
-                            flexible layouts, and a community that drives growth.
-                        </p> */}
                     </div>
                 </section>
 
@@ -327,7 +329,7 @@ const LocationCard = ({
                 {/* Action Buttons */}
                 <div className="mt-auto grid grid-cols-2 gap-3 pt-4 border-t border-slate-100">
                     <Button
-                        variant="default" // Assumes Shadcn variant
+                        variant="default"
                         className="w-full bg-teal-600 hover:bg-teal-600 text-white rounded-xl shadow-md group/btn"
                         onClick={onContact}
                     >
@@ -370,6 +372,9 @@ const Lightbox = ({
         thumbnailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }, [currentIndex]);
 
+    const currentMediaUrl = location.gallery[currentIndex];
+    const isCurrentMediaVideo = isVideo(currentMediaUrl);
+
     return (
         <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950/95 backdrop-blur-xl animate-in fade-in duration-300">
             {/* Top Bar */}
@@ -391,7 +396,7 @@ const Lightbox = ({
                 </div>
             </div>
 
-            {/* Main Image Area */}
+            {/* Main Image/Video Area */}
             <div className="flex-1 relative flex items-center justify-center p-4">
                 <button
                     onClick={(e) => { e.stopPropagation(); onPrev(); }}
@@ -401,12 +406,24 @@ const Lightbox = ({
                 </button>
 
                 <div className="relative w-full h-full flex items-center justify-center">
-                    <img
-                        key={currentIndex} // Force re-render for animation
-                        src={location.gallery[currentIndex]}
-                        alt="Gallery view"
-                        className="max-h-[75vh] max-w-full object-contain shadow-2xl animate-in zoom-in-95 fade-in duration-300 rounded-md"
-                    />
+                    {/* Render Video or Image based on file type */}
+                    {isCurrentMediaVideo ? (
+                        <video
+                            key={currentIndex}
+                            src={currentMediaUrl}
+                            controls
+                            autoPlay
+                            playsInline
+                            className="max-h-[75vh] max-w-full object-contain shadow-2xl animate-in zoom-in-95 fade-in duration-300 rounded-md"
+                        />
+                    ) : (
+                        <img
+                            key={currentIndex}
+                            src={currentMediaUrl}
+                            alt="Gallery view"
+                            className="max-h-[75vh] max-w-full object-contain shadow-2xl animate-in zoom-in-95 fade-in duration-300 rounded-md"
+                        />
+                    )}
                 </div>
 
                 <button
@@ -420,19 +437,31 @@ const Lightbox = ({
             {/* Thumbnails Strip */}
             <div className="h-24 md:h-28 bg-black/40 backdrop-blur-md border-t border-white/5 w-full flex items-center justify-center z-50">
                 <div className="flex gap-3 overflow-x-auto w-full max-w-6xl px-4 py-2 no-scrollbar scroll-smooth">
-                    {location.gallery.map((img, idx) => (
-                        <button
-                            key={idx}
-                            ref={idx === currentIndex ? thumbnailRef : null}
-                            onClick={() => onSelect(idx)}
-                            className={`relative flex-shrink-0 h-16 w-24 md:h-20 md:w-32 rounded-lg overflow-hidden transition-all duration-300 ${currentIndex === idx
-                                ? 'ring-2 ring-teal-500 ring-offset-2 ring-offset-black scale-105 opacity-100'
-                                : 'opacity-50 hover:opacity-100 hover:scale-105'
-                                }`}
-                        >
-                            <img src={img} alt="thumb" className="w-full h-full object-cover" />
-                        </button>
-                    ))}
+                    {location.gallery.map((media, idx) => {
+                        const isThumbVideo = isVideo(media);
+                        return (
+                            <button
+                                key={idx}
+                                ref={idx === currentIndex ? thumbnailRef : null}
+                                onClick={() => onSelect(idx)}
+                                className={`relative flex-shrink-0 h-16 w-24 md:h-20 md:w-32 rounded-lg overflow-hidden transition-all duration-300 ${currentIndex === idx
+                                    ? 'ring-2 ring-teal-500 ring-offset-2 ring-offset-black scale-105 opacity-100'
+                                    : 'opacity-50 hover:opacity-100 hover:scale-105'
+                                    }`}
+                            >
+                                {isThumbVideo ? (
+                                    <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
+                                        <video src={media} className="w-full h-full object-cover opacity-60 pointer-events-none" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Play className="w-6 h-6 text-white fill-white opacity-90 shadow-lg drop-shadow-md" />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <img src={media} alt="thumb" className="w-full h-full object-cover" />
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
         </div>
