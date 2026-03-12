@@ -166,7 +166,7 @@ const Footer = () => {
                   <Facebook className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://www.instagram.com/thelivingdesk"
+                  href="https://www.instagram.com/thelivingdesk/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
