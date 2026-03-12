@@ -35,16 +35,16 @@ const Hero = () => {
                 Schedule a Tour
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button
+              {/* <Button
                 size="lg"
                 variant="outline"
                 onClick={() => window.open('https://www.youtube.com/shorts/CSPZWy99wzQ', '_blank')}
               >
                 Virtual Tour
-              </Button>
+              </Button> */}
             </div>
           </div>
-
+          {/* 
           <div className="relative w-full max-w-xs mx-auto">
             <div className="relative rounded-lg overflow-hidden shadow-2xl aspect-[9/16]">
               <iframe
@@ -55,7 +55,7 @@ const Hero = () => {
                 allowFullScreen
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

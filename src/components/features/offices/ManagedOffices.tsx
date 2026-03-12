@@ -38,6 +38,14 @@ import Punawale5 from '@/assets/PUNAWALE/PUNAWALE_4.webp'
 import Punawale6 from '@/assets/PUNAWALE/PUNAWALE_5.webp'
 import Punawale7 from '@/assets/PUNAWALE/PUNAWALE_6.webp'
 
+//BANER
+import Baner1 from '@/assets/BANER/YBZ_1.webp'
+import Baner2 from '@/assets/BANER/YBZ_2.webp'
+import Baner3 from '@/assets/BANER/FLOOR_YBZ.webp'
+import Baner4 from '@/assets/BANER/VIRTUAL_MAPS_YBZ.webp'
+import Baner5 from '@/assets/BANER/LOCATION_YBZ.webp'
+
+
 
 // --- Types ---
 interface OfficeLocation {
@@ -84,6 +92,22 @@ const locations: OfficeLocation[] = [
         gallery: [
             Punawale1, Punawale2, Punawale3, Punawale4,
             Punawale5, Punawale6, Punawale7
+        ]
+    },
+
+    {
+        id: 'baner-01',
+        area: 'Baner',
+        name: 'YBZ Yashada Business Zone Baner',
+        address: '2nd Floor, Kashiniketan, HQ7H+H8J, Kashiniketan, Ram Indu Park Rd, Lalit Estate, Baner, Pune, Maharashtra 411069',
+        image: Baner1,
+        capacity: '40 Seats',
+        size: '1200 sq.ft',
+        amenities: ['High-Speed Wifi', 'Near Metro Station', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
+        price: 'Starting ₹6,500/seat',
+        gallery: [
+            Baner1, Baner2, Baner3, Baner4, Baner5,
+
         ]
     },
 ];
