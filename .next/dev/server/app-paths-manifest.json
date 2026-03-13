@@ -1,4 +1,7 @@
 {
+  "/blogs/page": "app/blogs/page.js",
+  "/booking/page": "app/booking/page.js",
+  "/community/page": "app/community/page.js",
   "/managed-office-pune/page": "app/managed-office-pune/page.js",
   "/page": "app/page.js"
 }
