@@ -1,12 +1,14 @@
+"use client";
+
 import { useState } from "react";
-import gallery1 from "@/assets/gallery-1.webp";
-import gallery2 from "@/assets/gallery-2.webp";
-import gallery3 from "@/assets/gallery-3.webp";
-import gallery4 from "@/assets/gallery-4.webp";
-import Cabin1 from '@/assets/CABIN_1.webp';
-import hot_desk from '@/assets/hot_desk.webp';
-import balcony from '@/assets/balcony.webp';
-import cover_view from '@/assets/cover_view.webp';
+const gallery1 = '/images/gallery-1.webp';
+const gallery2 = '/images/gallery-2.webp';
+const gallery3 = '/images/gallery-3.webp';
+const gallery4 = '/images/gallery-4.webp';
+const Cabin1 = '/images/CABIN_1.webp';
+const hot_desk = '/images/hot_desk.webp';
+const balcony = '/images/balcony.webp';
+const cover_view = '/images/cover_view.webp';
 
 
 // 1. Import DialogTitle here

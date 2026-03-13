@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Calendar, Share2, Loader2, Clock, ArrowRight, Eye, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -24,8 +26,8 @@ const BlogsPage = () => {
     // ==========================================
     // 🔧 CONFIGURATION
     // ==========================================
-    const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
-    const API_KEY = import.meta.env.VITE_API_KEY || "";
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000/api";
+    const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
 
     const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
     const S3_REGION = "ap-south-1";
@@ -379,7 +381,7 @@ const BlogsPage = () => {
                         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
                             Join our community of innovators and experience the future of work.
                         </p>
-                        <Link to="/spaces">
+                        <Link href="/spaces">
                             <Button size="lg" className="group">
                                 Explore Our Spaces
                                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />

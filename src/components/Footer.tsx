@@ -1,9 +1,11 @@
+"use client";
+
 import { Facebook, Instagram, Linkedin, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 const Footer = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [clickCount, setClickCount] = useState(0);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -73,7 +75,7 @@ const Footer = () => {
         // Navigate to visitor survey form
         // For React Router: use navigate('/visitor-survey')
         // For plain redirect:
-        navigate('/visitor-survey');
+        router.push('/visitor-survey');
 
 
       } else {

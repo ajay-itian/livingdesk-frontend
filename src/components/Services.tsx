@@ -1,19 +1,17 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Users, Briefcase, Coffee } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
-import privateOfficeImage from "@/assets/private-office.webp";
-import meetingRoomImage from "@/assets/meeting-room.webp";
-import dedicatedDeskImage from "@/assets/dedicated-desk.webp";
-import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
-import gallery1 from "@/assets/gallery-1.webp";
-import gallery2 from "@/assets/gallery-2.webp";
-import gallery3 from "@/assets/gallery-3.webp";
-import gallery4 from "@/assets/gallery-4.webp";
-import Cabin1 from '@/assets/CABIN_1.webp';
-import Cabin2 from '@/assets/CABIN_2.webp';
-import Cabin3 from '@/assets/CABIN_3.webp';
-import Conferenece from '@/assets/CONFERENECE.webp';
-import hot_desk from '@/assets/hot_desk.webp';
+import { useRouter } from "next/navigation";
+
+
+
+const VTPAltitude = '/images/VTP/VTP_Altitude.webp';
+
+const Cabin1 = '/images/CABIN_1.webp';
+const Cabin2 = '/images/CABIN_2.webp';
+const Cabin3 = '/images/CABIN_3.webp';
+const hot_desk = '/images/hot_desk.webp';
 
 // Define interface for Service item (optional if using TypeScript)
 interface ServiceItem {
@@ -54,12 +52,12 @@ const services: ServiceItem[] = [
     title: "Managed Office",
     description: "Fully managed office solutions with complete setup, maintenance, and premium services.",
     image: VTPAltitude,
-    path: "/managed-offices", // 2. Add the path here
+    path: "/managed-office-pune", // 2. Add the path here
   },
 ];
 
 const Services = () => {
-  const navigate = useNavigate(); // 3. Initialize hook
+  const router = useRouter(); // 3. Initialize hook
 
   return (
     <section id="services" className="py-20 bg-secondary/30">
@@ -76,7 +74,7 @@ const Services = () => {
             <Card
               key={index}
               // 4. Handle click navigation
-              onClick={() => service.path && navigate(service.path)}
+              onClick={() => service.path && router.push(service.path)}
               className={`overflow-hidden hover:shadow-lg transition-all duration-300 group ${service.path ? "cursor-pointer hover:ring-2 ring-primary/50" : ""
                 }`}
             >

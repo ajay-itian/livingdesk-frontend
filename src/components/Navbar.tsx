@@ -1,165 +1,152 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.webp";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const logo = '/images/logo.webp';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
   const [isInOfficePremises, setIsInOfficePremises] = useState(false);
+  const pathname = usePathname();
 
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // Office location coordinates
   const OFFICE_LAT = 18.5921498;
   const OFFICE_LNG = 73.8001093;
-  const OFFICE_RADIUS = 500; // meters - adjust this based on your office size
+  const OFFICE_RADIUS = 500; // meters
 
-  // Calculate distance between two coordinates (Haversine formula)
+  // Geolocation logic
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371e3; // Earth's radius in meters
+    const R = 6371e3;
     const φ1 = (lat1 * Math.PI) / 180;
     const φ2 = (lat2 * Math.PI) / 180;
     const Δφ = ((lat2 - lat1) * Math.PI) / 180;
     const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-
     const a =
       Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
       Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // Distance in meters
+    return R * c;
   };
 
-  // Check user location on component mount
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          const distance = calculateDistance(
-            latitude,
-            longitude,
-            OFFICE_LAT,
-            OFFICE_LNG
-          );
-
-          console.log(`Distance from office: ${distance.toFixed(2)} meters`);
+          const distance = calculateDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
           setIsInOfficePremises(distance <= OFFICE_RADIUS);
         },
         (error) => {
-          console.error("Geolocation error:", error);
-          // User denied location or error occurred - hide wifi link
+          if (error.code !== error.PERMISSION_DENIED) {
+            console.warn(`Geolocation error[${error.code}]: ${error.message}`);
+          }
           setIsInOfficePremises(false);
         }
       );
     }
   }, []);
 
+  // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
-  }, [location.pathname]);
+  }, [pathname]);
 
-  useEffect(() => {
-    if (!pendingScrollId) return;
+  const closeMenu = () => setIsOpen(false);
 
-    if (location.pathname === "/") {
-      const id = pendingScrollId;
-      setPendingScrollId(null);
-
-      requestAnimationFrame(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-        } else {
-          setTimeout(() => {
-            const el2 = document.getElementById(id);
-            if (el2) el2.scrollIntoView({ behavior: "smooth" });
-          }, 120);
-        }
-      });
-    }
-  }, [location.pathname, pendingScrollId]);
-
-  const close = () => setIsOpen(false);
-
-  const scrollToSection = (id: string) => {
-    if (location.pathname === "/") {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-      close();
-      return;
-    }
-
-    setPendingScrollId(id);
-    navigate("/");
-    close();
-  };
+  // Helper array for navigation links to keep JSX clean
+  const navLinks = [
+    { name: "Home", href: "/#home" },
+    { name: "Services", href: "/#services" },
+    { name: "Booking", href: "/booking" },
+    { name: "Managed Offices", href: "/managed-office-pune" },
+    { name: "Pricing", href: "/#pricing" },
+    { name: "Gallery", href: "/#gallery" },
+    { name: "Locate Us", href: "/#locate" },
+    { name: "Blogs", href: "/blogs" },
+    { name: "Community", href: "/community" },
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <Link
-              to="/"
-              onClick={() => {
-                setPendingScrollId(null);
-                close();
-              }}
-            >
+            <Link href="/#home" onClick={closeMenu}>
               <img src={logo} alt="The Living Desk" className="h-12 w-auto" />
             </Link>
           </div>
 
-          {/* Desktop */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection("home")} className="text-foreground transition-colors">Home</button>
-            <button onClick={() => scrollToSection("services")} className="text-foreground transition-colors">Services</button>
-            <Link to="/booking" onClick={close} className="text-foreground transition-colors">Booking</Link>
-            <Link to="/managed-offices" onClick={close} className="text-foreground text-left">Managed Offices</Link>
-            <button onClick={() => scrollToSection("pricing")} className="text-foreground transition-colors">Pricing</button>
-            <button onClick={() => scrollToSection("gallery")} className="text-foreground transition-colors">Gallery</button>
-            <button onClick={() => scrollToSection("locate")} className="text-foreground transition-colors">Locate Us</button>
-            <Link to="/blogs" onClick={close} className="text-foreground transition-colors">Blogs</Link>
-            <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-foreground transition-colors hover:text-primary"
+              >
+                {link.name}
+              </Link>
+            ))}
+
             {isInOfficePremises && (
-              <Link to="/wifi" onClick={close} className="text-foreground transition-colors">Wifi</Link>
+              <Link href="/wifi" className="text-foreground transition-colors hover:text-primary">
+                Wifi
+              </Link>
             )}
-            <button onClick={() => scrollToSection("contact")} className="text-foreground transition-colors">Contact</button>
-            <Button onClick={() => scrollToSection("contact")} type="button">Get Started</Button>
+
+            <Link href="/#contact" className="text-foreground transition-colors hover:text-primary">
+              Contact
+            </Link>
+
+            <Button asChild>
+              <Link href="/#contact">Get Started</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button type="button" onClick={() => setIsOpen(!isOpen)} className="text-foreground">
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-foreground focus:outline-none"
+              aria-label="Toggle menu"
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile */}
+        {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden pb-4">
-            <div className="flex flex-col space-y-4">
-              <button onClick={() => scrollToSection("home")} className="text-foreground text-left">Home</button>
-              <button onClick={() => scrollToSection("services")} className="text-foreground text-left">Services</button>
-              <Link to="/booking" onClick={close} className="text-foreground text-left">Booking</Link>
-              <button onClick={() => scrollToSection("pricing")} className="text-foreground text-left">Pricing</button>
-              <Link to="/managed-offices" onClick={close} className="text-foreground text-left">Managed Offices</Link>
-              <button onClick={() => scrollToSection("gallery")} className="text-foreground text-left">Gallery</button>
-              <button onClick={() => scrollToSection("locate")} className="text-foreground text-left">Locate Us</button>
-              <Link to="/blogs" onClick={close} className="text-foreground text-left">Blogs</Link>
-              <Link to="/community" onClick={close} className="text-foreground text-left">Community</Link>
+            <div className="flex flex-col space-y-4 pt-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={closeMenu}
+                  className="text-foreground text-left hover:text-primary"
+                >
+                  {link.name}
+                </Link>
+              ))}
+
               {isInOfficePremises && (
-                <Link to="/wifi" onClick={close} className="text-foreground text-left">Wifi</Link>
+                <Link href="/wifi" onClick={closeMenu} className="text-foreground text-left hover:text-primary">
+                  Wifi
+                </Link>
               )}
-              <button onClick={() => scrollToSection("contact")} className="text-foreground text-left">Contact</button>
-              <Button onClick={() => { close(); scrollToSection("contact"); }} className="w-full">Get Started</Button>
+
+              <Link href="/#contact" onClick={closeMenu} className="text-foreground text-left hover:text-primary">
+                Contact
+              </Link>
+
+              <Button asChild className="w-full">
+                <Link href="/#contact" onClick={closeMenu}>Get Started</Link>
+              </Button>
             </div>
           </div>
         )}

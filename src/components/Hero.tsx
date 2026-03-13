@@ -1,6 +1,8 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroImage from "@/assets/hero-coworking.webp";
+const heroImage = '/images/hero-coworking.webp';
 
 const Hero = () => {
   const scrollToContact = () => {
@@ -63,3 +65,4 @@ const Hero = () => {
 };
 
 export default Hero;
+

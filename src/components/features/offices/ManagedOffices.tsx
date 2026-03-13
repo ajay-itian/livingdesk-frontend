@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     MapPin,
@@ -12,43 +14,42 @@ import {
     CheckCircle2,
     Play // <-- Added Play icon for video thumbnails
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 
 // Images
-import VTPAltitude from '@/assets/VTP/VTP_Altitude.webp';
-import VTPAltitude1 from '@/assets/VTP/VTP_Altitude1.webp';
-import VTPAltitude2 from '@/assets/VTP/VTP_Altitude2.webp';
-import VTPAltitude3 from '@/assets/VTP/VTP_Altitude3.webp';
-import VTPAltitude4 from '@/assets/VTP/VTP_Altitude4.webp';
-import featureplan from '@/assets/VTP/feture_plan_map.webp';
-import VTPInner1 from '@/assets/VTP/VTP_Inner1.webp';
-import VTPInner2 from '@/assets/VTP/VTP_Inner2.webp';
-import VTPInner3 from '@/assets/VTP/VTP_Inner3.webp';
-import VTPInner4 from '@/assets/VTP/VTP_Inner4.webp';
-import VTPInner5 from '@/assets/VTP/VTP_Inner02.webp';
+const VTPAltitude = '/images/VTP/VTP_Altitude.webp';
+const VTPAltitude1 = '/images/VTP/VTP_Altitude1.webp';
+const VTPAltitude2 = '/images/VTP/VTP_Altitude2.webp';
+const VTPAltitude3 = '/images/VTP/VTP_Altitude3.webp';
+const VTPAltitude4 = '/images/VTP/VTP_Altitude4.webp';
+const featureplan = '/images/VTP/feture_plan_map.webp';
+const VTPInner1 = '/images/VTP/VTP_Inner1.webp';
+const VTPInner2 = '/images/VTP/VTP_Inner2.webp';
+const VTPInner3 = '/images/VTP/VTP_Inner3.webp';
+const VTPInner4 = '/images/VTP/VTP_Inner4.webp';
+const VTPInner5 = '/images/VTP/VTP_Inner02.webp';
 
-import Punawale1 from '@/assets/PUNAWALE/Sai_Punawale.webp';
-import Punawale2 from '@/assets/PUNAWALE/PUNAWALE_1.webp';
-import Punawale3 from '@/assets/PUNAWALE/PUNAWALE_2.webp';
-import Punawale4 from '@/assets/PUNAWALE/PUNAWALE_3.webp';
-import Punawale5 from '@/assets/PUNAWALE/PUNAWALE_4.webp';
-import Punawale6 from '@/assets/PUNAWALE/PUNAWALE_5.webp';
-import Punawale7 from '@/assets/PUNAWALE/PUNAWALE_6.webp';
+const Punawale1 = '/images/PUNAWALE/Sai_Punawale.webp';
+const Punawale2 = '/images/PUNAWALE/PUNAWALE_1.webp';
+const Punawale3 = '/images/PUNAWALE/PUNAWALE_2.webp';
+const Punawale4 = '/images/PUNAWALE/PUNAWALE_3.webp';
+const Punawale5 = '/images/PUNAWALE/PUNAWALE_4.webp';
+const Punawale6 = '/images/PUNAWALE/PUNAWALE_5.webp';
+const Punawale7 = '/images/PUNAWALE/PUNAWALE_6.webp';
 
 // BANER
-import Baner1 from '@/assets/BANER/YBZ_1.webp';
-import Baner2 from '@/assets/BANER/YBZ_2.webp';
+const Baner1 = '/images/BANER/YBZ_1.webp';
+const Baner2 = '/images/BANER/YBZ_2.webp';
 
-import Baner4 from '@/assets/BANER/VIRTUAL_MAPS_YBZ.webp';
-import Baner5 from '@/assets/BANER/LOCATION_YBZ.webp';
+const Baner4 = '/images/BANER/VIRTUAL_MAPS_YBZ.webp';
+const Baner5 = '/images/BANER/LOCATION_YBZ.webp';
 
 // --- ADD YOUR VIDEO IMPORT HERE ---
 // Make sure to rename 'baner_video.mp4' to your actual video file name
-import BanerVideo from '@/assets/BANER/YBZ_VIDEO.mp4';
-
+const BanerVideo = '/videos/YBZ_VIDEO.mp4';
 
 // --- Types ---
 interface OfficeLocation {
@@ -120,7 +121,7 @@ const locations: OfficeLocation[] = [
 ];
 
 const ManagedOffice: React.FC = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     // Scroll top
     useEffect(() => {
@@ -134,12 +135,12 @@ const ManagedOffice: React.FC = () => {
 
     // --- Handlers ---
     const handleContact = useCallback(() => {
-        navigate('/#contact');
+        router.push('/#contact');
         setTimeout(() => {
             const contactSection = document.getElementById('contact');
             contactSection?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
-    }, [navigate]);
+    }, [router]);
 
     const handleWhatsApp = useCallback(() => {
         window.open('https://web.whatsapp.com/send?phone=917066002650&text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.', '_blank');

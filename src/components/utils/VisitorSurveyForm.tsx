@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Users, Calendar, Send, CheckCircle2, Loader2, Sparkles, IndianRupee, NotebookIcon, LayoutDashboard, ArrowLeft } from 'lucide-react';
 import Navbar from "@/components/Navbar";

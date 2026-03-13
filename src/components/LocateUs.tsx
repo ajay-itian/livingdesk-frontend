@@ -1,5 +1,7 @@
+"use client";
+
 import { MapPin } from "lucide-react";
-import directionGuide from "@/assets/direction-guide.webp";
+const directionGuide = "/images/direction-guide.webp";
 
 const LocateUs = () => {
   return (
@@ -62,3 +64,4 @@ const LocateUs = () => {
 };
 
 export default LocateUs;
+

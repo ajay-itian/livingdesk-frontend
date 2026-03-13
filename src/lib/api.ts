@@ -5,21 +5,15 @@
  * Supports Vite (import.meta.env) and standard Node/Next.js (process.env)
  */
 const getApiBase = (): string => {
-  // Check for Vite
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) {
-    return import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  }
-  // Check for Next.js / Node
   if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_BASE) {
     return process.env.NEXT_PUBLIC_API_BASE.replace(/\/$/, '');
   }
-
-  return 'http://localhost:8000/api'; // Default fallback
+  return 'http://localhost:8000/api';
 };
 
 const getApiKey = (): string | null => {
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_KEY) {
-    return import.meta.env.VITE_API_KEY;
+  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_KEY) {
+    return process.env.NEXT_PUBLIC_API_KEY;
   }
   return null;
 };
