@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-
-  // ADD THIS LINE: This fixes the S3/CloudFront 403 refresh error
+  output: "export",
   trailingSlash: true,
 
   images: {
@@ -13,7 +11,6 @@ const nextConfig = {
       { protocol: "https", hostname: "thelivingdesk.in" },
     ],
   },
-  turbopack: {},
 };
 
 export default nextConfig;

@@ -1,14 +1,31 @@
-User-agent: Googlebot
+# ✅ Directed at all search engines
+User-agent: *
 Allow: /
+Allow: /blogs/
 
-User-agent: Bingbot
-Allow: /
+# Block sensitive directories and system files
+Disallow: /private/
+Disallow: /admin/
+Disallow: /config/
+Disallow: /temp/
+Disallow: /_next/static/development/
+Disallow: /api/
 
+# ✅ Prevent indexing of internal search and filtered views
+Disallow: /blogs?search=*
+Disallow: /blogs?category=*
+Disallow: /tag/*
+
+# ✅ Prevent crawling of unfinished or draft pages
+Disallow: /draft/
+Disallow: /preview/
+
+# ✅ Specifically allow social media scrapers
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# ✅ Point to your Sitemap
+Sitemap: https://thelivingdesk.in/sitemap.xml

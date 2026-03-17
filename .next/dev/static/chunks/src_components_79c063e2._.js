@@ -1036,7 +1036,11 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 __turbopack_context__.s([
     "default",
-    ()=>__TURBOPACK__default__export__
+    ()=>ManagedOffices,
+    "isVideo",
+    ()=>isVideo,
+    "locations",
+    ()=>locations
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
@@ -1056,7 +1060,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/Footer.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/button.tsx [app-client] (ecmascript)");
 ;
-var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
+var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
@@ -1064,7 +1068,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
-// Images
+// ─── Images ────────────────────────────────────────────────────────────────
 const VTPAltitude = '/images/VTP/VTP_Altitude.webp';
 const VTPAltitude1 = '/images/VTP/VTP_Altitude1.webp';
 const VTPAltitude2 = '/images/VTP/VTP_Altitude2.webp';
@@ -1083,28 +1087,30 @@ const Punawale4 = '/images/PUNAWALE/PUNAWALE_3.webp';
 const Punawale5 = '/images/PUNAWALE/PUNAWALE_4.webp';
 const Punawale6 = '/images/PUNAWALE/PUNAWALE_5.webp';
 const Punawale7 = '/images/PUNAWALE/PUNAWALE_6.webp';
-// BANER
 const Baner1 = '/images/BANER/YBZ_1.webp';
 const Baner2 = '/images/BANER/YBZ_2.webp';
 const Baner4 = '/images/BANER/VIRTUAL_MAPS_YBZ.webp';
 const Baner5 = '/images/BANER/LOCATION_YBZ.webp';
-// --- ADD YOUR VIDEO IMPORT HERE ---
-// Make sure to rename 'baner_video.mp4' to your actual video file name
 const BanerVideo = '/videos/YBZ_VIDEO.mp4';
-// Helper to determine if a file is a video
-const isVideo = (url)=>{
-    return typeof url === 'string' && /\.(mp4|webm|ogg)/i.test(url);
-};
-// --- Data ---
+const isVideo = (url)=>typeof url === 'string' && /\.(mp4|webm|ogg)/i.test(url);
 const locations = [
     {
         id: 'wakad-01',
+        slug: 'wakad',
         area: 'Wakad',
         name: 'VTP Altitude',
         address: '18/6, Aundh - Ravet BRTS Rd, Pawar Nagar, Mangal Nagar, Wakad, Pune 411033',
         image: VTPAltitude,
         capacity: '20 - 25 Seats - 1 Cabin',
         size: '880 sq.ft',
+        price: 'Starting ₹6,500/seat',
+        description: "A premium managed workspace nestled in the heart of Wakad, VTP Altitude offers a sophisticated environment for businesses that demand excellence. With state-of-the-art infrastructure and a prime location on the Aundh-Ravet BRTS corridor, this space is designed to elevate your team's productivity.",
+        highlights: [
+            'Prime BRTS Corridor Location',
+            'Dedicated Cabin Available',
+            'Fully Managed Services',
+            'Flexible Seat Plans'
+        ],
         amenities: [
             'High-Speed Wifi',
             'Conference Rooms',
@@ -1113,7 +1119,6 @@ const locations = [
             '24/7 Security & CCTV Surveillance',
             'Housekeeping Services'
         ],
-        price: 'Starting ₹6,500/seat',
         gallery: [
             VTPAltitude,
             VTPAltitude4,
@@ -1130,12 +1135,21 @@ const locations = [
     },
     {
         id: 'punawale-01',
+        slug: 'punawale',
         area: 'Punawale',
         name: 'Sai Millenium',
         address: 'service road, 585, Mumbai Pune Bypass Rd Flyover, Kate Wasti, Punawale, Dattwadi, Maharashtra 411033',
         image: Punawale1,
         capacity: '50 Seats',
         size: '2000 sq.ft',
+        price: 'Starting ₹6,500/seat',
+        description: 'Sai Millenium is a spacious, well-connected workspace sitting right on the Mumbai-Pune Bypass — making it the ideal base for teams that value accessibility and scale. With 2000 sq.ft of thoughtfully designed floor space, it comfortably accommodates growing teams.',
+        highlights: [
+            'Mumbai-Pune Bypass Access',
+            'Large Team Capacity',
+            'Scalable Floor Plans',
+            'Easy Highway Connectivity'
+        ],
         amenities: [
             'High-Speed Wifi',
             'Conference Rooms',
@@ -1144,7 +1158,6 @@ const locations = [
             '24/7 Security & CCTV Surveillance',
             'Housekeeping Services'
         ],
-        price: 'Starting ₹6,500/seat',
         gallery: [
             Punawale1,
             Punawale2,
@@ -1157,12 +1170,21 @@ const locations = [
     },
     {
         id: 'baner-01',
+        slug: 'baner',
         area: 'Baner',
         name: 'YBZ Yashada Business Zone Baner',
         address: '2nd Floor, Kashiniketan, HQ7H+H8J, Kashiniketan, Ram Indu Park Rd, Lalit Estate, Baner, Pune, Maharashtra 411069',
         image: Baner1,
         capacity: '40 Seats',
         size: '1200 sq.ft',
+        price: 'Starting ₹6,500/seat',
+        description: "Strategically located in Baner — one of Pune's most vibrant business districts — YBZ Yashada Business Zone puts you steps away from the metro and surrounded by Pune's top tech companies and startups. A dynamic space for a dynamic team.",
+        highlights: [
+            'Steps from Metro Station',
+            'Baner Business Hub',
+            'Modern Infrastructure',
+            'Vibrant Startup Ecosystem'
+        ],
         amenities: [
             'High-Speed Wifi',
             'Near Metro Station',
@@ -1172,9 +1194,7 @@ const locations = [
             '24/7 Security & CCTV Surveillance',
             'Housekeeping Services'
         ],
-        price: 'Starting ₹6,500/seat',
         gallery: [
-            // <-- Added Video to the start of the Baner Gallery
             Baner1,
             Baner2,
             Baner4,
@@ -1183,40 +1203,34 @@ const locations = [
         ]
     }
 ];
-const ManagedOffice = ()=>{
+function ManagedOffices() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
-    // Scroll top
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "ManagedOffice.useEffect": ()=>{
+        "ManagedOffices.useEffect": ()=>{
             window.scrollTo(0, 0);
         }
-    }["ManagedOffice.useEffect"], []);
-    // Lightbox State
+    }["ManagedOffices.useEffect"], []);
     const [isLightboxOpen, setIsLightboxOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [currentLocation, setCurrentLocation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [currentImageIndex, setCurrentImageIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
-    // --- Handlers ---
     const handleContact = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "ManagedOffice.useCallback[handleContact]": ()=>{
+        "ManagedOffices.useCallback[handleContact]": ()=>{
             router.push('/#contact');
             setTimeout({
-                "ManagedOffice.useCallback[handleContact]": ()=>{
-                    const contactSection = document.getElementById('contact');
-                    contactSection?.scrollIntoView({
+                "ManagedOffices.useCallback[handleContact]": ()=>document.getElementById('contact')?.scrollIntoView({
                         behavior: 'smooth'
-                    });
-                }
-            }["ManagedOffice.useCallback[handleContact]"], 100);
+                    })
+            }["ManagedOffices.useCallback[handleContact]"], 100);
         }
-    }["ManagedOffice.useCallback[handleContact]"], [
+    }["ManagedOffices.useCallback[handleContact]"], [
         router
     ]);
     const handleWhatsApp = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "ManagedOffice.useCallback[handleWhatsApp]": ()=>{
+        "ManagedOffices.useCallback[handleWhatsApp]": ()=>{
             window.open('https://web.whatsapp.com/send?phone=917066002650&text=Hello!%20I%27m%20interested%20in%20your%20coworking%20space.', '_blank');
         }
-    }["ManagedOffice.useCallback[handleWhatsApp]"], []);
+    }["ManagedOffices.useCallback[handleWhatsApp]"], []);
     const openGallery = (location)=>{
         setCurrentLocation(location);
         setCurrentImageIndex(0);
@@ -1224,44 +1238,41 @@ const ManagedOffice = ()=>{
         document.body.style.overflow = 'hidden';
     };
     const closeGallery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "ManagedOffice.useCallback[closeGallery]": ()=>{
+        "ManagedOffices.useCallback[closeGallery]": ()=>{
             setIsLightboxOpen(false);
             setCurrentLocation(null);
             document.body.style.overflow = 'auto';
         }
-    }["ManagedOffice.useCallback[closeGallery]"], []);
+    }["ManagedOffices.useCallback[closeGallery]"], []);
     const navigateImage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "ManagedOffice.useCallback[navigateImage]": (direction)=>{
+        "ManagedOffices.useCallback[navigateImage]": (direction)=>{
             if (!currentLocation) return;
             setCurrentImageIndex({
-                "ManagedOffice.useCallback[navigateImage]": (prev)=>{
-                    if (direction === 'next') {
-                        return prev === currentLocation.gallery.length - 1 ? 0 : prev + 1;
-                    }
+                "ManagedOffices.useCallback[navigateImage]": (prev)=>{
+                    if (direction === 'next') return prev === currentLocation.gallery.length - 1 ? 0 : prev + 1;
                     return prev === 0 ? currentLocation.gallery.length - 1 : prev - 1;
                 }
-            }["ManagedOffice.useCallback[navigateImage]"]);
+            }["ManagedOffices.useCallback[navigateImage]"]);
         }
-    }["ManagedOffice.useCallback[navigateImage]"], [
+    }["ManagedOffices.useCallback[navigateImage]"], [
         currentLocation
     ]);
-    // Keyboard support
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "ManagedOffice.useEffect": ()=>{
+        "ManagedOffices.useEffect": ()=>{
             const handleKeyDown = {
-                "ManagedOffice.useEffect.handleKeyDown": (e)=>{
+                "ManagedOffices.useEffect.handleKeyDown": (e)=>{
                     if (!isLightboxOpen) return;
                     if (e.key === 'Escape') closeGallery();
                     if (e.key === 'ArrowRight') navigateImage('next');
                     if (e.key === 'ArrowLeft') navigateImage('prev');
                 }
-            }["ManagedOffice.useEffect.handleKeyDown"];
+            }["ManagedOffices.useEffect.handleKeyDown"];
             window.addEventListener('keydown', handleKeyDown);
             return ({
-                "ManagedOffice.useEffect": ()=>window.removeEventListener('keydown', handleKeyDown)
-            })["ManagedOffice.useEffect"];
+                "ManagedOffices.useEffect": ()=>window.removeEventListener('keydown', handleKeyDown)
+            })["ManagedOffices.useEffect"];
         }
-    }["ManagedOffice.useEffect"], [
+    }["ManagedOffices.useEffect"], [
         isLightboxOpen,
         closeGallery,
         navigateImage
@@ -1270,9 +1281,9 @@ const ManagedOffice = ()=>{
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 186,
+                lineNumber: 173,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0)),
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-teal-100 selection:text-teal-900",
                 children: [
@@ -1280,12 +1291,12 @@ const ManagedOffice = ()=>{
                         className: "relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px][mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"
+                                className: "absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 191,
+                                lineNumber: 176,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "relative max-w-4xl mx-auto text-center z-10",
                                 children: [
@@ -1296,20 +1307,21 @@ const ManagedOffice = ()=>{
                                                 className: "w-3 h-3"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                lineNumber: 195,
+                                                lineNumber: 179,
                                                 columnNumber: 29
-                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            }, this),
                                             " Prime Locations"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 194,
+                                        lineNumber: 178,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                                         className: "text-4xl md:text-5xl lg:text-6xl font-bold text-teal-600 tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100",
                                         children: [
-                                            "Workspaces Designed for ",
+                                            "Workspaces Designed for",
+                                            ' ',
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-teal-600 relative whitespace-nowrap",
                                                 children: [
@@ -1325,38 +1337,38 @@ const ManagedOffice = ()=>{
                                                             fill: "none"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                            lineNumber: 201,
+                                                            lineNumber: 186,
                                                             columnNumber: 37
-                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                        }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                        lineNumber: 200,
+                                                        lineNumber: 185,
                                                         columnNumber: 33
-                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                    }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                lineNumber: 198,
-                                                columnNumber: 53
-                                            }, ("TURBOPACK compile-time value", void 0))
+                                                lineNumber: 183,
+                                                columnNumber: 29
+                                            }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 181,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 193,
+                                lineNumber: 177,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 190,
+                        lineNumber: 175,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                         className: "pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1369,19 +1381,19 @@ const ManagedOffice = ()=>{
                                     index: index
                                 }, location.id, false, {
                                     fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                    lineNumber: 212,
+                                    lineNumber: 196,
                                     columnNumber: 29
-                                }, ("TURBOPACK compile-time value", void 0)))
+                                }, this))
                         }, void 0, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 210,
+                            lineNumber: 194,
                             columnNumber: 21
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 209,
+                        lineNumber: 193,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     isLightboxOpen && currentLocation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Lightbox, {
                         location: currentLocation,
                         currentIndex: currentImageIndex,
@@ -1391,40 +1403,42 @@ const ManagedOffice = ()=>{
                         onSelect: setCurrentImageIndex
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 226,
+                        lineNumber: 209,
                         columnNumber: 21
-                    }, ("TURBOPACK compile-time value", void 0))
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 187,
+                lineNumber: 174,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0)),
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Footer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 236,
+                lineNumber: 219,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0))
+            }, this)
         ]
     }, void 0, true);
-};
-_s(ManagedOffice, "uZoKGD88lin797c5WKcuWPTdOQA=", false, function() {
+}
+_s(ManagedOffices, "uZoKGD88lin797c5WKcuWPTdOQA=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
-_c = ManagedOffice;
-// --- Sub-Component: Location Card ---
-const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })=>{
+_c = ManagedOffices;
+// ─── Location Card ────────────────────────────────────────────────────────────
+function LocationCard({ location, onOpenGallery, onContact, onWhatsApp, index }) {
+    _s1();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "group relative bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards",
+        className: "group relative bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col h-full cursor-pointer animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards",
         style: {
             animationDelay: `${index * 150}ms`
         },
+        onClick: ()=>router.push(`/managed-office-pune/${location.slug}`),
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative aspect-[4/3] overflow-hidden cursor-pointer",
-                onClick: ()=>onOpenGallery(location),
+                className: "relative aspect-[4/3] overflow-hidden",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                         src: location.image,
@@ -1433,9 +1447,9 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                         loading: "lazy"
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 265,
+                        lineNumber: 243,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "absolute top-4 left-4 right-4 flex justify-between items-start z-10",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1445,29 +1459,29 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                     className: "w-3 h-3"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                    lineNumber: 275,
+                                    lineNumber: 251,
                                     columnNumber: 25
-                                }, ("TURBOPACK compile-time value", void 0)),
+                                }, this),
                                 " ",
                                 location.area
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 274,
+                            lineNumber: 250,
                             columnNumber: 21
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 273,
+                        lineNumber: 249,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/20 transition-colors duration-300"
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 280,
+                        lineNumber: 254,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1481,27 +1495,27 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                    lineNumber: 286,
+                                    lineNumber: 260,
                                     columnNumber: 25
-                                }, ("TURBOPACK compile-time value", void 0)),
-                                "View Gallery"
+                                }, this),
+                                " View Gallery"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 282,
+                            lineNumber: 256,
                             columnNumber: 21
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 281,
+                        lineNumber: 255,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0))
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 261,
+                lineNumber: 242,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0)),
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "p-6 flex-1 flex flex-col",
                 children: [
@@ -1513,9 +1527,9 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                 children: location.name
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 295,
+                                lineNumber: 267,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex items-start gap-2 text-slate-500 text-sm leading-snug",
                                 children: [
@@ -1523,29 +1537,29 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                         className: "w-4 h-4 mt-0.5 flex-shrink-0 text-teal-500/70"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 269,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "line-clamp-2",
                                         children: location.address
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 300,
+                                        lineNumber: 270,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 298,
+                                lineNumber: 268,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 294,
+                        lineNumber: 266,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "grid grid-cols-2 gap-3 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100",
                         children: [
@@ -1559,30 +1573,30 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                lineNumber: 308,
+                                                lineNumber: 277,
                                                 columnNumber: 29
-                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            }, this),
                                             " Capacity"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 307,
+                                        lineNumber: 276,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "font-bold text-slate-800",
                                         children: location.capacity
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 310,
+                                        lineNumber: 279,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 306,
+                                lineNumber: 275,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-1",
                                 children: [
@@ -1593,36 +1607,36 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                                lineNumber: 314,
+                                                lineNumber: 283,
                                                 columnNumber: 29
-                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            }, this),
                                             " Size"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 313,
+                                        lineNumber: 282,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "font-bold text-slate-800",
                                         children: location.size
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 316,
+                                        lineNumber: 285,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 312,
+                                lineNumber: 281,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 305,
+                        lineNumber: 274,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex flex-wrap gap-2 mb-6",
                         children: location.amenities.map((amenity, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1632,90 +1646,101 @@ const LocationCard = ({ location, onOpenGallery, onContact, onWhatsApp, index })
                                         className: "w-3 h-3 text-teal-500"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 324,
+                                        lineNumber: 292,
                                         columnNumber: 29
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
+                                    " ",
                                     amenity
                                 ]
                             }, i, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 323,
+                                lineNumber: 291,
                                 columnNumber: 25
-                            }, ("TURBOPACK compile-time value", void 0)))
+                            }, this))
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 321,
+                        lineNumber: 289,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-auto grid grid-cols-2 gap-3 pt-4 border-t border-slate-100",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                                 variant: "default",
-                                className: "w-full bg-teal-600 hover:bg-teal-600 text-white rounded-xl shadow-md group/btn",
-                                onClick: onContact,
+                                className: "w-full bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-md group/btn",
+                                onClick: (e)=>{
+                                    e.stopPropagation();
+                                    onContact();
+                                },
                                 children: [
-                                    "Contact Us",
+                                    "Contact Us ",
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
                                         className: "w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 338,
-                                        columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                        lineNumber: 303,
+                                        columnNumber: 36
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 332,
+                                lineNumber: 298,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                                 variant: "outline",
-                                onClick: onWhatsApp,
+                                onClick: (e)=>{
+                                    e.stopPropagation();
+                                    onWhatsApp();
+                                },
                                 className: "w-full border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-xl",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$message$2d$circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MessageCircle$3e$__["MessageCircle"], {
                                         className: "mr-2 h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 345,
+                                        lineNumber: 310,
                                         columnNumber: 25
-                                    }, ("TURBOPACK compile-time value", void 0)),
-                                    "WhatsApp"
+                                    }, this),
+                                    " WhatsApp"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 340,
+                                lineNumber: 305,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 331,
+                        lineNumber: 297,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0))
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 293,
+                lineNumber: 265,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0))
+            }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-        lineNumber: 256,
+        lineNumber: 237,
         columnNumber: 9
-    }, ("TURBOPACK compile-time value", void 0));
-};
+    }, this);
+}
+_s1(LocationCard, "fN7XvhJ+p5oE6+Xlo0NJmXpxjC8=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
 _c1 = LocationCard;
-// --- Sub-Component: Lightbox ---
-const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })=>{
-    _s1();
-    // Auto-scroll thumbnail into view
-    const thumbnailRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+// ─── Lightbox ────────────────────────────────────────────────────────────────
+function Lightbox({ location, currentIndex, onClose, onNext, onPrev, onSelect }) {
+    _s2();
+    const thumbRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Lightbox.useEffect": ()=>{
-            thumbnailRef.current?.scrollIntoView({
+            thumbRef.current?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'nearest',
                 inline: 'center'
@@ -1724,8 +1749,8 @@ const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })
     }["Lightbox.useEffect"], [
         currentIndex
     ]);
-    const currentMediaUrl = location.gallery[currentIndex];
-    const isCurrentMediaVideo = isVideo(currentMediaUrl);
+    const currentMedia = location.gallery[currentIndex];
+    const isVid = isVideo(currentMedia);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-[100] flex flex-col bg-slate-950/95 backdrop-blur-xl animate-in fade-in duration-300",
         children: [
@@ -1740,23 +1765,23 @@ const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })
                                 children: location.name
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 384,
+                                lineNumber: 341,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-white/60 text-sm hidden sm:block",
                                 children: location.address
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 385,
+                                lineNumber: 342,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 383,
+                        lineNumber: 340,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center gap-4",
                         children: [
@@ -1769,9 +1794,9 @@ const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 388,
+                                lineNumber: 345,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0)),
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: onClose,
                                 className: "p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors",
@@ -1779,108 +1804,102 @@ const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })
                                     className: "w-6 h-6"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                    lineNumber: 395,
+                                    lineNumber: 349,
                                     columnNumber: 25
-                                }, ("TURBOPACK compile-time value", void 0))
+                                }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 391,
+                                lineNumber: 348,
                                 columnNumber: 21
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 387,
+                        lineNumber: 344,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0))
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 382,
+                lineNumber: 339,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0)),
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex-1 relative flex items-center justify-center p-4",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        onClick: (e)=>{
-                            e.stopPropagation();
-                            onPrev();
-                        },
+                        onClick: onPrev,
                         className: "absolute left-4 md:left-8 p-3 bg-black/20 hover:bg-white/10 text-white rounded-full transition-all backdrop-blur-sm z-40 group border border-white/5",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__["ChevronLeft"], {
                             className: "w-8 h-8 group-hover:-translate-x-1 transition-transform"
                         }, void 0, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 406,
+                            lineNumber: 356,
                             columnNumber: 21
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 402,
+                        lineNumber: 355,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "relative w-full h-full flex items-center justify-center",
-                        children: isCurrentMediaVideo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
-                            src: currentMediaUrl,
+                        children: isVid ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
+                            src: currentMedia,
                             controls: true,
                             autoPlay: true,
                             playsInline: true,
                             className: "max-h-[75vh] max-w-full object-contain shadow-2xl animate-in zoom-in-95 fade-in duration-300 rounded-md"
                         }, currentIndex, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 412,
+                            lineNumber: 360,
                             columnNumber: 25
-                        }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: currentMediaUrl,
+                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: currentMedia,
                             alt: "Gallery view",
                             className: "max-h-[75vh] max-w-full object-contain shadow-2xl animate-in zoom-in-95 fade-in duration-300 rounded-md"
                         }, currentIndex, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 421,
+                            lineNumber: 362,
                             columnNumber: 25
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 409,
+                        lineNumber: 358,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0)),
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        onClick: (e)=>{
-                            e.stopPropagation();
-                            onNext();
-                        },
+                        onClick: onNext,
                         className: "absolute right-4 md:right-8 p-3 bg-black/20 hover:bg-white/10 text-white rounded-full transition-all backdrop-blur-sm z-40 group border border-white/5",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                             className: "w-8 h-8 group-hover:translate-x-1 transition-transform"
                         }, void 0, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 434,
+                            lineNumber: 366,
                             columnNumber: 21
-                        }, ("TURBOPACK compile-time value", void 0))
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                        lineNumber: 430,
+                        lineNumber: 365,
                         columnNumber: 17
-                    }, ("TURBOPACK compile-time value", void 0))
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 401,
+                lineNumber: 354,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0)),
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "h-24 md:h-28 bg-black/40 backdrop-blur-md border-t border-white/5 w-full flex items-center justify-center z-50",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex gap-3 overflow-x-auto w-full max-w-6xl px-4 py-2 no-scrollbar scroll-smooth",
                     children: location.gallery.map((media, idx)=>{
-                        const isThumbVideo = isVideo(media);
+                        const isThumbVid = isVideo(media);
                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            ref: idx === currentIndex ? thumbnailRef : null,
+                            ref: idx === currentIndex ? thumbRef : null,
                             onClick: ()=>onSelect(idx),
                             className: `relative flex-shrink-0 h-16 w-24 md:h-20 md:w-32 rounded-lg overflow-hidden transition-all duration-300 ${currentIndex === idx ? 'ring-2 ring-teal-500 ring-offset-2 ring-offset-black scale-105 opacity-100' : 'opacity-50 hover:opacity-100 hover:scale-105'}`,
-                            children: isThumbVideo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: isThumbVid ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "relative w-full h-full bg-slate-900 flex items-center justify-center",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
@@ -1888,65 +1907,64 @@ const Lightbox = ({ location, currentIndex, onClose, onNext, onPrev, onSelect })
                                         className: "w-full h-full object-cover opacity-60 pointer-events-none"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 455,
+                                        lineNumber: 384,
                                         columnNumber: 41
-                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "absolute inset-0 flex items-center justify-center",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$play$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Play$3e$__["Play"], {
-                                            className: "w-6 h-6 text-white fill-white opacity-90 shadow-lg drop-shadow-md"
+                                            className: "w-6 h-6 text-white fill-white opacity-90"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                            lineNumber: 457,
+                                            lineNumber: 386,
                                             columnNumber: 45
-                                        }, ("TURBOPACK compile-time value", void 0))
+                                        }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                        lineNumber: 456,
+                                        lineNumber: 385,
                                         columnNumber: 41
-                                    }, ("TURBOPACK compile-time value", void 0))
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 454,
+                                lineNumber: 383,
                                 columnNumber: 37
-                            }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: media,
                                 alt: "thumb",
                                 className: "w-full h-full object-cover"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                                lineNumber: 461,
+                                lineNumber: 390,
                                 columnNumber: 37
-                            }, ("TURBOPACK compile-time value", void 0))
+                            }, this)
                         }, idx, false, {
                             fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                            lineNumber: 444,
+                            lineNumber: 375,
                             columnNumber: 29
-                        }, ("TURBOPACK compile-time value", void 0));
+                        }, this);
                     })
                 }, void 0, false, {
                     fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                    lineNumber: 440,
+                    lineNumber: 371,
                     columnNumber: 17
-                }, ("TURBOPACK compile-time value", void 0))
+                }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-                lineNumber: 439,
+                lineNumber: 370,
                 columnNumber: 13
-            }, ("TURBOPACK compile-time value", void 0))
+            }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/features/offices/ManagedOffices.tsx",
-        lineNumber: 380,
+        lineNumber: 338,
         columnNumber: 9
-    }, ("TURBOPACK compile-time value", void 0));
-};
-_s1(Lightbox, "2VOHp0qCoT9nfmfxoqf9rZnmJw0=");
+    }, this);
+}
+_s2(Lightbox, "pBnC7umuBgFjsauZMOGMd8CE7yk=");
 _c2 = Lightbox;
-const __TURBOPACK__default__export__ = ManagedOffice;
 var _c, _c1, _c2;
-__turbopack_context__.k.register(_c, "ManagedOffice");
+__turbopack_context__.k.register(_c, "ManagedOffices");
 __turbopack_context__.k.register(_c1, "LocationCard");
 __turbopack_context__.k.register(_c2, "Lightbox");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {

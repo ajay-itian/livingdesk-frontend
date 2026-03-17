@@ -5,25 +5,32 @@ import { usePathname } from "next/navigation";
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-interface NavLinkCompatProps {
-  to: string;
+interface NavLinkCompatProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  to?: string;
   href?: string;
-  className?: string;
   activeClassName?: string;
-  children?: React.ReactNode;
-  onClick?: () => void;
 }
 
 const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(
-  ({ className, activeClassName, to, href, ...props }, ref) => {
+  ({ className, activeClassName = "active", to, href, ...props }, ref) => {
     const pathname = usePathname();
-    const destination = href || to;
+
+    // Support both 'to' (React Router style) and 'href' (Next.js style)
+    const destination = href || to || "#";
+
+    // Check if the current path matches the destination
+    // Note: Use startsWith(destination) if you want parent links to stay active for sub-routes
     const isActive = pathname === destination;
+
     return (
       <NextLink
         ref={ref}
         href={destination}
-        className={cn(className, isActive && activeClassName)}
+        className={cn(
+          "transition-colors", // Optional: smooths out the active state change
+          className,
+          isActive && activeClassName
+        )}
         {...props}
       />
     );

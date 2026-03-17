@@ -4,6 +4,7 @@
   "/blogs/page": "/blogs",
   "/booking/page": "/booking",
   "/community/page": "/community",
+  "/managed-office-pune/[slug]/page": "/managed-office-pune/[slug]",
   "/managed-office-pune/page": "/managed-office-pune",
   "/page": "/",
   "/survey/page": "/survey",
