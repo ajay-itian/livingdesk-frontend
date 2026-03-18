@@ -488,7 +488,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$c
 ;
 /**
  * MIMICS BACKEND LOGIC: Sanitizes titles into slugs that match S3 filenames.
- * This prevents 404s and accidental redirects to the home page.
  */ const generateBackendMatchSlug = (title)=>{
     const STOP_WORDS = new Set([
         "a",
@@ -563,13 +562,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$c
         "no"
     ]);
     if (!title) return "blog-post";
-    // Lowercase and remove special characters
     let slug = title.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
-    // Split words and filter stop words
     let words = slug.split(/\s+/).filter((w)=>w && !STOP_WORDS.has(w));
-    // Join with hyphens
     slug = words.join("-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
-    // Cap at 60 chars on a word boundary (Matching Python's rfind logic)
     if (slug.length > 60) {
         const truncated = slug.substring(0, 60);
         const lastHyphen = truncated.lastIndexOf("-");
@@ -581,12 +576,16 @@ const BlogsPage = ()=>{
     const [blogs, setBlogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    const API_BASE = ("TURBOPACK compile-time value", "https://evzp3stpn2.execute-api.ap-south-1.amazonaws.com/prod/api") || "http://localhost:8000/api";
+    // Configuration
+    const API_BASE = ("TURBOPACK compile-time value", "https://evzp3stpn2.execute-api.ap-south-1.amazonaws.com/prod/api") || "https://api.thelivingdesk.in/api";
     const API_KEY = ("TURBOPACK compile-time value", "syGE7Drau6J2oC3xbXOsJ_dYFYpVqUcOzF3RXHbc0R0") || "";
     const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
     const S3_REGION = "ap-south-1";
     const S3_PREFIX = "blogs/";
+    // Internal URL for fetching data
     const bucketBase = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
+    // PUBLIC URL for the User Experience (CLEAN URL)
+    const PUBLIC_BLOG_DOMAIN = "https://thelivingdesk.in/blogs";
     const FALLBACK_IMAGES = [
         "https://images.pexels.com/photos/1181304/pexels-photo-1181304.jpeg?w=800",
         "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?w=800",
@@ -682,13 +681,11 @@ const BlogsPage = ()=>{
         const doc = parser.parseFromString(html, "text/html");
         const getMeta = (name)=>doc.querySelector(`meta[name="${name}"], meta[property="${name}"], meta[property="og:${name}"]`)?.getAttribute("content");
         const fileName = s3Key.split("/").pop() || "";
-        const slugFromS3 = fileName.replace(".html", "");
-        const title = getMeta("title") || getMeta("og:title") || doc.title || slugFromS3.replace(/-/g, " ");
+        const slug = fileName.replace(".html", "");
+        const title = getMeta("title") || getMeta("og:title") || doc.title || slug.replace(/-/g, " ");
         const description = getMeta("description") || getMeta("og:description") || "";
-        // IMPORTANT: We use the S3 slug as the source of truth for the ID/URL
-        const slug = slugFromS3;
-        // FIX: Replaced BLOG_BASE with bucketBase so sharing the link gives a working URL
-        const cleanUrl = `${bucketBase}/blogs/${slug}.html`;
+        // CLEAN URL UPDATED HERE
+        const cleanUrl = `${PUBLIC_BLOG_DOMAIN}/${slug}.html`;
         let image = s3Image;
         if (!image) {
             const ogImg = getMeta("og:image") || getMeta("image");
@@ -696,9 +693,7 @@ const BlogsPage = ()=>{
         }
         if (!image) {
             let hash = 0;
-            for(let i = 0; i < slug.length; i++){
-                hash = slug.charCodeAt(i) + ((hash << 5) - hash);
-            }
+            for(let i = 0; i < slug.length; i++)hash = slug.charCodeAt(i) + ((hash << 5) - hash);
             image = FALLBACK_IMAGES[Math.abs(hash) % FALLBACK_IMAGES.length];
         }
         let finalDate = s3CreatedDate;
@@ -726,10 +721,9 @@ const BlogsPage = ()=>{
         };
     };
     const getBlogUrl = (blog)=>{
-        // If the slug is missing, generate it from the title to predict the S3 filename
         const finalSlug = blog.slug || generateBackendMatchSlug(blog.title);
-        // FIX: Point directly to the S3 bucket to bypass Next.js 404s & redirects
-        return `${bucketBase}/blogs/${finalSlug}.html`;
+        // CLEAN URL RETURNED HERE
+        return `${PUBLIC_BLOG_DOMAIN}/${finalSlug}.html`;
     };
     const openBlog = (blog)=>{
         incrementView(blog);
@@ -782,7 +776,7 @@ const BlogsPage = ()=>{
             });
             else {
                 await navigator.clipboard.writeText(url);
-                alert("Link copied!");
+                alert("Link copied to clipboard!");
             }
         } catch (err) {
             console.error(err);
@@ -793,7 +787,7 @@ const BlogsPage = ()=>{
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                lineNumber: 270,
+                lineNumber: 257,
                 columnNumber: 13
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -806,22 +800,22 @@ const BlogsPage = ()=>{
                             className: "w-12 h-12 animate-spin text-primary"
                         }, void 0, false, {
                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                            lineNumber: 275,
+                            lineNumber: 262,
                             columnNumber: 29
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                        lineNumber: 274,
+                        lineNumber: 261,
                         columnNumber: 25
                     }, ("TURBOPACK compile-time value", void 0)) : error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "text-center py-20",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "text-red-500",
+                                className: "text-red-500 font-medium",
                                 children: error
                             }, void 0, false, {
                                 fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                lineNumber: 279,
+                                lineNumber: 266,
                                 columnNumber: 29
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -830,13 +824,13 @@ const BlogsPage = ()=>{
                                 children: "Retry"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                lineNumber: 280,
+                                lineNumber: 267,
                                 columnNumber: 29
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                        lineNumber: 278,
+                        lineNumber: 265,
                         columnNumber: 25
                     }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
@@ -855,17 +849,17 @@ const BlogsPage = ()=>{
                                                     className: "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 292,
+                                                    lineNumber: 279,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "absolute top-4 right-4 bg-background/90 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1",
+                                                    className: "absolute top-4 right-4 bg-background/90 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 backdrop-blur-sm",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$clock$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Clock$3e$__["Clock"], {
                                                             className: "w-3 h-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                            lineNumber: 298,
+                                                            lineNumber: 285,
                                                             columnNumber: 49
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         getReadTime(blog.excerpt),
@@ -873,13 +867,13 @@ const BlogsPage = ()=>{
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 297,
+                                                    lineNumber: 284,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                            lineNumber: 291,
+                                            lineNumber: 278,
                                             columnNumber: 41
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -892,14 +886,16 @@ const BlogsPage = ()=>{
                                                             className: "w-3 h-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                            lineNumber: 304,
+                                                            lineNumber: 291,
                                                             columnNumber: 49
                                                         }, ("TURBOPACK compile-time value", void 0)),
-                                                        new Date(blog.published_at).toLocaleDateString()
+                                                        new Date(blog.published_at).toLocaleDateString(undefined, {
+                                                            dateStyle: 'medium'
+                                                        })
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 303,
+                                                    lineNumber: 290,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -907,7 +903,7 @@ const BlogsPage = ()=>{
                                                     children: blog.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 307,
+                                                    lineNumber: 294,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -915,7 +911,7 @@ const BlogsPage = ()=>{
                                                     children: blog.excerpt
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 310,
+                                                    lineNumber: 297,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -924,105 +920,124 @@ const BlogsPage = ()=>{
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                                                             variant: "ghost",
                                                             size: "sm",
+                                                            className: "px-0 group-hover:text-primary",
                                                             children: [
-                                                                "Read ",
+                                                                "Read More ",
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
-                                                                    className: "w-4 h-4 ml-1"
+                                                                    className: "w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 315,
-                                                                    columnNumber: 58
+                                                                    lineNumber: 302,
+                                                                    columnNumber: 63
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                            lineNumber: 314,
+                                                            lineNumber: 301,
                                                             columnNumber: 49
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex items-center gap-2",
+                                                            className: "flex items-center gap-3",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$heart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Heart$3e$__["Heart"], {
-                                                                    className: `w-4 h-4 ${blog.isLiked ? "text-red-500 fill-current" : ""}`,
-                                                                    onClick: (e)=>handleLike(e, blog)
-                                                                }, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex items-center gap-1",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$heart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Heart$3e$__["Heart"], {
+                                                                            className: `w-4 h-4 transition-colors ${blog.isLiked ? "text-red-500 fill-current" : "hover:text-red-500"}`,
+                                                                            onClick: (e)=>handleLike(e, blog)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/blogs/BlogsPage.tsx",
+                                                                            lineNumber: 306,
+                                                                            columnNumber: 57
+                                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "text-xs text-muted-foreground",
+                                                                            children: blog.likes || 0
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/blogs/BlogsPage.tsx",
+                                                                            lineNumber: 310,
+                                                                            columnNumber: 57
+                                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                                    ]
+                                                                }, void 0, true, {
                                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 318,
+                                                                    lineNumber: 305,
                                                                     columnNumber: 53
                                                                 }, ("TURBOPACK compile-time value", void 0)),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-xs",
-                                                                    children: blog.likes || 0
-                                                                }, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex items-center gap-1",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
+                                                                            className: "w-4 h-4 text-muted-foreground"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/blogs/BlogsPage.tsx",
+                                                                            lineNumber: 313,
+                                                                            columnNumber: 57
+                                                                        }, ("TURBOPACK compile-time value", void 0)),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "text-xs text-muted-foreground",
+                                                                            children: blog.views || 0
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/blogs/BlogsPage.tsx",
+                                                                            lineNumber: 314,
+                                                                            columnNumber: 57
+                                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                                    ]
+                                                                }, void 0, true, {
                                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 319,
-                                                                    columnNumber: 53
-                                                                }, ("TURBOPACK compile-time value", void 0)),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
-                                                                    className: "w-4 h-4"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 320,
-                                                                    columnNumber: 53
-                                                                }, ("TURBOPACK compile-time value", void 0)),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-xs",
-                                                                    children: blog.views || 0
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 321,
+                                                                    lineNumber: 312,
                                                                     columnNumber: 53
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$share$2d$2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Share2$3e$__["Share2"], {
-                                                                    className: "w-4 h-4",
+                                                                    className: "w-4 h-4 text-muted-foreground hover:text-primary transition-colors",
                                                                     onClick: (e)=>handleShare(e, blog)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                                    lineNumber: 322,
+                                                                    lineNumber: 316,
                                                                     columnNumber: 53
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                            lineNumber: 317,
+                                                            lineNumber: 304,
                                                             columnNumber: 49
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                                    lineNumber: 313,
+                                                    lineNumber: 300,
                                                     columnNumber: 45
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                            lineNumber: 302,
+                                            lineNumber: 289,
                                             columnNumber: 41
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                    lineNumber: 290,
+                                    lineNumber: 277,
                                     columnNumber: 37
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, blog.id, false, {
                                 fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                                lineNumber: 285,
+                                lineNumber: 272,
                                 columnNumber: 33
                             }, ("TURBOPACK compile-time value", void 0)))
                     }, void 0, false, {
                         fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                        lineNumber: 283,
+                        lineNumber: 270,
                         columnNumber: 25
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                    lineNumber: 272,
+                    lineNumber: 259,
                     columnNumber: 17
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/src/components/blogs/BlogsPage.tsx",
-                lineNumber: 271,
+                lineNumber: 258,
                 columnNumber: 13
             }, ("TURBOPACK compile-time value", void 0))
         ]

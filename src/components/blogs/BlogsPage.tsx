@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Calendar, Share2, Loader2, Clock, ArrowRight, Eye, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ interface ExtendedBlog extends Blog {
 
 /**
  * MIMICS BACKEND LOGIC: Sanitizes titles into slugs that match S3 filenames.
- * This prevents 404s and accidental redirects to the home page.
  */
 const generateBackendMatchSlug = (title: string): string => {
     const STOP_WORDS = new Set([
@@ -32,23 +30,15 @@ const generateBackendMatchSlug = (title: string): string => {
     ]);
 
     if (!title) return "blog-post";
-
-    // Lowercase and remove special characters
     let slug = title.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
-
-    // Split words and filter stop words
     let words = slug.split(/\s+/).filter(w => w && !STOP_WORDS.has(w));
-
-    // Join with hyphens
     slug = words.join("-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
 
-    // Cap at 60 chars on a word boundary (Matching Python's rfind logic)
     if (slug.length > 60) {
         const truncated = slug.substring(0, 60);
         const lastHyphen = truncated.lastIndexOf("-");
         slug = lastHyphen !== -1 ? truncated.substring(0, lastHyphen) : truncated;
     }
-
     return slug || "blog-post";
 };
 
@@ -57,12 +47,18 @@ const BlogsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000/api";
+    // Configuration
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.thelivingdesk.in/api";
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
     const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
     const S3_REGION = "ap-south-1";
     const S3_PREFIX = "blogs/";
+
+    // Internal URL for fetching data
     const bucketBase = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
+
+    // PUBLIC URL for the User Experience (CLEAN URL)
+    const PUBLIC_BLOG_DOMAIN = "https://thelivingdesk.in/blogs";
 
     const FALLBACK_IMAGES = [
         "https://images.pexels.com/photos/1181304/pexels-photo-1181304.jpeg?w=800",
@@ -108,9 +104,7 @@ const BlogsPage = () => {
                 headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
             });
             return res.ok ? await res.json() : {};
-        } catch (e) {
-            return {};
-        }
+        } catch (e) { return {}; }
     };
 
     const fetchS3Blogs = async (): Promise<ExtendedBlog[]> => {
@@ -166,16 +160,13 @@ const BlogsPage = () => {
                 ?.getAttribute("content");
 
         const fileName = s3Key.split("/").pop() || "";
-        const slugFromS3 = fileName.replace(".html", "");
+        const slug = fileName.replace(".html", "");
 
-        const title = getMeta("title") || getMeta("og:title") || doc.title || slugFromS3.replace(/-/g, " ");
+        const title = getMeta("title") || getMeta("og:title") || doc.title || slug.replace(/-/g, " ");
         const description = getMeta("description") || getMeta("og:description") || "";
 
-        // IMPORTANT: We use the S3 slug as the source of truth for the ID/URL
-        const slug = slugFromS3;
-
-        // FIX: Replaced BLOG_BASE with bucketBase so sharing the link gives a working URL
-        const cleanUrl = `${bucketBase}/blogs/${slug}.html`;
+        // CLEAN URL UPDATED HERE
+        const cleanUrl = `${PUBLIC_BLOG_DOMAIN}/${slug}.html`;
 
         let image = s3Image;
         if (!image) {
@@ -184,9 +175,7 @@ const BlogsPage = () => {
         }
         if (!image) {
             let hash = 0;
-            for (let i = 0; i < slug.length; i++) {
-                hash = slug.charCodeAt(i) + ((hash << 5) - hash);
-            }
+            for (let i = 0; i < slug.length; i++) hash = slug.charCodeAt(i) + ((hash << 5) - hash);
             image = FALLBACK_IMAGES[Math.abs(hash) % FALLBACK_IMAGES.length];
         }
 
@@ -215,11 +204,9 @@ const BlogsPage = () => {
     };
 
     const getBlogUrl = (blog: ExtendedBlog) => {
-        // If the slug is missing, generate it from the title to predict the S3 filename
         const finalSlug = blog.slug || generateBackendMatchSlug(blog.title);
-
-        // FIX: Point directly to the S3 bucket to bypass Next.js 404s & redirects
-        return `${bucketBase}/blogs/${finalSlug}.html`;
+        // CLEAN URL RETURNED HERE
+        return `${PUBLIC_BLOG_DOMAIN}/${finalSlug}.html`;
     };
 
     const openBlog = (blog: ExtendedBlog) => {
@@ -258,7 +245,7 @@ const BlogsPage = () => {
             if (navigator.share) await navigator.share({ title: blog.title, url });
             else {
                 await navigator.clipboard.writeText(url);
-                alert("Link copied!");
+                alert("Link copied to clipboard!");
             }
         } catch (err) { console.error(err); }
     };
@@ -276,7 +263,7 @@ const BlogsPage = () => {
                         </div>
                     ) : error ? (
                         <div className="text-center py-20">
-                            <p className="text-red-500">{error}</p>
+                            <p className="text-red-500 font-medium">{error}</p>
                             <Button className="mt-4" onClick={loadData}>Retry</Button>
                         </div>
                     ) : (
@@ -294,7 +281,7 @@ const BlogsPage = () => {
                                                 alt={blog.title}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
-                                            <div className="absolute top-4 right-4 bg-background/90 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                                            <div className="absolute top-4 right-4 bg-background/90 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
                                                 <Clock className="w-3 h-3" />
                                                 {getReadTime(blog.excerpt)} min
                                             </div>
@@ -302,7 +289,7 @@ const BlogsPage = () => {
                                         <div className="p-6 space-y-4">
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <Calendar className="w-3 h-3" />
-                                                {new Date(blog.published_at).toLocaleDateString()}
+                                                {new Date(blog.published_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                                             </div>
                                             <h3 className="text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors">
                                                 {blog.title}
@@ -311,15 +298,25 @@ const BlogsPage = () => {
                                                 {blog.excerpt}
                                             </p>
                                             <div className="flex items-center justify-between pt-4 border-t">
-                                                <Button variant="ghost" size="sm">
-                                                    Read <ArrowRight className="w-4 h-4 ml-1" />
+                                                <Button variant="ghost" size="sm" className="px-0 group-hover:text-primary">
+                                                    Read More <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                                                 </Button>
-                                                <div className="flex items-center gap-2">
-                                                    <Heart className={`w-4 h-4 ${blog.isLiked ? "text-red-500 fill-current" : ""}`} onClick={(e) => handleLike(e, blog)} />
-                                                    <span className="text-xs">{blog.likes || 0}</span>
-                                                    <Eye className="w-4 h-4" />
-                                                    <span className="text-xs">{blog.views || 0}</span>
-                                                    <Share2 className="w-4 h-4" onClick={(e) => handleShare(e, blog)} />
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-1">
+                                                        <Heart
+                                                            className={`w-4 h-4 transition-colors ${blog.isLiked ? "text-red-500 fill-current" : "hover:text-red-500"}`}
+                                                            onClick={(e) => handleLike(e, blog)}
+                                                        />
+                                                        <span className="text-xs text-muted-foreground">{blog.likes || 0}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Eye className="w-4 h-4 text-muted-foreground" />
+                                                        <span className="text-xs text-muted-foreground">{blog.views || 0}</span>
+                                                    </div>
+                                                    <Share2
+                                                        className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors"
+                                                        onClick={(e) => handleShare(e, blog)}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>

@@ -2278,6 +2278,11 @@ body {
   padding: 1px;
 }
 
+.px-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .px-1 {
   padding-left: .25rem;
   padding-right: .25rem;
@@ -3636,6 +3641,11 @@ html {
 
 .hover\:text-primary\/90:hover {
   color: hsl(var(--primary) / .9);
+}
+
+.hover\:text-red-500:hover {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 
 .hover\:text-sidebar-accent-foreground:hover {

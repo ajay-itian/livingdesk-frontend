@@ -60,13 +60,13 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: "Home", href: "/#home" },
     { name: "Services", href: "/#services" },
-    { name: "Booking", href: "/booking" },
-    { name: "Managed Offices", href: "/managed-office-pune" },
+    { name: "Booking", href: "/booking/" }, // Added /
+    { name: "Managed Offices", href: "/managed-office-pune/" }, // Added /
     { name: "Pricing", href: "/#pricing" },
     { name: "Gallery", href: "/#gallery" },
     { name: "Locate Us", href: "/#locate" },
-    { name: "Blogs", href: "/blogs" },
-    { name: "Community", href: "/community" },
+    { name: "Blogs", href: "/blogs/" }, // Added /
+    { name: "Community", href: "/community/" }, // Added /
   ];
 
   return (

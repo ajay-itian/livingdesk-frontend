@@ -75,6 +75,10 @@ self.__SERVER_FILES_MANIFEST={
         {
           "protocol": "https",
           "hostname": "thelivingdesk.in"
+        },
+        {
+          "protocol": "https",
+          "hostname": "images.pexels.com"
         }
       ],
       "qualities": [
