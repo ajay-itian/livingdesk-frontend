@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":""}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///E:/The_Living_Desk/livingdesk-hq-main/src/app/managed-office-pune/page.tsx"],"sourcesContent":["import ManagedOffices from \"@/components/features/offices/ManagedOffices\";\n\nexport default function ManagedOfficesPage() {\n  return <ManagedOffices />;\n}\n"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBAAO,8OAAC,sKAAc;;;;;AACxB"}}]
-}

@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Coworking Space in Pimple Saudagar, Pune | The Living Desk",
     description: "Premium coworking & managed office space in Pimple Saudagar, Pimpri Chinchwad. Private cabins, hot desks, meeting rooms. Book a free tour today!",
-    url: "https://thelivingdesk.in/",
+    url: "https://www.thelivingdesk.in/",
     siteName: "The Living Desk",
     locale: "en_IN",
     type: "website",
     images: [
       {
-        url: "https://thelivingdesk.in/og-image.jpg",
+        url: "https://www.thelivingdesk.in/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "The Living Desk - Coworking Space in Pimple Saudagar, Pune",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coworking Space in Pimple Saudagar, Pune | The Living Desk",
     description: "Premium coworking & managed office space in Pimple Saudagar, Pimpri Chinchwad. Private cabins, hot desks, meeting rooms.",
-    images: ["https://thelivingdesk.in/og-image.jpg"],
+    images: ["https://www.thelivingdesk.in/og-image.jpg"],
   },
   verification: {
     google: "_q8cTRFIanOYH7XVG48D6-5Qi1lKg6flfdslj3Ku3Pk",

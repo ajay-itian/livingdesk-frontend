@@ -1,31 +1,20 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
-    "/Index": [
-      "static/chunks/4355af307a5a6222.js",
-      "static/chunks/89eb18b6af5a93f9.js",
-      "static/chunks/6286a1d05d5a1c8f.js",
-      "static/chunks/a957340485641b18.js",
-      "static/chunks/5626a84cd77f3d57.js",
-      "static/chunks/turbopack-d2ce82ab96818aeb.js"
-    ],
     "/NotFound": [
-      "static/chunks/4804cc617d12ee28.js",
-      "static/chunks/89eb18b6af5a93f9.js",
-      "static/chunks/6286a1d05d5a1c8f.js",
-      "static/chunks/5626a84cd77f3d57.js",
-      "static/chunks/turbopack-c69e7838cb6ea5e8.js"
+      "static/chunks/4355af307a5a6222.js",
+      "static/chunks/88710778d8816e88.js",
+      "static/chunks/86f918b6365d2651.js",
+      "static/chunks/turbopack-bd4707b7bad26339.js"
     ],
     "/_app": [
-      "static/chunks/7db304816c5836ed.js",
-      "static/chunks/5626a84cd77f3d57.js",
-      "static/chunks/6286a1d05d5a1c8f.js",
-      "static/chunks/turbopack-2309771f8674bb34.js"
+      "static/chunks/ab92fcde88315798.js",
+      "static/chunks/88710778d8816e88.js",
+      "static/chunks/turbopack-39732901c0798b90.js"
     ],
     "/_error": [
       "static/chunks/15cfe4a4ab82ee34.js",
-      "static/chunks/5626a84cd77f3d57.js",
-      "static/chunks/6286a1d05d5a1c8f.js",
-      "static/chunks/turbopack-a31dbfe540b126a9.js"
+      "static/chunks/88710778d8816e88.js",
+      "static/chunks/turbopack-ab649a4dfe6cbfce.js"
     ]
   },
   "devFiles": [],
@@ -34,11 +23,12 @@ globalThis.__BUILD_MANIFEST = {
   ],
   "lowPriorityFiles": [],
   "rootMainFiles": [
-    "static/chunks/cb81c94c84c84253.js",
-    "static/chunks/1627bf2f54f2038d.js",
-    "static/chunks/58054aefee29294a.js",
+    "static/chunks/d59f830a2b8e768c.js",
+    "static/chunks/d54799806b9979c8.js",
     "static/chunks/f2f58a7e93290fbb.js",
-    "static/chunks/turbopack-ac45f6294f33565c.js"
+    "static/chunks/725576f1d706fa88.js",
+    "static/chunks/82abf2d65f5428ae.js",
+    "static/chunks/turbopack-7ab16ecc374acbf3.js"
   ]
 };
 globalThis.__BUILD_MANIFEST.lowPriorityFiles = [

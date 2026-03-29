@@ -1,9 +1,12 @@
-# ✅ Directed at all search engines
+# thelivingdesk.in — robots.txt
+# Updated to explicitly allow individual blog post URLs
+
 User-agent: *
 Allow: /
 Allow: /blogs/
+Allow: /blogs/*.html
 
-# Block sensitive directories and system files
+# Block sensitive directories
 Disallow: /private/
 Disallow: /admin/
 Disallow: /config/
@@ -11,21 +14,21 @@ Disallow: /temp/
 Disallow: /_next/static/development/
 Disallow: /api/
 
-# ✅ Prevent indexing of internal search and filtered views
+# Block filtered/search views (avoid duplicate param URLs)
 Disallow: /blogs?search=*
 Disallow: /blogs?category=*
 Disallow: /tag/*
 
-# ✅ Prevent crawling of unfinished or draft pages
+# Block draft pages
 Disallow: /draft/
 Disallow: /preview/
 
-# ✅ Specifically allow social media scrapers
+# Allow social media crawlers
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
-# ✅ Point to your Sitemap
+# Dynamic sitemap — includes every blog post URL
 Sitemap: https://thelivingdesk.in/sitemap.xml

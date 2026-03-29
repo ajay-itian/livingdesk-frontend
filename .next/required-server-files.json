@@ -42,7 +42,7 @@
         256,
         384
       ],
-      "path": "/_next/image/",
+      "path": "/_next/image",
       "loader": "default",
       "loaderFile": "",
       "domains": [],
@@ -66,19 +66,11 @@
       "remotePatterns": [
         {
           "protocol": "https",
-          "hostname": "*.amazonaws.com"
-        },
-        {
-          "protocol": "https",
-          "hostname": "images.unsplash.com"
-        },
-        {
-          "protocol": "https",
-          "hostname": "thelivingdesk.in"
-        },
-        {
-          "protocol": "https",
           "hostname": "images.pexels.com"
+        },
+        {
+          "protocol": "https",
+          "hostname": "thelivingdesk-blogs-313701249911-ap-south-1.s3.ap-south-1.amazonaws.com"
         }
       ],
       "qualities": [
@@ -95,7 +87,7 @@
     },
     "basePath": "",
     "sassOptions": {},
-    "trailingSlash": true,
+    "trailingSlash": false,
     "i18n": null,
     "productionBrowserSourceMaps": false,
     "excludeDefaultMomentLocales": true,
@@ -118,7 +110,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "E:\\The_Living_Desk\\livingdesk-hq-main",
+    "outputFileTracingRoot": "E:\\Project\\The_Living_Desk\\livingdesk-hq",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -311,11 +303,11 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
     "turbopack": {
-      "root": "E:\\The_Living_Desk\\livingdesk-hq-main"
+      "root": "E:\\Project\\The_Living_Desk\\livingdesk-hq"
     },
     "distDirRoot": ".next"
   },
-  "appDir": "E:\\The_Living_Desk\\livingdesk-hq-main",
+  "appDir": "E:\\Project\\The_Living_Desk\\livingdesk-hq",
   "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",

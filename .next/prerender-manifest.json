@@ -26,6 +26,54 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/blogs/[slug]",
+      "dataRoute": "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/blogs/struggle-real-why-indian-freelancers-need-break-home-office": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/blogs/[slug]",
+      "dataRoute": "/blogs/struggle-real-why-indian-freelancers-need-break-home-office.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/blogs": {
       "experimentalBypassFor": [
         {
@@ -292,6 +340,33 @@
     }
   },
   "dynamicRoutes": {
+    "/blogs/[slug]": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "routeRegex": "^/blogs/([^/]+?)(?:/)?$",
+      "dataRoute": "/blogs/[slug].rsc",
+      "fallback": null,
+      "fallbackRouteParams": [],
+      "dataRouteRegex": "^/blogs/([^/]+?)\\.rsc$",
+      "prefetchDataRoute": null,
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/managed-office-pune/[slug]": {
       "experimentalBypassFor": [
         {
@@ -322,8 +397,8 @@
   },
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "16ebdc84abfbd41db13e89b942cae205",
-    "previewModeSigningKey": "353d3f94d92363cbe0b9c1b42f56417b6ad88ef701ad221409b751000d0821b9",
-    "previewModeEncryptionKey": "9775efaef49ba8791dcf5b6f173c33bb8b15c3d655e157f137c7099041d14670"
+    "previewModeId": "7ea821d6bd4a733ada2c44e17f104ecf",
+    "previewModeSigningKey": "5a87b7068afc8e51b40d5ba650878163a73415ea24ca49f7cc30849aa83fec7e",
+    "previewModeEncryptionKey": "8b300943cf14edd002ac1ca2251de8f1521ab439e7390f4aaa6797e360b96593"
   }
 }

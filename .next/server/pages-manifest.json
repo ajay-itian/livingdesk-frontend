@@ -1,5 +1,4 @@
 {
-  "/Index": "pages/Index.html",
   "/NotFound": "pages/NotFound.html",
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
