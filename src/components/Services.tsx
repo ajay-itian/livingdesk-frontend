@@ -24,35 +24,35 @@ const services: ServiceItem[] = [
   {
     icon: Building2,
     title: "Private Offices",
-    description: "Secure, fully-furnished private office cabins in Pimple Saudagar for teams of all sizes with 24/7 access.",
+    description: "Secure, fully-furnished, air-conditioned private office cabins in Pimple Saudagar for teams of all sizes with 24/7 access.",
     image: Cabin2,
     alt: "Private office cabins for rent at The Living Desk Pimple Saudagar"
   },
   {
     icon: Users,
     title: "Meeting Rooms",
-    description: "Professional conference rooms in Pune equipped with high-speed WiFi and AV for seamless presentations.",
+    description: "Professional air-conditioned conference rooms in Pune equipped with high-speed WiFi and AV for seamless presentations.",
     image: Cabin1,
     alt: "Professional meeting and conference rooms at Vision Flora Pune"
   },
   {
     icon: Briefcase,
     title: "Dedicated Desks",
-    description: "Your own permanent workspace in a vibrant coworking community, perfect for growing startups.",
+    description: "Your own permanent workspace in a vibrant air-conditioned coworking community, perfect for growing startups.",
     image: Cabin3,
     alt: "Dedicated coworking desk in Pimpri Chinchwad Pune"
   },
   {
     icon: Coffee,
     title: "Hot Desks",
-    description: "Flexible, budget-friendly coworking day passes and hot desk solutions for freelancers and remote workers.",
+    description: "Flexible, budget-friendly air-conditioned coworking day passes and hot desk solutions for freelancers and remote workers.",
     image: hot_desk,
     alt: "Flexible hot desk workspace solutions in Pune"
   },
   {
     icon: Building2,
     title: "Managed Office",
-    description: "Tailor-made, fully managed office spaces in Pune with complete IT support and facility management.",
+    description: "Tailor-made, fully managed air-conditioned office spaces in Pune with complete IT support and facility management.",
     image: VTPAltitude,
     alt: "Customized managed office solutions in Pimple Saudagar Pune",
     path: "/managed-office-pune",

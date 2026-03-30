@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Wind, Wifi, Coffee, Clock } from "lucide-react";
 const heroImage = '/images/hero-coworking.webp';
 
 const Hero = () => {
@@ -30,10 +30,31 @@ const Hero = () => {
               Premium Coworking Space in
               <span className="block text-primary">Pimple Saudagar</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
+            <p className="text-xl md:text-2xl mb-6 text-muted-foreground">
               Elevate your business at Pune's most professional managed office.
-              Private cabins, dedicated desks, and meeting rooms at Vision Flora.
+              Fully air-conditioned private cabins, dedicated desks, and meeting rooms at Vision Flora.
             </p>
+
+            {/* ✅ Amenity Badges — AC highlighted first for Pune summer visibility */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              <span className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-sm font-medium">
+                <Wind className="h-4 w-4" />
+                100% Air Conditioned
+              </span>
+              <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground border border-border rounded-full px-4 py-1.5 text-sm font-medium">
+                <Wifi className="h-4 w-4" />
+                High-Speed WiFi
+              </span>
+              <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground border border-border rounded-full px-4 py-1.5 text-sm font-medium">
+                <Coffee className="h-4 w-4" />
+                Free Beverages
+              </span>
+              <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground border border-border rounded-full px-4 py-1.5 text-sm font-medium">
+                <Clock className="h-4 w-4" />
+                24/7 Access
+              </span>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" onClick={scrollToContact} className="group" aria-label="Book a free tour">
                 Schedule a Tour

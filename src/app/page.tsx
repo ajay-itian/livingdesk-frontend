@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 
 // All your SEO Meta tags go here
 export const metadata: Metadata = {
-  title: "Coworking Space in Pimple Saudagar, Pune | The Living Desk",
+  title: "Coworking Space & Managed Office in Pune | The Living Desk",
   description: "Premium coworking & managed office space in Pimple Saudagar, Pune. Private cabins & meeting rooms from ₹299. Book a free tour at Vision Flora, Kunal Icon Rd!",
   alternates: { canonical: "https://www.thelivingdesk.in/" },
   openGraph: {

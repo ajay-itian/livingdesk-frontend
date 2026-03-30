@@ -111,7 +111,7 @@ const Footer = () => {
                 The Living Desk
               </h3>
               <p className="text-primary-foreground/80">
-                Your premium coworking space for productivity and growth
+                Your premium air-conditioned coworking space for productivity and growth
               </p>
             </div>
 
