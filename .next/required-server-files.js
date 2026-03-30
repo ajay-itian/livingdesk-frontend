@@ -305,7 +305,7 @@ self.__SERVER_FILES_MANIFEST={
     "turbopack": {
       "root": "E:\\Project\\The_Living_Desk\\livingdesk-hq"
     },
-    "distDirRoot": ".next"
+    "distDirRoot": "out"
   },
   "appDir": "E:\\Project\\The_Living_Desk\\livingdesk-hq",
   "relativeAppDir": "",
