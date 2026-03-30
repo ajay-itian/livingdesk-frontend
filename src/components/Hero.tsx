@@ -46,10 +46,6 @@ const Hero = () => {
                 High-Speed WiFi
               </span>
               <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground border border-border rounded-full px-4 py-1.5 text-sm font-medium">
-                <Coffee className="h-4 w-4" />
-                Free Beverages
-              </span>
-              <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground border border-border rounded-full px-4 py-1.5 text-sm font-medium">
                 <Clock className="h-4 w-4" />
                 24/7 Access
               </span>
