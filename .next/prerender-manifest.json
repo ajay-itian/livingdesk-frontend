@@ -26,7 +26,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/blogs/breaking-time-zone-struggle-indian-freelancers-maintain": {
+    "/survey": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -39,8 +39,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/blogs/[slug]",
-      "dataRoute": "/blogs/breaking-time-zone-struggle-indian-freelancers-maintain.rsc",
+      "srcRoute": "/survey",
+      "dataRoute": "/survey.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -50,7 +50,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes": {
+    "/wifi": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -63,8 +63,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/blogs/[slug]",
-      "dataRoute": "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes.rsc",
+      "srcRoute": "/wifi",
+      "dataRoute": "/wifi.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -74,7 +74,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/blogs/struggle-real-why-indian-freelancers-need-break-home-office": {
+    "/managed-office-pune": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -87,8 +87,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/blogs/[slug]",
-      "dataRoute": "/blogs/struggle-real-why-indian-freelancers-need-break-home-office.rsc",
+      "srcRoute": "/managed-office-pune",
+      "dataRoute": "/managed-office-pune.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/community": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/community",
+      "dataRoute": "/community.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -122,7 +146,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/booking": {
+    "/": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -135,8 +159,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/booking",
-      "dataRoute": "/booking.rsc",
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -146,7 +170,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/community": {
+    "/visitor-survey": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -159,8 +183,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/community",
-      "dataRoute": "/community.rsc",
+      "srcRoute": "/visitor-survey",
+      "dataRoute": "/visitor-survey.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -242,7 +266,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/managed-office-pune": {
+    "/booking": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -255,8 +279,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/managed-office-pune",
-      "dataRoute": "/managed-office-pune.rsc",
+      "srcRoute": "/booking",
+      "dataRoute": "/booking.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -266,7 +290,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
+    "/blogs/breaking-time-zone-struggle-indian-freelancers-maintain": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -279,8 +303,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
+      "srcRoute": "/blogs/[slug]",
+      "dataRoute": "/blogs/breaking-time-zone-struggle-indian-freelancers-maintain.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -290,7 +314,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/survey": {
+    "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -303,8 +327,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/survey",
-      "dataRoute": "/survey.rsc",
+      "srcRoute": "/blogs/[slug]",
+      "dataRoute": "/blogs/chaos-productivity-why-pune-s-remote-workers-ditching-cafes.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -314,7 +338,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/visitor-survey": {
+    "/blogs/struggle-real-why-indian-freelancers-need-break-home-office": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -327,32 +351,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/visitor-survey",
-      "dataRoute": "/visitor-survey.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/wifi": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/wifi",
-      "dataRoute": "/wifi.rsc",
+      "srcRoute": "/blogs/[slug]",
+      "dataRoute": "/blogs/struggle-real-why-indian-freelancers-need-break-home-office.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -364,33 +364,6 @@
     }
   },
   "dynamicRoutes": {
-    "/blogs/[slug]": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "routeRegex": "^/blogs/([^/]+?)(?:/)?$",
-      "dataRoute": "/blogs/[slug].rsc",
-      "fallback": null,
-      "fallbackRouteParams": [],
-      "dataRouteRegex": "^/blogs/([^/]+?)\\.rsc$",
-      "prefetchDataRoute": null,
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/managed-office-pune/[slug]": {
       "experimentalBypassFor": [
         {
@@ -406,9 +379,32 @@
       "routeRegex": "^/managed\\-office\\-pune/([^/]+?)(?:/)?$",
       "dataRoute": "/managed-office-pune/[slug].rsc",
       "fallback": null,
-      "fallbackRouteParams": [],
       "dataRouteRegex": "^/managed\\-office\\-pune/([^/]+?)\\.rsc$",
-      "prefetchDataRoute": null,
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/blogs/[slug]": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "routeRegex": "^/blogs/([^/]+?)(?:/)?$",
+      "dataRoute": "/blogs/[slug].rsc",
+      "fallback": null,
+      "dataRouteRegex": "^/blogs/([^/]+?)\\.rsc$",
       "allowHeader": [
         "host",
         "x-matched-path",

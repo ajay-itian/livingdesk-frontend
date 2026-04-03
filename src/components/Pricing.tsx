@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const plans = [
   {
     name: "Day Pass",
-    price: "₹249",
+    price: "₹299",
     period: "per day",
     description: "Perfect for occasional visits and trial days",
     features: [

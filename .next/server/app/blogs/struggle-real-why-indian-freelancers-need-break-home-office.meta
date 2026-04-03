@@ -3,14 +3,5 @@
     "x-nextjs-stale-time": "300",
     "x-nextjs-prerender": "1",
     "x-next-cache-tags": "_N_T_/layout,_N_T_/blogs/layout,_N_T_/blogs/[slug]/layout,_N_T_/blogs/[slug]/page,_N_T_/blogs/struggle-real-why-indian-freelancers-need-break-home-office/"
-  },
-  "segmentPaths": [
-    "/_tree",
-    "/_full",
-    "/blogs/$d$slug/__PAGE__",
-    "/blogs/$d$slug",
-    "/blogs",
-    "/_index",
-    "/_head"
-  ]
+  }
 }

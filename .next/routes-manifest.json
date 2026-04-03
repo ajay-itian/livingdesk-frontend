@@ -1,7 +1,6 @@
 {
   "version": 3,
   "pages404": true,
-  "appType": "hybrid",
   "caseSensitive": false,
   "basePath": "",
   "redirects": [
@@ -9,7 +8,6 @@
       "source": "/:file((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/]+\\.\\w+)/",
       "destination": "/:file",
       "internal": true,
-      "priority": true,
       "missing": [
         {
           "type": "header",
@@ -23,7 +21,6 @@
       "source": "/:notfile((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+)",
       "destination": "/:notfile/",
       "internal": true,
-      "priority": true,
       "statusCode": 308,
       "regex": "^(?:/((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+))$"
     }
@@ -122,11 +119,10 @@
     "didPostponeHeader": "x-nextjs-postponed",
     "contentTypeHeader": "text/x-component",
     "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
     "prefetchSegmentHeader": "next-router-segment-prefetch",
     "prefetchSegmentSuffix": ".segment.rsc",
-    "prefetchSegmentDirSuffix": ".segments",
-    "clientParamParsing": false,
-    "dynamicRSCPrerender": false
+    "prefetchSegmentDirSuffix": ".segments"
   },
   "rewriteHeaders": {
     "pathHeader": "x-nextjs-rewritten-path",

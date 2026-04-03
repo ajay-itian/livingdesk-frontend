@@ -8,7 +8,6 @@ import LocateUs from "@/components/LocateUs";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
-// All your SEO Meta tags go here
 export const metadata: Metadata = {
   title: "Coworking Space & Managed Office in Pune | The Living Desk",
   description: "Premium coworking & managed office space in Pimple Saudagar, Pune. Private cabins & meeting rooms from ₹299. Book a free tour at Vision Flora, Kunal Icon Rd!",
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       <Navbar />
       <Hero />
       <Services />
@@ -34,6 +33,6 @@ export default function Home() {
       <LocateUs />
       <Contact />
       <Footer />
-    </div>
+    </main>
   );
 }

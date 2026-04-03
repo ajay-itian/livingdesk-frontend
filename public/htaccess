@@ -1,0 +1,26 @@
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# 1. Serve real files (JS, CSS, images, fonts, _next/, etc.) directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# 2. Serve real directories directly
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 3. For trailing-slash URLs like /booking/ /blogs/ /community/ etc.
+#    serve the pre-built index.html that Next.js generated
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}index.html -f
+RewriteRule ^(.+)/$ /$1/index.html [L]
+
+# 4. For URLs WITHOUT trailing slash like /booking → redirect to /booking/
+#    (required because Next.js trailingSlash: true generates /booking/index.html)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule ^(.*)$ /$1/ [R=301,L]
+
+# 5. Custom 404 page (Next.js generates this automatically)
+ErrorDocument 404 /404/index.html

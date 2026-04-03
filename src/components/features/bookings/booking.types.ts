@@ -2,8 +2,9 @@
 import { z } from "zod";
 
 export const bookingSchema = z.object({
-  email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  name:  z.string().min(1, "Name is required"),
+  email: z.string().email("Please enter a valid email address"),
   room_id: z.string().min(1, "Please select a room"),
   date: z.date({
     required_error: "Please select a date",
@@ -13,6 +14,19 @@ export const bookingSchema = z.object({
 export type BookingFormData = z.infer<typeof bookingSchema>;
 
 export interface ChargeInfo {
+  // ── New company-credit fields ──────────────────────────────
+  user_type: "member" | "guest";
+  company_id: string | null;
+  company_name: string | null;
+  monthly_credit_hours: number;
+  company_used_hours: number;
+  company_remaining_hours: number;
+  requested_hours: number;
+  free_hours_applied: number;
+  paid_hours: number;
+  amount: number;
+  rate_per_30min: number;
+  // ── Legacy fields (kept for backwards compat) ───────────────
   is_existing_customer: boolean;
   monthly_hours: number;
   charge_per_hour: number;
@@ -23,19 +37,20 @@ export interface ChargeInfo {
 
 export interface PaymentIntent {
   payment_id: string;
-  email: string;
+  phone: string;
+  name: string;
   amount: number;
   currency: string;
   status: string;
   upi_id: string;
   upi_url: string;
   qr_code: string;
-  created_at: string;
 }
 
 export interface PendingBooking {
-  email: string;
   phone: string;
+  name: string;
+  email: string;          // required
   room_id: number;
   date: string;
   start_time: string;
@@ -51,8 +66,9 @@ export interface AvailabilityResponse {
 
 export interface BookingResponse {
   id: string;
-  email: string;
   phone: string;
+  name: string;
+  email: string;
   room_id: number;
   date: string;
   start_time: string;
@@ -61,16 +77,11 @@ export interface BookingResponse {
   created_at: string;
   pricing: {
     duration_hours: number;
-    rate_per_hour: number;
+    rate_per_30min: number;
     total_charge: number;
     tier: string;
     tier_description: string;
     currency: string;
-  };
-  zoho_sync?: {
-    success: boolean;
-    contact_id?: string;
-    error?: string;
   };
 }
 

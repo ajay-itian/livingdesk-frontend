@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // optional, depends on if they used Inter
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { GoogleAnalytics } from '@next/third-parties/google';
+import FcmHandler from "@/components/FcmHandler";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Coworking Space in Pimple Saudagar, Pune | Managed Offices | The Living Desk",
@@ -48,9 +52,18 @@ export default function RootLayout({
         <meta name="geo.placename" content="Pimple Saudagar, Pune, Maharashtra" />
         <meta name="geo.position" content="18.5921498;73.7589091" />
         <meta name="ICBM" content="18.5921498, 73.7589091" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#09090b" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body>
-        <Providers>{children}</Providers>
+      <body className={inter.className}>
+        <Providers>
+          {/* This component handles the Notification logic for Windows/Browsers */}
+          <FcmHandler />
+          {children}
+        </Providers>
+        <GoogleAnalytics gaId="G-V7HM7LJ0T4" />
       </body>
     </html>
   );
