@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function BlogsPage() {
-    return <BlogsPageInner />;
+  return <BlogsPageInner />;
 }

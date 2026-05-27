@@ -110,9 +110,9 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-primary-foreground/80">
-                <li>+91 70660 02650</li>
+                <li>+91 70660 02651</li>
                 <li>+91 95959 10945</li>
-                <li>thelivingdesk@gmail.com</li>
+                <li>contact@thelivingdesk.in</li>
               </ul>
             </div>
 

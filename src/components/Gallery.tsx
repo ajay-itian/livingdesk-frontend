@@ -8,7 +8,8 @@ const gallery1 = '/images/gallery-1.webp';
 const gallery2 = '/images/gallery-2.webp';
 const gallery3 = '/images/gallery-3.webp';
 const gallery4 = '/images/gallery-4.webp';
-const Cabin1 = '/images/CABIN_1.webp';
+const Cabin1 = '/images/CABIN_3_NEW.webp';
+const Cabin2 = '/images/CABIN_2_NEW.webp';
 const hot_desk = '/images/hot_desk.webp';
 const balcony = '/images/balcony.webp';
 const cover_view = '/images/cover_view.webp';
@@ -23,6 +24,7 @@ const Gallery = () => {
     { src: gallery3, alt: "Professional meeting room facilities at The Living Desk" },
     { src: gallery4, alt: "Collaborative coworking environment for startups" },
     { src: Cabin1, alt: "Private office cabin for rent in Pimpri Chinchwad" },
+    { src: Cabin2, alt: "Reception and managed office entrance" },
     { src: hot_desk, alt: "Flexible hot desk workspace in Pimple Saudagar" },
     { src: balcony, alt: "Outdoor breakout area at The Living Desk Vision Flora" },
     { src: cover_view, alt: "Reception and managed office entrance" },

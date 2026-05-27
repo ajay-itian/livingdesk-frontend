@@ -1,10 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Copy, CheckCircle2, ExternalLink, Smartphone, User, CalendarDays, Clock } from "lucide-react";
+import { Loader2, Copy, User, CalendarDays, ShieldCheck, ArrowRight, Zap, Check, Smartphone, QrCode } from "lucide-react";
 import { PaymentIntent, PendingBooking } from "./booking.types";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -19,121 +20,142 @@ interface PaymentDialogProps {
 }
 
 export function PaymentDialog({ open, onOpenChange, loadingPayment, paymentIntent, pendingBooking, copied, onCopyUpiId, onConfirmBooking, isSubmitting }: PaymentDialogProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
-  // 1. Construct the UPI URL
-  // pa: Payee VPA, pn: Payee Name, am: Amount, cu: Currency, tn: Transaction Note
   const upiUrl = paymentIntent
     ? `upi://pay?pa=${paymentIntent.upi_id}&pn=Library%20Booking&am=${paymentIntent.amount}&cu=INR&tn=Booking%20for%20${pendingBooking?.name || 'User'}`
     : "#";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-lg max-h-[92dvh] flex flex-col p-0 gap-0 overflow-hidden rounded-2xl">
-        <DialogHeader className="px-6 pt-5 pb-4 border-b">
-          <DialogTitle className="text-lg font-black uppercase tracking-tight">Complete Payment</DialogTitle>
-          <DialogDescription className="text-sm">Scan QR or pay via UPI ID to confirm booking.</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="p-0 gap-0 overflow-hidden rounded-[2rem] sm:rounded-[3rem] w-[95vw] max-w-lg border-none shadow-2xl bg-white">
 
-        <div className="flex-1 overflow-y-auto">
-          {loadingPayment ? (
-            <div className="flex flex-col items-center py-16 gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm font-medium">Generating QR…</p>
+        {/* Top Branding Section */}
+        <div className="bg-zinc-950 p-8 pt-10 text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#3b82f644_0%,transparent_70%)] pointer-events-none" />
+
+          <div className="relative z-10 space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-2">
+              <ShieldCheck size={12} />
+              Secure Checkout
             </div>
-          ) : paymentIntent && (
-            <div className="p-5 space-y-5">
-              {/* Amount Display */}
-              <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 text-center">
-                <p className="text-xs font-bold uppercase text-zinc-500 mb-1">Amount Due</p>
-                <p className="text-4xl font-black text-primary">₹{paymentIntent.amount}</p>
-              </div>
-
-              {/* Mobile Redirect Button (Visible mostly on mobile) */}
-              <div className="block sm:hidden">
-                <Button
-                  asChild
-                  className="w-full bg-[#111] hover:bg-black text-white h-12 rounded-xl flex items-center justify-center gap-2 font-bold"
-                >
-                  <a href={upiUrl}>
-                    <Smartphone size={18} />
-                    Pay via Any UPI App
-                  </a>
-                </Button>
-                <p className="text-[10px] text-center mt-2 text-zinc-500 font-medium">GPay, PhonePe, Paytm, etc.</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* QR Code Section */}
-                <div className="space-y-3">
-                  <p className="text-sm font-bold flex items-center gap-2">
-                    <span className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center text-[10px]">1</span>
-                    Scan QR
-                  </p>
-                  <div className="bg-white border rounded-2xl p-3 flex justify-center min-h-[160px] relative">
-                    {!imageLoaded && <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-zinc-300" /></div>}
-                    <img
-                      src={paymentIntent.qr_code}
-                      alt="UPI QR"
-                      className={`w-full max-w-[160px] aspect-square object-contain transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-                      onLoad={() => setImageLoaded(true)}
-                    />
-                  </div>
-                </div>
-
-                {/* UPI ID Section */}
-                <div className="space-y-3">
-                  <p className="text-sm font-bold flex items-center gap-2">
-                    <span className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center text-[10px]">2</span>
-                    UPI ID
-                  </p>
-                  <div className="flex items-center gap-2 bg-muted rounded-xl p-3 border">
-                    <code className="flex-1 text-[11px] font-mono font-bold break-all">{paymentIntent.upi_id}</code>
-                    <button onClick={onCopyUpiId} className="p-2 bg-white rounded-lg border shadow-sm shrink-0">
-                      {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </button>
-                  </div>
-
-                  {/* Web-only link helper */}
-                  <div className="hidden sm:block">
-                    <a
-                      href={upiUrl}
-                      className="text-[11px] flex items-center gap-1 font-bold text-primary hover:underline underline-offset-2"
-                    >
-                      <ExternalLink size={12} /> Launch UPI App
-                    </a>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-[11px] text-blue-700 space-y-1 font-medium">
-                    <p className="font-bold uppercase mb-1 text-[9px]">Quick Steps:</p>
-                    <p>• Open GPay/PhonePe</p>
-                    <p>• Scan QR or enter UPI ID</p>
-                    <p>• Pay ₹{paymentIntent.amount} & click Confirm</p>
-                  </div>
-                </div>
-              </div>
-
-              {pendingBooking && (
-                <div className="border rounded-xl p-4 space-y-2 bg-muted/30">
-                  <p className="text-[10px] font-black uppercase text-zinc-500 tracking-wider">Booking Details</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                    <div className="flex items-center gap-1.5"><User size={12} /> {pendingBooking.name}</div>
-                    <div className="flex items-center gap-1.5"><CalendarDays size={12} /> {pendingBooking.date}</div>
-                    <div className="flex items-center gap-1.5 col-span-2">
-                      <Clock size={12} />
-                      {pendingBooking.totalCharge === 299 ? "Full Day (8 AM - 6:30 PM)" : `${pendingBooking.start_time} - ${pendingBooking.end_time}`}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+            <h2 className="text-white text-3xl font-black tracking-tight">
+              ₹{paymentIntent?.amount}
+            </h2>
+            <p className="text-zinc-400 text-xs font-medium tracking-wide">
+              Complete payment to secure your seat
+            </p>
+          </div>
         </div>
 
-        <div className="px-5 py-4 border-t bg-white">
-          <Button onClick={onConfirmBooking} disabled={isSubmitting} className="w-full h-12 font-black uppercase text-sm">
-            {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Confirming…</> : "I've Paid — Confirm Booking"}
-          </Button>
+        <div className="p-6 sm:p-10 space-y-8">
+          {loadingPayment ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
+                <Loader2 className="h-10 w-10 animate-spin text-blue-600 relative" />
+              </div>
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Initialising Security...</p>
+            </div>
+          ) : (
+            <>
+              {/* Main Action Area */}
+              <div className="space-y-4">
+                {/* 1. THE BIG BUTTON (Deep Link) */}
+                <a
+                  href={upiUrl}
+                  className="group relative flex items-center justify-center gap-3 w-full bg-blue-600 hover:bg-blue-700 text-white h-16 rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]"
+                >
+                  <Zap size={20} className="fill-white group-hover:animate-pulse" />
+                  <div className="text-left">
+                    <p className="text-[10px] font-bold uppercase opacity-80 leading-none">Pay via</p>
+                    <p className="text-sm font-black uppercase tracking-widest">Any UPI App</p>
+                  </div>
+                  <ArrowRight size={18} className="absolute right-6 opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </a>
+
+                <div className="relative flex items-center py-2">
+                  <div className="flex-grow border-t border-zinc-100"></div>
+                  <span className="flex-none px-4 text-[10px] font-black text-zinc-300 uppercase tracking-widest">Or choose another way</span>
+                  <div className="flex-grow border-t border-zinc-100"></div>
+                </div>
+
+                {/* 2. THE ALTERNATIVES TABLET */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setShowQR(!showQR)}
+                    className={cn(
+                      "flex items-center justify-center gap-2 h-12 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all",
+                      showQR ? "bg-zinc-950 border-zinc-950 text-white" : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    )}
+                  >
+                    <QrCode size={14} />
+                    {showQR ? "Hide QR" : "Show QR"}
+                  </button>
+
+                  <button
+                    onClick={onCopyUpiId}
+                    className={cn(
+                      "flex items-center justify-center gap-2 h-12 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all",
+                      copied ? "bg-green-50 border-green-200 text-green-600" : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    )}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                    {copied ? "Copied ID" : "Copy ID"}
+                  </button>
+                </div>
+
+                {/* QR Display Area (Collapsible) */}
+                {showQR && paymentIntent && (
+                  <div className="pt-4 flex flex-col items-center animate-in fade-in zoom-in duration-300">
+                    <div className="p-4 bg-zinc-50 rounded-3xl border border-zinc-100 mb-2">
+                      <img
+                        src={paymentIntent.qr_code}
+                        alt="UPI QR"
+                        className="w-40 h-40 mix-blend-multiply"
+                      />
+                    </div>
+                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Scan with GPay, PhonePe, or Paytm</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Booking Context Card */}
+              <div className="bg-zinc-50 rounded-2xl p-5 flex items-center justify-between border border-zinc-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-zinc-100">
+                    <User size={18} className="text-zinc-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-zinc-900 leading-tight">{pendingBooking?.name}</p>
+                    <p className="text-[10px] font-medium text-zinc-500 italic">{pendingBooking?.date}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em]">Status</p>
+                  <p className="text-[10px] font-bold text-blue-600">Waiting for Pay</p>
+                </div>
+              </div>
+
+              {/* Verify Step */}
+              <div className="space-y-4 pt-4 border-t border-zinc-100">
+                <p className="text-[10px] text-center font-medium text-zinc-400 px-6">
+                  After completing the payment in your app, click below to verify and finalize your booking.
+                </p>
+                <Button
+                  onClick={onConfirmBooking}
+                  disabled={isSubmitting}
+                  className="w-full h-14 bg-zinc-950 hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin h-5 w-5" />
+                  ) : (
+                    "Verify & Confirm"
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

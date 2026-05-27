@@ -190,7 +190,7 @@ const Contact = () => {
               </CardHeader>
               <CardContent className="flex flex-col space-y-2">
                 <a href="tel:+917066002650" className="text-muted-foreground hover:text-primary transition-colors inline-block">
-                  +91 70660 02650
+                  +91 70660 02651
                 </a>
                 <a href="tel:+919595910945" className="text-muted-foreground hover:text-primary transition-colors inline-block">
                   +91 95959 10945
@@ -206,8 +206,8 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <a href="mailto:thelivingdesk@gmail.com" className="text-muted-foreground hover:text-primary">
-                  thelivingdesk@gmail.com
+                <a href="mailto:contact@thelivingdesk.in" className="text-muted-foreground hover:text-primary">
+                  contact@thelivingdesk.in
                 </a>
               </CardContent>
             </Card>

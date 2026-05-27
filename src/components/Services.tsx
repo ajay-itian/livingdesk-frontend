@@ -6,9 +6,9 @@ import { Building2, Users, Briefcase, Coffee } from "lucide-react";
 
 // ✅ Imagery should reflect the specific keyword for that service
 const VTPAltitude = '/images/VTP/VTP_Altitude.webp';
-const Cabin1 = '/images/CABIN_1.webp';
-const Cabin2 = '/images/CABIN_2.webp';
-const Cabin3 = '/images/CABIN_3.webp';
+const Cabin2 = '/images/CABIN_1.webp';
+const Cabin1 = '/images/CABIN_3_NEW.webp';
+const Cabin3 = '/images/CABIN_2_NEW.webp';
 const hot_desk = '/images/hot_desk.webp';
 
 interface ServiceItem {

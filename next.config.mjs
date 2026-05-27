@@ -4,18 +4,25 @@ const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
 const S3_REGION = "ap-south-1";
 
 const nextConfig = {
+  // 🔥 REQUIRED for static export
   output: "export",
-  trailingSlash: true, // This creates /visitor-survey/index.html
+
   images: {
-    unoptimized: true,
+    unoptimized: true, // required for static export
     remotePatterns: [
       { protocol: "https", hostname: "images.pexels.com" },
-      { protocol: "https", hostname: `${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com` },
+      {
+        protocol: "https",
+        hostname: `${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`,
+      },
     ],
   },
-  // Adding these to prevent build breaks during export
+
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+
+  // ✅ Optional but recommended for S3 hosting
+  trailingSlash: true,   // helps avoid 404 in S3
 };
 
 export default nextConfig;

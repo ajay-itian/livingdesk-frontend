@@ -5,7 +5,7 @@ import { format, addDays, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
-import { API_BASE, fetchWithApiKey } from "@/lib/api";
+import { API_BASE, apiClient, fetchWithApiKey } from "@/lib/api";
 import {
   Send,
   CheckCircle2,
@@ -377,10 +377,34 @@ export default function BookingChat() {
 
   useEffect(() => {
     let active = true;
-    fetchWithApiKey(`${API_BASE}/rooms`)
-      .then((r) => r.json())
-      .then((data) => { if (active) setRooms(data); })
-      .catch(() => toast({ title: "Could not load rooms", variant: "destructive" }));
+
+    apiClient
+      .get<any[]>("/rooms")
+      .then((data) => {
+        if (!active) return;
+        if (Array.isArray(data)) {
+          setRooms(data);
+        } else {
+          console.warn("Unexpected rooms payload", data);
+          setRooms([]);
+          toast({
+            title: "Could not load rooms",
+            description: "Invalid API response format.",
+            variant: "destructive",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Rooms fetch failed", error);
+        if (active) {
+          setRooms([]);
+          toast({
+            title: "Could not load rooms",
+            description: error?.response?.data?.detail || "Please try again.",
+            variant: "destructive",
+          });
+        }
+      });
 
     const istHour = new Date(
       new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
@@ -971,4 +995,4 @@ export default function BookingChat() {
       />
     </div>
   );
-}
+} 

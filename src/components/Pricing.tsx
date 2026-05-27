@@ -53,7 +53,7 @@ const plans = [
   },
   {
     name: "Small Cabin",
-    price: "₹20,000",
+    price: "₹24,999",
     period: "per month",
     description: "Perfect private space for small teams (4 persons)",
     features: [
@@ -69,7 +69,7 @@ const plans = [
   },
   {
     name: "Private Office",
-    price: "₹24,999",
+    price: "₹29,999",
     period: "per month",
     description: "Exclusive space for your team (6 persons)",
     features: [

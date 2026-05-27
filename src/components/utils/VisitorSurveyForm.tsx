@@ -19,9 +19,9 @@ interface FormData {
 interface VisitorResponse {
     survey_id: string;
     name: string;
-    email: string;
+    email?: string | null;         // ← optional: old records may not have it
     phone_number: string;
-    address: string;
+    address?: string | null;
     team_size: number;
     expected_date: string;
     budget: number;
@@ -108,6 +108,13 @@ const VisitorSurveyForm = () => {
         }
     };
 
+    // Helper: show email or a readable fallback
+    const displayEmail = (email?: string | null) => {
+        if (!email) return null;
+        if (email.startsWith('no-email-') && email.endsWith('@placeholder.com')) return null;
+        return email;
+    };
+
     useEffect(() => {
         if (view === 'admin') {
             fetchVisitors();
@@ -144,7 +151,9 @@ const VisitorSurveyForm = () => {
                         onClick={() => setView(view === 'form' ? 'admin' : 'form')}
                         className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur border border-gray-200 rounded-full text-sm font-semibold text-gray-700 hover:bg-white hover:shadow-md transition-all"
                     >
-                        {view === 'form' ? <><LayoutDashboard className="w-4 h-4" /> Admin View</> : <><ArrowLeft className="w-4 h-4" /> Back to Form</>}
+                        {view === 'form'
+                            ? <><LayoutDashboard className="w-4 h-4" /> Admin View</>
+                            : <><ArrowLeft className="w-4 h-4" /> Back to Form</>}
                     </button>
                 </div>
 
@@ -232,12 +241,21 @@ const VisitorSurveyForm = () => {
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {loadingAdmin && visitors.length === 0 ? (
-                                            <tr><td colSpan={6} className="px-6 py-12 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500 mb-2" /><p>Loading records...</p></td></tr>
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center">
+                                                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500 mb-2" />
+                                                    <p>Loading records...</p>
+                                                </td>
+                                            </tr>
                                         ) : visitors.map((v) => (
                                             <tr key={v.survey_id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <div className="font-semibold text-gray-900">{v.name}</div>
-                                                    <div className="text-xs text-gray-400">{v.email || 'No Email'}</div>
+                                                    {/* Only show email if it's a real one, not the placeholder */}
+                                                    {displayEmail(v.email)
+                                                        ? <div className="text-xs text-gray-400">{displayEmail(v.email)}</div>
+                                                        : <div className="text-xs text-gray-300 italic">No email</div>
+                                                    }
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
@@ -251,19 +269,24 @@ const VisitorSurveyForm = () => {
                                                     <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-medium">{v.team_size} Seats</span>
                                                 </td>
                                                 <td className="px-6 py-4 font-medium text-gray-900">
-                                                    {v.budget > 1 ? `₹${Number(v.budget).toLocaleString()}` : <span className="text-gray-300 italic">-</span>}
+                                                    {v.budget > 1
+                                                        ? `₹${Number(v.budget).toLocaleString()}`
+                                                        : <span className="text-gray-300 italic">-</span>
+                                                    }
                                                 </td>
                                                 <td className="px-6 py-4 text-xs">
                                                     <div className="text-gray-700">Start: {v.expected_date}</div>
                                                     <div className="text-gray-400 mt-1">Ref: {new Date(v.created_at).toLocaleDateString()}</div>
                                                 </td>
-                                                {/* --- FIXED NOTES COLUMN --- */}
                                                 <td className="px-6 py-4">
                                                     <div
                                                         className="text-xs text-gray-600 whitespace-normal break-words max-w-[250px] line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
-                                                        title={v.address}
+                                                        title={v.address ?? ''}
                                                     >
-                                                        {v.address ? v.address : <span className="text-gray-300 italic text-[10px]">No notes provided</span>}
+                                                        {v.address
+                                                            ? v.address
+                                                            : <span className="text-gray-300 italic text-[10px]">No notes provided</span>
+                                                        }
                                                     </div>
                                                 </td>
                                             </tr>
@@ -283,7 +306,9 @@ const InputField = ({ icon: Icon, label, isFocused, ...props }: any) => (
     <div className="group">
         <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">{label}</label>
         <div className={`relative flex items-center transition-all duration-300 rounded-xl border ${isFocused ? 'border-indigo-500 ring-4 ring-indigo-500/10 bg-white shadow-sm' : 'border-gray-200 bg-gray-50/50 hover:bg-white'}`}>
-            <div className={`absolute left-4 transition-colors ${isFocused ? 'text-indigo-500' : 'text-gray-400'}`}><Icon className="w-5 h-5" /></div>
+            <div className={`absolute left-4 transition-colors ${isFocused ? 'text-indigo-500' : 'text-gray-400'}`}>
+                <Icon className="w-5 h-5" />
+            </div>
             <input className="w-full pl-12 pr-4 py-3.5 bg-transparent rounded-xl outline-none text-gray-900 font-medium placeholder:text-gray-400" {...props} />
         </div>
     </div>

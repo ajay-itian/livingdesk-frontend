@@ -38,22 +38,36 @@ export const fetchWithApiKey = async (
   options: RequestInit = {}
 ): Promise<Response> => {
   const headers = new Headers(options.headers);
+  const method = (options.method ?? 'GET').toUpperCase();
 
-  if (!headers.has('Content-Type')) {
+  // Avoid adding Content-Type for GET/HEAD requests because
+  // `Content-Type: application/json` makes them non-simple CORS requests.
+  // That can trigger preflight checks and fail if the gateway does not
+  // handle OPTIONS correctly for the route.
+  if (method !== 'GET' && method !== 'HEAD' && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
   if (API_KEY) {
-    // Standard Custom Header for FastAPI
+    // NOTE: `x-api-key` and `Api-Key` are non-simple CORS headers.
+    // They will trigger a CORS preflight (OPTIONS) on cross-origin requests
+    // regardless of the HTTP method — including GET — even after the
+    // Content-Type fix above.  The API Gateway must therefore have an OPTIONS
+    // handler configured for every GET route that is called cross-origin
+    // (e.g. /rooms, /bookings/availability) in order to fully resolve the
+    // 405 error.  Configuring OPTIONS on the API Gateway is a remaining
+    // infrastructure concern outside this frontend codebase.
+
+    // Standard custom header for FastAPI
     headers.set('Api-Key', API_KEY);
 
-    // AWS API Gateway often requires 'x-api-key' specifically. 
-    // Adding both ensures compatibility with both local FastAPI and AWS Gateway auth.
+    // AWS API Gateway may require x-api-key specifically.
     headers.set('x-api-key', API_KEY);
   }
 
   return fetch(url, {
     ...options,
+    method,
     headers,
   });
 };
