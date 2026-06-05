@@ -4,10 +4,10 @@
   "/survey/page": "/survey",
   "/wifi/page": "/wifi",
   "/visitor-survey/page": "/visitor-survey",
-  "/blogs/page": "/blogs",
   "/booking/page": "/booking",
-  "/blogs/[slug]/page": "/blogs/[slug]",
-  "/managed-office-pune/[slug]/page": "/managed-office-pune/[slug]",
+  "/blogs/page": "/blogs",
   "/managed-office-pune/page": "/managed-office-pune",
+  "/managed-office-pune/[slug]/page": "/managed-office-pune/[slug]",
+  "/blogs/[slug]/page": "/blogs/[slug]",
   "/page": "/"
 }

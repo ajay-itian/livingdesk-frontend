@@ -46,6 +46,15 @@ const Baner4 = '/images/BANER/VIRTUAL_MAPS_YBZ.webp';
 const Baner5 = '/images/BANER/LOCATION_YBZ.webp';
 const BanerVideo = '/videos/YBZ_VIDEO.mp4';
 
+
+
+const Bhosari1 = '/images/BHOSARI/gera-front.webp';
+const Bhosari2 = '/images/BHOSARI/gera-1.webp';
+const Bhosari3 = '/images/BHOSARI/gera-2.webp';
+const Bhosari5 = '/images/BHOSARI/gera-4.webp';
+const Bhosari6 = '/images/BHOSARI/gera-5.webp';
+const Bhosarimaps = '/images/BHOSARI/gera-maps.webp';
+
 // ─── Data ───────────────────────────────────────────────────────────────────
 export const locations: OfficeLocation[] = [
     {
@@ -60,10 +69,35 @@ export const locations: OfficeLocation[] = [
         price: 'Starting ₹6,500/seat',
         description:
             "A premium managed workspace nestled in the heart of Wakad, VTP Altitude offers a sophisticated environment for businesses that demand excellence. With state-of-the-art infrastructure and a prime location on the Aundh-Ravet BRTS corridor, this space is designed to elevate your team's productivity.",
-        highlights: ['Prime BRTS Corridor Location', 'Dedicated Cabin Available', 'Fully Managed Services', 'Flexible Seat Plans'],
-        amenities: ['High-Speed Wifi', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
-        gallery: [VTPAltitude, VTPAltitude4, featureplan, VTPAltitude1, VTPInner1, VTPInner2, VTPInner3, VTPInner4, VTPInner5, VTPAltitude2, VTPAltitude3],
+        highlights: [
+            'Prime BRTS Corridor Location',
+            'Dedicated Cabin Available',
+            'Fully Managed Services',
+            'Flexible Seat Plans'
+        ],
+        amenities: [
+            'High-Speed Wifi',
+            'Conference Rooms',
+            'Valet Parking',
+            'Power Backup',
+            '24/7 Security & CCTV Surveillance',
+            'Housekeeping Services'
+        ],
+        gallery: [
+            VTPAltitude,
+            VTPAltitude4,
+            featureplan,
+            VTPAltitude1,
+            VTPInner1,
+            VTPInner2,
+            VTPInner3,
+            VTPInner4,
+            VTPInner5,
+            VTPAltitude2,
+            VTPAltitude3
+        ],
     },
+
     {
         id: 'punawale-01',
         slug: 'punawale',
@@ -74,11 +108,33 @@ export const locations: OfficeLocation[] = [
         capacity: '50 Seats',
         size: '2000 sq.ft',
         price: 'Starting ₹6,500/seat',
-        description: 'Sai Millenium is a spacious, well-connected workspace sitting right on the Mumbai-Pune Bypass — making it the ideal base for teams that value accessibility and scale. With 2000 sq.ft of thoughtfully designed floor space, it comfortably accommodates growing teams.',
-        highlights: ['Mumbai-Pune Bypass Access', 'Large Team Capacity', 'Scalable Floor Plans', 'Easy Highway Connectivity'],
-        amenities: ['High-Speed Wifi', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
-        gallery: [Punawale1, Punawale2, Punawale3, Punawale4, Punawale5, Punawale6, Punawale7],
+        description:
+            'Sai Millenium is a spacious, well-connected workspace sitting right on the Mumbai-Pune Bypass — making it the ideal base for teams that value accessibility and scale. With 2000 sq.ft of thoughtfully designed floor space, it comfortably accommodates growing teams.',
+        highlights: [
+            'Mumbai-Pune Bypass Access',
+            'Large Team Capacity',
+            'Scalable Floor Plans',
+            'Easy Highway Connectivity'
+        ],
+        amenities: [
+            'High-Speed Wifi',
+            'Conference Rooms',
+            'Valet Parking',
+            'Power Backup',
+            '24/7 Security & CCTV Surveillance',
+            'Housekeeping Services'
+        ],
+        gallery: [
+            Punawale1,
+            Punawale2,
+            Punawale3,
+            Punawale4,
+            Punawale5,
+            Punawale6,
+            Punawale7
+        ],
     },
+
     {
         id: 'baner-01',
         slug: 'baner',
@@ -89,9 +145,68 @@ export const locations: OfficeLocation[] = [
         capacity: '40 Seats',
         size: '1200 sq.ft',
         price: 'Starting ₹6,500/seat',
-        description: "Strategically located in Baner — one of Pune's most vibrant business districts — YBZ Yashada Business Zone puts you steps away from the metro and surrounded by Pune's top tech companies and startups. A dynamic space for a dynamic team.",
-        highlights: ['Steps from Metro Station', 'Baner Business Hub', 'Modern Infrastructure', 'Vibrant Startup Ecosystem'],
-        amenities: ['High-Speed Wifi', 'Near Metro Station', 'Conference Rooms', 'Valet Parking', 'Power Backup', '24/7 Security & CCTV Surveillance', 'Housekeeping Services'],
-        gallery: [Baner1, Baner2, Baner4, Baner5, BanerVideo],
+        description:
+            "Strategically located in Baner — one of Pune's most vibrant business districts — YBZ Yashada Business Zone puts you steps away from the metro and surrounded by Pune's top tech companies and startups. A dynamic space for a dynamic team.",
+        highlights: [
+            'Steps from Metro Station',
+            'Baner Business Hub',
+            'Modern Infrastructure',
+            'Vibrant Startup Ecosystem'
+        ],
+        amenities: [
+            'High-Speed Wifi',
+            'Near Metro Station',
+            'Conference Rooms',
+            'Valet Parking',
+            'Power Backup',
+            '24/7 Security & CCTV Surveillance',
+            'Housekeeping Services'
+        ],
+        gallery: [
+            Baner1,
+            Baner2,
+            Baner4,
+            Baner5,
+            BanerVideo
+        ],
     },
+
+    {
+        id: 'kasarwadi-01',
+        slug: 'kasarwadi',
+        area: 'Kasarwadi',
+        name: "Gera's Imperium Gateway",
+        address: 'Old Mumbai Pune Highway, Kasarwadi, Pimpri-Chinchwad, Pune, Maharashtra 411034',
+        image: Bhosari1,
+        capacity: '6-7 seats',
+        size: '381 sq.ft per',
+        price: 'Starting ₹6,500/seat',
+        description:
+            "Located in the heart of PCMC, Gera's Imperium Gateway is a premium metro-connected commercial destination offering managed offices, retail spaces, and business infrastructure. Its strategic location on the Old Mumbai-Pune Highway ensures excellent connectivity to Pune, Pimpri-Chinchwad, and major business hubs.",
+        highlights: [
+            'Bhosari Metro Station(Nashik Phata)',
+            'Direct Metro Connectivity',
+            'Prime PCMC Business Location',
+            'Premium Commercial Development',
+            'High Visibility & Accessibility'
+        ],
+        amenities: [
+            'High-Speed Wifi',
+            'Metro Connectivity',
+            'Conference Rooms',
+            '100% Power Backup',
+            '24/7 Security & CCTV Surveillance',
+            'Ample Parking',
+            'Food Court & Restaurants',
+            'Housekeeping Services'
+        ],
+        gallery: [
+            Bhosari1,
+            Bhosari2,
+            Bhosari3,
+            Bhosari5,
+            Bhosari6,
+            Bhosarimaps
+        ],
+    }
 ];
