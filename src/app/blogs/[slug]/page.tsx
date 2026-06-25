@@ -2,11 +2,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import BlogInteractions from "@/components/blogs/BlogInteractions";
+import { API_BASE } from "@/lib/api";
 
-const S3_BASE =
+const S3_BASE = process.env.NEXT_PUBLIC_S3_BASE || 
   "https://thelivingdesk-blogs-313701249911-ap-south-1.s3.ap-south-1.amazonaws.com";
-const API_BASE =
-  "https://evzp3stpn2.execute-api.ap-south-1.amazonaws.com/prod/api";
 
 function normalizeSlug(raw: string): string {
   return (raw || "")
@@ -20,14 +19,9 @@ function normalizeSlug(raw: string): string {
 async function fetchHtmlFromS3(slug: string): Promise<string | null> {
   const cleanSlug = normalizeSlug(slug);
   try {
-    let res = await fetch(`${S3_BASE}/blogs/${cleanSlug}.html`, {
+    const res = await fetch(`${S3_BASE}/blogs/${cleanSlug}.html`, {
       next: { revalidate: 3600 },
     });
-    if (!res.ok) {
-      res = await fetch(`${S3_BASE}/blogs/${cleanSlug}/index.html`, {
-        next: { revalidate: 3600 },
-      });
-    }
     if (!res.ok) return null;
     return await res.text();
   } catch {
