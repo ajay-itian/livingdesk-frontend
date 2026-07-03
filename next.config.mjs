@@ -4,11 +4,9 @@ const S3_BUCKET = "thelivingdesk-blogs-313701249911-ap-south-1";
 const S3_REGION = "ap-south-1";
 
 const nextConfig = {
-  // 🔥 REQUIRED for static export
   output: "export",
-
   images: {
-    unoptimized: true, // required for static export
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "images.pexels.com" },
       {
@@ -17,12 +15,9 @@ const nextConfig = {
       },
     ],
   },
-
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
-
-  // ✅ Optional but recommended for S3 hosting
-  trailingSlash: true,   // helps avoid 404 in S3
+  trailingSlash: true,
 };
 
 export default nextConfig;

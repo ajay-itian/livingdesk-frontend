@@ -3,65 +3,79 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { format, addDays, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import Webcam from "react-webcam";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE, apiClient, fetchWithApiKey } from "@/lib/api";
 import {
-  Send,
-  CheckCircle2,
-  Sparkles,
-  MapPin,
-  ChevronLeft,
-  AtSign,
-  Timer,
-  Hash,
-  ArrowRight,
-  Loader2,
-  CalendarDays,
-  Clock,
-  Users,
-  TrendingUp,
-  Zap,
-  Building2,
+  Send, Sparkles, MapPin, Plus, CheckCircle2, Loader2, ArrowRight,
+  Hash, AtSign, MessageSquare, PanelLeftClose,
+  PanelLeftOpen, Building2, TrendingUp,
+  Sun, Repeat, Users,
 } from "lucide-react";
+
+import PromoBanner from "@/components/PromoBanner";
 
 import { PaymentDialog } from "@/components/features/bookings/PaymentDialog";
 import type { ChargeInfo, PaymentIntent } from "@/components/features/bookings/booking.types";
+import { TIME_SLOTS } from "@/components/features/bookings/booking.types";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+/* ─── Constants ────────────────────────────────────────────────────────── */
 
 const PHONE_PREFIX = "+91 ";
 const PHONE_RE = /^\+91\s[6-9][0-9]{9}$/;
-const TIME_SLOTS = [
-  "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
-  "16:00", "16:30", "17:00", "17:30", "18:00",
-];
 
-type Step = "room" | "date" | "slots" | "phone-lookup" | "name" | "email" | "summary" | "done";
+type Step = "room" | "date" | "slots" | "phone-lookup" | "name" | "email" | "face-capture" | "summary" | "done";
 
-// ─── Summary data stored separately to avoid stale closures ──────────────────
 interface SummaryData {
   slots: string[];
   phone: string;
   name: string;
   freshCharge: ChargeInfo | null;
   email: string;
+  faceImage?: string | null;
+}
+RoomPicker
+/* ─── Helpers ──────────────────────────────────────────────────────────── */
+
+interface BookingHistoryItem {
+  id: string;
+  roomName: string;
+  date: string;
+  slots: string[];
+  timestamp: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+function saveBookingHistory(item: Omit<BookingHistoryItem, "id" | "timestamp">) {
+  try {
+    const prev = JSON.parse(localStorage.getItem("livingdesk_bookings") || "[]");
+    prev.unshift({ ...item, id: Date.now().toString(), timestamp: Date.now() });
+    localStorage.setItem("livingdesk_bookings", JSON.stringify(prev.slice(0, 10)));
+    window.dispatchEvent(new Event('booking_history_updated'));
+  } catch (e) {
+    console.error(e);
+  }
+}
+function getBookingHistory(): BookingHistoryItem[] {
+  try {
+    return JSON.parse(localStorage.getItem("livingdesk_bookings") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
 
 function isDayPassRoom(roomName?: string): boolean {
   return !!roomName?.toLowerCase().includes("day pass");
 }
-
+function isMonthlyPassRoom(roomName?: string): boolean {
+  return !!roomName?.toLowerCase().includes("monthly");
+}
 function addThirtyMinutes(slot: string | undefined): string {
   if (!slot) return "00:00";
   const [h, m] = slot.split(":").map(Number);
   const d = new Date(2000, 0, 1, h, m + 30);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
-
 function formatDuration(slotCount: number): string {
   const totalMins = slotCount * 30;
   const h = Math.floor(totalMins / 60);
@@ -71,271 +85,348 @@ function formatDuration(slotCount: number): string {
   return `${h}h ${m}m`;
 }
 
-// ─── Progress Bar ─────────────────────────────────────────────────────────────
+/* ─── Sidebar ──────────────────────────────────────────────────────────── */
 
-const STEP_LABELS: Partial<Record<Step, string>> = {
-  room: "Space", date: "Date", slots: "Time", "phone-lookup": "Contact", summary: "Confirm",
-};
+function Sidebar({ open, onToggle, onNewBooking }: { open: boolean; onToggle: () => void; onNewBooking: () => void }) {
+  const [history, setHistory] = useState<BookingHistoryItem[]>([]);
+  useEffect(() => {
+    const loadHistory = () => setHistory(getBookingHistory());
+    if (open) loadHistory();
+    window.addEventListener('booking_history_updated', loadHistory);
+    return () => window.removeEventListener('booking_history_updated', loadHistory);
+  }, [open]);
 
-function ProgressBar({ step }: { step: Step }) {
-  const visibleSteps: Step[] = ["room", "date", "slots", "phone-lookup", "summary"];
-  const currentIdx = visibleSteps.indexOf(
-    step === "name" || step === "email" ? "phone-lookup" : step === "done" ? "summary" : step
-  );
   return (
-    <div className="flex items-center gap-1 px-8 py-3 border-b border-zinc-100 dark:border-white/5 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-sm">
-      {visibleSteps.map((s, i) => (
-        <div key={s} className="flex items-center gap-1 flex-1 last:flex-none">
-          <div className={`flex items-center gap-1.5 ${i <= currentIdx ? "text-primary" : "text-zinc-300 dark:text-zinc-600"}`}>
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black border-2 transition-all duration-300 ${i < currentIdx ? "bg-primary border-primary text-white" :
-              i === currentIdx ? "border-primary text-primary bg-primary/10" :
-                "border-zinc-200 dark:border-zinc-700 text-zinc-400"
-              }`}>
-              {i < currentIdx ? "✓" : i + 1}
+    <aside className={`${open ? "w-72" : "w-0"} shrink-0 overflow-hidden transition-[width] duration-200 ease-out bg-[#171717] text-zinc-200 flex flex-col h-full`}>
+      <div className="w-72 flex flex-col h-full">
+        <div className="flex items-center justify-between px-3 py-3">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
+              <Sparkles size={14} className="text-primary" />
             </div>
-            <span className="text-[9px] font-black uppercase tracking-wider hidden sm:block">
-              {STEP_LABELS[s]}
-            </span>
+            <span className="text-sm font-semibold tracking-tight">The Living Desk</span>
           </div>
-          {i < visibleSteps.length - 1 && (
-            <div className={`flex-1 h-px mx-1 transition-all duration-300 ${i < currentIdx ? "bg-primary" : "bg-zinc-200 dark:bg-zinc-700"}`} />
+          <button onClick={onToggle} className="p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-white/10 transition-colors" title="Collapse sidebar">
+            <PanelLeftClose size={16} />
+          </button>
+        </div>
+
+        <div className="px-3 pt-1 pb-3">
+          <button
+            onClick={onNewBooking}
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition-colors"
+          >
+            <Plus size={15} /> New booking
+          </button>
+        </div>
+
+        <div className="px-4 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Recent</div>
+        <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
+          {history.length > 0 ? (
+            history.map((h) => (
+              <div key={h.id} className="px-3 py-2 text-xs text-zinc-300 bg-white/5 rounded-lg mb-1">
+                <div className="font-semibold">{h.roomName}</div>
+                <div className="text-zinc-500">{h.date} • {h.slots.length > 0 ? `${h.slots[0]} - ${addThirtyMinutes(h.slots[h.slots.length - 1])}` : 'All Day'}</div>
+              </div>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-xs text-zinc-600 italic flex items-center gap-2">
+              <MessageSquare size={12} /> No history yet
+            </div>
           )}
         </div>
-      ))}
+      </div>
+    </aside>
+  );
+}
+
+/* ─── Chat bubbles ─────────────────────────────────────────────────────── */
+
+function AssistantMessage({ text, children }: { text?: string; children?: React.ReactNode }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex gap-3.5 px-1">
+      <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+        <Sparkles size={13} className="text-primary" />
+      </div>
+      <div className="min-w-0 flex-1 space-y-3 pt-0.5">
+        {text && <p className="text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-100">{text}</p>}
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+function UserMessage({ text }: { text: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end px-1">
+      <div className="max-w-[75%] bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-100">
+        {text}
+      </div>
+    </motion.div>
+  );
+}
+
+function TypingDots() {
+  return (
+    <div className="flex gap-3.5 px-1">
+      <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center shrink-0">
+        <Sparkles size={13} className="text-primary" />
+      </div>
+      <div className="flex items-center gap-1 pt-2.5">
+        {[0, 0.15, 0.3].map((d, i) => (
+          <span key={i} className="w-1.5 h-1.5 bg-zinc-300 rounded-full animate-bounce" style={{ animationDelay: `${d}s` }} />
+        ))}
+      </div>
     </div>
   );
 }
 
-// ─── Credit Bar ───────────────────────────────────────────────────────────────
+/* ─── Widget cards ─────────────────────────────────────────────────────── */
+
+function CardShell({ children, eyebrow }: { children: React.ReactNode; eyebrow?: string }) {
+  return (
+    <div className="max-w-md space-y-2">
+      {eyebrow && <p className="text-xs text-zinc-400 dark:text-zinc-500">{eyebrow}</p>}
+      {children}
+    </div>
+  );
+}
+
+function roomVisuals(name?: string) {
+  const n = name?.toLowerCase() ?? "";
+  if (n.includes("day pass")) return { icon: Sun, badge: "₹299 / day", note: "Full-day access, any desk" };
+  if (n.includes("monthly")) return { icon: Repeat, badge: "₹5999 / month", note: "Recurring monthly access" };
+  if (n.includes("meeting") || n.includes("conference") || n.includes("huddle")) return { icon: Users, badge: "₹150 / 30 min", note: "For teams & meetings" };
+  return { icon: MapPin, badge: "Hourly", note: "Dedicated workspace" };
+}
+
+function RoomPicker({ rooms, selectedRoomId, onSelect }: { rooms: any[]; selectedRoomId?: string; onSelect: (r: any) => void }) {
+  return (
+    <CardShell>
+      {rooms.length === 0 ? (
+        <div className="flex items-center gap-2 text-zinc-400 py-1">
+          <Loader2 size={14} className="animate-spin" /> <span className="text-xs font-medium">Loading spaces…</span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {rooms.map((r) => {
+            const { icon: Icon, badge, note } = roomVisuals(r.name);
+            const isSelected = r.id === selectedRoomId;
+            return (
+              <motion.button
+                key={r.id}
+                onClick={() => onSelect(r)}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className={`flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-[border-color,box-shadow,background-color] group ${
+                  isSelected
+                    ? "border-primary shadow-md shadow-primary/20 bg-primary/5 dark:bg-primary/10"
+                    : "border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 hover:border-primary/60 hover:shadow-md hover:shadow-primary/5"
+                }`}
+              >
+                <div className="w-9 h-9 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center shrink-0 transition-colors">
+                  <Icon size={16} className="text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[13px] font-bold text-zinc-800 dark:text-zinc-100 truncate">{r.name}</p>
+                    <ArrowRight size={13} className="text-zinc-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">{note}</p>
+                  <span className="inline-block mt-1.5 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{badge}</span>
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      )}
+    </CardShell>
+  );
+}
+
+function DatePicker({ onSelect }: { onSelect: (iso: string, label: string) => void }) {
+  return (
+    <CardShell>
+      <div className="flex flex-wrap gap-2">
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => {
+          const d = addDays(new Date(), i);
+          const today = isToday(d);
+          return (
+            <button
+              key={i}
+              onClick={() => onSelect(format(d, "yyyy-MM-dd"), today ? "Today" : format(d, "EEE, do"))}
+              className={`px-3.5 py-2 rounded-full border text-[13px] font-semibold transition-colors ${today ? "bg-zinc-900 dark:bg-primary border-zinc-900 dark:border-primary text-white" : "border-zinc-200 dark:border-white/10 hover:border-primary text-zinc-700 dark:text-zinc-200"
+                }`}
+            >
+              {today ? "Today" : `${format(d, "EEE")} ${format(d, "d")}`}
+            </button>
+          );
+        })}
+      </div>
+    </CardShell>
+  );
+}
+
+function SlotPicker({
+  disabledSlots, loading, onConfirm,
+}: { disabledSlots: string[]; loading: boolean; onConfirm: (slots: string[]) => void }) {
+  const [chosen, setChosen] = useState<string[]>([]);
+  const [confirmed, setConfirmed] = useState(false);
+
+  // First tap sets the anchor. Every tap after that recomputes the range from
+  // that anchor to the newly tapped slot — so you can keep tapping further-out
+  // slots to extend the duration, or a nearer slot to shrink it, right up until
+  // you hit Confirm. Tapping the anchor again keeps it a single 30-min block.
+  const toggle = (s: string) => {
+    if (confirmed || disabledSlots.includes(s)) return;
+    if (chosen.length === 0) { setChosen([s]); return; }
+    const anchor = chosen[0];
+    if (anchor === s && chosen.length === 1) { setChosen([]); return; }
+    const a = TIME_SLOTS.indexOf(anchor), b = TIME_SLOTS.indexOf(s);
+    const range = TIME_SLOTS.slice(Math.min(a, b), Math.max(a, b) + 1);
+    if (range.some((x) => disabledSlots.includes(x))) return; // blocked slot in the way — ignore, keep current range
+    setChosen(range);
+  };
+  const quick = (h: number) => {
+    if (chosen.length === 0 || confirmed) return;
+    const start = TIME_SLOTS.indexOf(chosen[0]);
+    const range = TIME_SLOTS.slice(start, start + h * 2);
+    if (range.length === h * 2 && !range.some((x) => disabledSlots.includes(x))) {
+      setChosen(range);
+      setConfirmed(true);
+      onConfirm(range);
+    }
+  };
+  const confirmSelection = () => {
+    if (chosen.length === 0 || confirmed) return;
+    setConfirmed(true);
+    onConfirm(chosen);
+  };
+
+  return (
+    <CardShell>
+      {loading ? (
+        <div className="flex items-center gap-2 text-zinc-400 py-1">
+          <Loader2 size={14} className="animate-spin" /> <span className="text-xs">Checking availability…</span>
+        </div>
+      ) : (
+        <>
+          <div className={`flex flex-wrap gap-2 ${confirmed ? "opacity-60 pointer-events-none" : ""}`}>
+            {TIME_SLOTS.map((s) => {
+              const dis = disabledSlots.includes(s);
+              const sel = chosen.includes(s);
+              return (
+                <button
+                  key={s}
+                  disabled={dis}
+                  onClick={() => toggle(s)}
+                  className={`px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-colors ${sel ? "bg-primary border-primary text-white"
+                    : dis ? "border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-600 line-through"
+                      : "border-zinc-200 dark:border-white/10 hover:border-primary text-zinc-700 dark:text-zinc-200"
+                    }`}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+          {chosen.length > 0 && !confirmed && (
+            <div className="flex items-center justify-between bg-primary/8 dark:bg-primary/15 rounded-xl px-3 py-2 border border-primary/20">
+              <span className="text-xs font-semibold text-primary">
+                {chosen[0]}–{addThirtyMinutes(chosen[chosen.length - 1])} · {formatDuration(chosen.length)}
+              </span>
+              <button onClick={confirmSelection} className="flex items-center gap-1 bg-primary text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold">
+                Confirm <ArrowRight size={10} />
+              </button>
+            </div>
+          )}
+          {chosen.length === 1 && !confirmed && (
+            <p className="text-xs text-zinc-400 pt-1">
+              Tap a further slot to extend the range, or pick a duration:{" "}
+              {[1, 2, 3].map((h) => (
+                <button key={h} onClick={() => quick(h)} className="text-primary font-semibold underline underline-offset-2 mr-2">
+                  {h}h
+                </button>
+              ))}
+            </p>
+          )}
+        </>
+      )}
+    </CardShell>
+  );
+}
 
 function CreditBar({ chargeInfo }: { chargeInfo: ChargeInfo }) {
-  const creditUsed = chargeInfo.company_used_hours ?? 0;
   const creditMax = chargeInfo.monthly_credit_hours ?? 0;
-  const remaining = chargeInfo.company_remaining_hours ?? 0;
-  const freeApplied = chargeInfo.free_hours_applied ?? 0;
-  const paidHours = chargeInfo.paid_hours ?? 0;
-
   if (creditMax === 0) return null;
-
+  const creditUsed = chargeInfo.company_used_hours ?? 0;
+  const remaining = chargeInfo.company_remaining_hours ?? 0;
   const pct = Math.min(100, (creditUsed / creditMax) * 100);
-  const overLimit = creditUsed >= creditMax;
-
   return (
-    <div className="space-y-2 border-t border-white/10 pt-3">
+    <div className="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-white/10">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-zinc-400">
-          <Building2 size={10} />
-          <span className="text-[10px] font-bold">{chargeInfo.company_name ?? "Company Credits"}</span>
-        </div>
-        <span className="text-[10px] font-black text-zinc-300">
-          {creditUsed.toFixed(1)}h <span className="text-zinc-500 font-normal">/ {creditMax.toFixed(0)}h</span>
+        <span className="flex items-center gap-1 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+          <Building2 size={10} /> {chargeInfo.company_name ?? "Company credits"}
         </span>
+        <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-300">{creditUsed.toFixed(1)}h / {creditMax.toFixed(0)}h</span>
       </div>
-
-      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${overLimit ? "bg-red-400" : "bg-primary"}`}
-          style={{ width: `${pct}%` }}
-        />
+      <div className="h-1.5 rounded-full bg-zinc-100 dark:bg-white/10 overflow-hidden">
+        <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
       </div>
-
       {remaining > 0 && (
-        <p className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
-          <TrendingUp size={10} /> {remaining.toFixed(1)}h credit remaining this month
+        <p className="text-[10px] text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+          <TrendingUp size={9} /> {remaining.toFixed(1)}h remaining this month
         </p>
-      )}
-
-      {(freeApplied > 0 || paidHours > 0) && (
-        <div className="bg-white/5 rounded-xl p-2.5 space-y-1.5 border border-white/5">
-          {freeApplied > 0 && (
-            <div className="flex justify-between text-[10px]">
-              <span className="text-zinc-400">Free credits applied</span>
-              <span className="font-bold text-green-400">{freeApplied.toFixed(1)}h → ₹0</span>
-            </div>
-          )}
-          {paidHours > 0 && (
-            <div className="flex justify-between text-[10px]">
-              <span className="text-zinc-400">Overage (billable)</span>
-              <span className="font-bold text-primary">
-                {paidHours.toFixed(1)}h @ ₹{chargeInfo.rate_per_30min}/30 min
-              </span>
-            </div>
-          )}
-          {freeApplied > 0 && paidHours > 0 && (
-            <div className="flex items-center gap-1 text-[9px] text-amber-400 border-t border-white/10 pt-1.5">
-              <Zap size={9} className="flex-shrink-0" />
-              <span>This session crosses your company's monthly credit limit.</span>
-            </div>
-          )}
-        </div>
       )}
     </div>
   );
 }
 
-// ─── BookingSummary Sub-component ─────────────────────────────────────────────
-
-interface BookingSummaryProps {
-  roomName: string;
-  date: string;
-  slots: string[];
-  amount: number;
-  chargeInfo: ChargeInfo | null;
-  isSubmitting: boolean;
-  loadingPayment: boolean;
-  onConfirm: () => void;
-}
-
-function BookingSummary({ roomName, date, slots, amount, chargeInfo, isSubmitting, loadingPayment, onConfirm }: BookingSummaryProps) {
-  const isDayPass = isDayPassRoom(roomName);
+function SummaryCardInline({
+  roomName, date, slots, chargeInfo, amount, onConfirm, busy,
+}: { roomName: string; date: string; slots: string[]; chargeInfo: ChargeInfo | null; amount: number; onConfirm: () => void; busy: boolean }) {
+  const dp = isDayPassRoom(roomName);
   const sorted = [...slots].sort();
-  const startTime = isDayPass ? "08:00" : sorted[0];
-  const endTime = isDayPass ? "18:30" : addThirtyMinutes(sorted[sorted.length - 1]);
-  const durationLabel = isDayPass ? "Full Day" : formatDuration(slots.length);
-  const isDisabled = isSubmitting || loadingPayment;
+  const start = dp ? "08:00" : sorted[0];
+  const end = dp ? "18:30" : addThirtyMinutes(sorted[sorted.length - 1]);
   const isMember = chargeInfo?.user_type === "member";
 
   return (
-    <motion.div
-      initial={{ scale: 0.95, opacity: 0, y: 8 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className="bg-zinc-950 text-white rounded-2xl overflow-hidden shadow-2xl border border-white/10"
-    >
-      <div className="bg-gradient-to-r from-primary/80 to-primary px-6 py-4 flex items-center justify-between">
-        <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60 mb-0.5">Your Reservation</p>
-          <h4 className="text-lg font-black">{roomName}</h4>
-        </div>
-        <Sparkles size={18} className="text-white/70" />
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="max-w-md rounded-2xl border border-zinc-200 dark:border-white/10 p-4 space-y-3">
+      <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{roomName}</p>
+      <div className="space-y-1.5 text-[13px]">
+        <div className="flex justify-between"><span className="text-zinc-400">Date</span><span className="font-medium text-zinc-700 dark:text-zinc-200">{format(new Date(date), "MMM do")}</span></div>
+        <div className="flex justify-between"><span className="text-zinc-400">Time</span><span className="font-medium text-zinc-700 dark:text-zinc-200">{start}–{end}</span></div>
+        <div className="flex justify-between"><span className="text-zinc-400">Duration</span><span className="font-medium text-zinc-700 dark:text-zinc-200">{dp ? "Full day" : formatDuration(slots.length)}</span></div>
       </div>
-
-      <div className="p-5 space-y-4">
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { icon: CalendarDays, label: "Date", value: format(new Date(date), "MMM do") },
-            { icon: Clock, label: "Time", value: `${startTime}–${endTime}` },
-            { icon: Timer, label: "Duration", value: durationLabel },
-          ].map(({ icon: Icon, label, value }) => (
-            <div key={label} className="bg-white/5 rounded-xl p-3 border border-white/5">
-              <div className="flex items-center gap-1 mb-1">
-                <Icon size={10} className="text-zinc-400" />
-                <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-wider">{label}</p>
-              </div>
-              <p className="text-xs font-black leading-tight">{value}</p>
-            </div>
-          ))}
-        </div>
-
-        {isDayPass && (
-          <div className="bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 text-[10px] text-primary font-bold flex items-center gap-1.5">
-            <Zap size={10} /> Full day access · Flat rate ₹299
-          </div>
-        )}
-
-        {isMember && chargeInfo && <CreditBar chargeInfo={chargeInfo} />}
-
-        <div className="flex items-center justify-between pt-3 border-t border-white/10">
-          <div>
-            <p className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">Total</p>
-            {amount === 0 ? (
-              <p className="text-2xl font-black text-green-400">Free ✓</p>
-            ) : (
-              <p className="text-2xl font-black">₹{amount}</p>
-            )}
-          </div>
-          <button
-            onClick={onConfirm}
-            disabled={isDisabled}
-            aria-busy={isDisabled}
-            className="bg-primary text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/30 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center gap-2"
-          >
-            {isDisabled ? (
-              <><Loader2 size={13} className="animate-spin" />Processing…</>
-            ) : (
-              <>Confirm & Pay<ArrowRight size={13} /></>
-            )}
-          </button>
-        </div>
+      {isMember && chargeInfo && <CreditBar chargeInfo={chargeInfo} />}
+      <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-white/10">
+        <p className={`text-lg font-bold ${amount === 0 ? "text-green-600 dark:text-green-400" : "text-zinc-900 dark:text-zinc-100"}`}>
+          {amount === 0 ? "Free" : `₹${amount}`}
+        </p>
+        <button
+          onClick={onConfirm}
+          disabled={busy}
+          className="bg-primary text-white px-4 py-2 rounded-full text-[12px] font-semibold flex items-center gap-1.5 disabled:opacity-50"
+        >
+          {busy ? <Loader2 size={13} className="animate-spin" /> : <>Confirm & pay <ArrowRight size={12} /></>}
+        </button>
       </div>
     </motion.div>
   );
 }
 
-// ─── Chat Message ─────────────────────────────────────────────────────────────
-
-interface ChatMessageProps {
-  m: any;
-  summaryData: SummaryData | null;
-  roomName: string;
-  selectedDate: string;
-  isSubmitting: boolean;
-  loadingPayment: boolean;
-  onSummaryConfirm: (phone: string, name: string, amount: number, email: string) => void;
-}
-
-function ChatMessage({ m, summaryData, roomName, selectedDate, isSubmitting, loadingPayment, onSummaryConfirm }: ChatMessageProps) {
-  const isUser = m.from === "user";
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 28 }}
-      className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-    >
-      {!isUser && (
-        <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 flex-shrink-0">
-          <Sparkles size={12} className="text-primary" />
-        </div>
-      )}
-      <div className={`max-w-[82%] ${m.node || m.type === "summary" ? "w-full" : ""}`}>
-        {m.text && (
-          <div className={`px-4 py-2.5 rounded-2xl text-sm font-semibold leading-relaxed ${isUser
-            ? "bg-primary text-white rounded-tr-sm shadow-md shadow-primary/20"
-            : "bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 rounded-tl-sm shadow-sm border border-zinc-100 dark:border-white/5"
-            }`}>
-            {m.text}
-          </div>
-        )}
-        {m.node && <div className="mt-1">{m.node}</div>}
-        {m.type === "summary" && summaryData && (
-          <div className="mt-1">
-            <BookingSummary
-              roomName={roomName}
-              date={selectedDate}
-              slots={summaryData.slots}
-              amount={summaryData.freshCharge?.amount ?? (isDayPassRoom(roomName) ? 299 : summaryData.slots.length * 150)}
-              chargeInfo={summaryData.freshCharge}
-              isSubmitting={isSubmitting}
-              loadingPayment={loadingPayment}
-              onConfirm={() =>
-                onSummaryConfirm(
-                  summaryData.phone,
-                  summaryData.name,
-                  summaryData.freshCharge?.amount ?? (isDayPassRoom(roomName) ? 299 : summaryData.slots.length * 150),
-                  summaryData.email
-                )
-              }
-            />
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+/* ─── Main component ───────────────────────────────────────────────────── */
 
 export default function BookingChat() {
   const { toast } = useToast();
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const chatRef = useRef<HTMLDivElement>(null);
+  const webcamRef = useRef<Webcam>(null);
 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [messages, setMessages] = useState<any[]>([]);
   const [step, setStep] = useState<Step>("room");
-  const [stepHistory, setStepHistory] = useState<Step[]>([]);
   const [typing, setTyping] = useState(false);
 
   const [rooms, setRooms] = useState<any[]>([]);
@@ -357,132 +448,112 @@ export default function BookingChat() {
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [faceImage, setFaceImage] = useState<string | null>(null);
 
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
-
-  // ─── Messaging ──────────────────────────────────────────────────────────────
 
   const addMsg = useCallback((m: any) => {
     setMessages((prev) => [...prev, { ...m, id: Math.random().toString(36).substring(2, 11) }]);
   }, []);
 
-  const botSay = useCallback(async (text: string, node?: React.ReactNode) => {
+  const botSay = useCallback(async (text: string) => {
     setTyping(true);
     await new Promise((res) => setTimeout(res, 400));
     setTyping(false);
-    addMsg({ from: "bot", text, node });
+    addMsg({ from: "bot", text });
   }, [addMsg]);
 
-  // ─── Init ────────────────────────────────────────────────────────────────────
+  /* ── Init: load rooms + greet ─────────────────────────────────────── */
 
-  useEffect(() => {
-    let active = true;
+  const startConversation = useCallback(async () => {
+    try {
+      const data = await apiClient.get<any[]>("/rooms");
+      const roomsData = Array.isArray(data) ? data : [];
+      setRooms(roomsData);
 
-    apiClient
-      .get<any[]>("/rooms")
-      .then((data) => {
-        if (!active) return;
-        if (Array.isArray(data)) {
-          setRooms(data);
-        } else {
-          console.warn("Unexpected rooms payload", data);
-          setRooms([]);
-          toast({
-            title: "Could not load rooms",
-            description: "Invalid API response format.",
-            variant: "destructive",
-          });
+      const istHour = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })).getHours();
+      const greeting = istHour < 12 ? "Good morning" : istHour < 17 ? "Good afternoon" : "Good evening";
+
+      let autoSelected = false;
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("autoSelect") === "meeting") {
+          const meetingRoom = roomsData.find(r => r.name.toLowerCase().includes("meeting") || r.name.toLowerCase().includes("conference") || r.name.toLowerCase().includes("huddle"));
+          if (meetingRoom) {
+            autoSelected = true;
+            window.history.replaceState({}, '', '/booking/');
+            await botSay(`${greeting}! Which space would you like to book today?`);
+            addMsg({ from: "bot-widget", widget: "room" });
+            
+            setSelectedRoom(meetingRoom);
+            addMsg({ from: "user", text: meetingRoom.name });
+            setStep("date");
+            await botSay("Great choice! Now pick a date:");
+            addMsg({ from: "bot-widget", widget: "date" });
+          }
         }
-      })
-      .catch((error) => {
-        console.error("Rooms fetch failed", error);
-        if (active) {
-          setRooms([]);
-          toast({
-            title: "Could not load rooms",
-            description: error?.response?.data?.detail || "Please try again.",
-            variant: "destructive",
-          });
-        }
-      });
+      }
 
-    const istHour = new Date(
-      new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    ).getHours();
-
-    const greeting =
-      istHour < 12 ? "Good morning" :
-        istHour < 17 ? "Good afternoon" :
-          "Good evening";
-    if (active) botSay(`${greeting}! Which space would you like to book today?`);
-    return () => { active = false; };
-  }, [botSay]);
-
-  // ─── Auto-scroll ─────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
+      if (!autoSelected) {
+        await botSay(`${greeting}! Which space would you like to book today?`);
+        addMsg({ from: "bot-widget", widget: "room" });
+      }
+    } catch (error: any) {
+      setRooms([]);
+      toast({ title: "Could not load rooms", description: error?.response?.data?.detail || "Please try again.", variant: "destructive" });
     }
+  }, [botSay, addMsg, toast]);
+
+  useEffect(() => {
+    startConversation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
-  // ─── Step Navigation ─────────────────────────────────────────────────────────
-
-  const navigateTo = useCallback((nextStep: Step) => {
-    setStepHistory((prev) => {
-      if (prev[prev.length - 1] === step) return prev;
-      return [...prev, step];
-    });
-    setStep(nextStep);
-  }, [step]);
-
-  const goBack = useCallback(() => {
-    if (stepHistory.length === 0) return;
-    const prevStep = stepHistory[stepHistory.length - 1];
-
-    if (step === "slots") setChosenSlots([]);
-    if (step === "date") { setSelectedDate(""); setDisabledSlots([]); }
-    if (step === "phone-lookup" || step === "name" || step === "email") setInputValue("");
-
-    setStepHistory((prev) => prev.slice(0, -1));
-    setStep(prevStep);
-    setMessages((prev) => {
-      const lastBotIdx = [...prev].reverse().findIndex((m) => m.from === "bot");
-      if (lastBotIdx === -1) return prev;
-      return prev.slice(0, prev.length - 1 - lastBotIdx);
-    });
-  }, [stepHistory, step]);
-
-  // ─── Room ────────────────────────────────────────────────────────────────────
+  /* ── Room ──────────────────────────────────────────────────────────── */
 
   const handleRoomSelect = async (room: any) => {
     setSelectedRoom(room);
     addMsg({ from: "user", text: room.name });
-    navigateTo("date");
+    setStep("date");
     await botSay("Great choice! Now pick a date:");
+    addMsg({ from: "bot-widget", widget: "date" });
   };
 
-  // ─── Date ────────────────────────────────────────────────────────────────────
+  /* ── Date ──────────────────────────────────────────────────────────── */
 
   const handleDateSelect = async (iso: string, label: string) => {
     setSelectedDate(iso);
     addMsg({ from: "user", text: label });
 
-    // ── Day Pass: skip slot picker, auto-fill full day ──
     if (isDayPassRoom(selectedRoom?.name)) {
       setChosenSlots(TIME_SLOTS);
       setDisabledSlots([]);
-      navigateTo("phone-lookup");
+      setStep("phone-lookup");
       setInputValue(PHONE_PREFIX);
       await botSay("Day Pass covers the full day (8:00 – 18:30). What's your mobile number?");
       return;
     }
 
+    if (isMonthlyPassRoom(selectedRoom?.name)) {
+      setChosenSlots(TIME_SLOTS);
+      setDisabledSlots([]);
+      setStep("phone-lookup");
+      setInputValue(PHONE_PREFIX);
+      await botSay("Monthly Pass covers your recurring monthly access. What's your mobile number?");
+      return;
+    }
+
+    setStep("slots");
     setLoadingAvailability(true);
+    await botSay("Select your time slots — tap a start and end slot to set a range:");
+    addMsg({ from: "bot-widget", widget: "slots" });
+
     try {
-      const res = await fetchWithApiKey(
-        `${API_BASE}/bookings/availability?room_id=${selectedRoom.id}&date=${iso}`
-      );
+      const res = await fetchWithApiKey(`${API_BASE}/bookings/availability?room_id=${selectedRoom.id}&date=${iso}`);
       const data = await res.json();
       setDisabledSlots(data.disabled_slots || []);
     } catch {
@@ -490,54 +561,20 @@ export default function BookingChat() {
     } finally {
       setLoadingAvailability(false);
     }
-    navigateTo("slots");
-    await botSay("Select your time slots — tap a start and end slot to set a range:");
   };
 
-  // ─── Slots ───────────────────────────────────────────────────────────────────
+  /* ── Slots ─────────────────────────────────────────────────────────── */
 
-  const handleSlotToggle = (slot: string) => {
-    if (disabledSlots.includes(slot)) return;
-    setChosenSlots((prev) => {
-      if (prev.length === 0 || prev.includes(slot)) return [slot];
-      const startIdx = TIME_SLOTS.indexOf(prev[0]);
-      const endIdx = TIME_SLOTS.indexOf(slot);
-      const range = TIME_SLOTS.slice(Math.min(startIdx, endIdx), Math.max(startIdx, endIdx) + 1);
-      if (range.some((s) => disabledSlots.includes(s))) {
-        toast({ title: "Blocked slot in range", description: "Selection reset to tapped slot." });
-        return [slot];
-      }
-      return range;
-    });
-  };
-
-  const applyDuration = (hours: number) => {
-    if (chosenSlots.length === 0) {
-      toast({ title: "Pick a start slot first" });
-      return;
-    }
-    const startIdx = TIME_SLOTS.indexOf(chosenSlots[0]);
-    const range = TIME_SLOTS.slice(startIdx, startIdx + hours * 2);
-    if (range.length < hours * 2) {
-      toast({ title: "Not enough slots available at end of day" });
-      return;
-    }
-    if (range.some((s) => disabledSlots.includes(s))) {
-      toast({ title: "Time block unavailable", description: "A slot in this range is taken." });
-      return;
-    }
-    setChosenSlots(range);
-  };
-
-  const handleSlotsConfirm = async () => {
-    const sorted = [...chosenSlots].sort();
+  const handleSlotsConfirm = async (slots: string[]) => {
+    setChosenSlots(slots);
+    const sorted = [...slots].sort();
     addMsg({ from: "user", text: `${sorted[0]} – ${addThirtyMinutes(sorted[sorted.length - 1])} (${formatDuration(sorted.length)})` });
-    navigateTo("phone-lookup");
+    setStep("phone-lookup");
     setInputValue(PHONE_PREFIX);
     await botSay("Almost there! What's your mobile number?");
   };
 
-  // ─── Phone Input ─────────────────────────────────────────────────────────────
+  /* ── Phone ─────────────────────────────────────────────────────────── */
 
   const handlePhoneInput = (val: string) => {
     if (!val.startsWith(PHONE_PREFIX)) { setInputValue(PHONE_PREFIX); return; }
@@ -556,20 +593,16 @@ export default function BookingChat() {
     setTyping(true);
 
     try {
-      const hours = isDayPassRoom(selectedRoom?.name) ? 10.5 : chosenSlots.length * 0.5;
+      let hours = chosenSlots.length * 0.5;
+      if (isDayPassRoom(selectedRoom?.name)) hours = 10.5;
+      if (isMonthlyPassRoom(selectedRoom?.name)) hours = 0;
+
       const [lookupRes, cRes] = await Promise.all([
         fetchWithApiKey(`${API_BASE}/bookings/customers/lookup?phone=${encodeURIComponent(val)}`),
-        fetchWithApiKey(`${API_BASE}/bookings/check-charge?phone=${encodeURIComponent(val)}&requested_hours=${hours}`),
+        fetchWithApiKey(`${API_BASE}/bookings/check-charge?phone=${encodeURIComponent(val)}&requested_hours=${hours}&room_id=${selectedRoom?.id || ''}&date=${selectedDate}`),
       ]);
 
       const freshCharge: ChargeInfo | null = cRes.ok ? await cRes.json() : null;
-
-      // For Day Pass, always override amount to 299 unless member with full credit
-      if (freshCharge && isDayPassRoom(selectedRoom?.name)) {
-        if (freshCharge.amount !== 0) {
-          freshCharge.amount = 299;
-        }
-      }
 
       setChargeInfo(freshCharge);
 
@@ -580,16 +613,16 @@ export default function BookingChat() {
         setUserEmail(data.email || "");
         setTyping(false);
         if (data.email) {
-          renderSummary(chosenSlots, data.phone, data.name, freshCharge, data.email);
+          startFaceCapture(chosenSlots, data.phone, data.name, freshCharge, data.email);
         } else {
-          navigateTo("email");
+          setStep("email");
           setInputValue("");
           await botSay(`Welcome back, ${data.name.split(" ")[0]}! We just need your email to finish.`);
         }
       } else {
         setUserPhone(val);
         setTyping(false);
-        navigateTo("name");
+        setStep("name");
         setInputValue("");
         await botSay("Nice to meet you! What's your full name?");
       }
@@ -599,18 +632,17 @@ export default function BookingChat() {
     }
   };
 
-  // ─── Text Input (name / email) ────────────────────────────────────────────────
+  /* ── Name / Email ──────────────────────────────────────────────────── */
 
-  const handleTextInput = async (suggestion?: string) => {
-    const val = (suggestion ?? inputValue).trim();
+  const handleTextInput = async () => {
+    const val = inputValue.trim();
     if (!val) return;
     setInputValue("");
     addMsg({ from: "user", text: val });
 
     if (step === "name") {
       setUserName(val);
-      navigateTo("email");
-      setInputValue("");
+      setStep("email");
       await botSay(`Thanks, ${val.split(" ")[0]}! Lastly, your email address?`);
     } else if (step === "email") {
       if (!val.includes("@") || !val.includes(".")) {
@@ -618,23 +650,28 @@ export default function BookingChat() {
         return;
       }
       setUserEmail(val);
-      renderSummary(chosenSlots, userPhone, userName, chargeInfo, val);
+      startFaceCapture(chosenSlots, userPhone, userName, chargeInfo, val);
     }
   };
 
-  // ─── Summary ─────────────────────────────────────────────────────────────────
+  /* ── Face Capture ──────────────────────────────────────────────────── */
 
-  const renderSummary = (slots: string[], phone: string, name: string, freshCharge: ChargeInfo | null, email: string) => {
-    navigateTo("summary");
-    setSummaryData({ slots, phone, name, freshCharge, email });
-    addMsg({
-      from: "bot",
-      text: "Here's your booking summary:",
-      type: "summary",
-    });
+  const startFaceCapture = async (slots: string[], phone: string, name: string, freshCharge: ChargeInfo | null, email: string) => {
+    setStep("face-capture");
+    await botSay("Awesome! Before we finish, please take a quick photo of your face for access control.");
+    addMsg({ from: "bot-widget", widget: "face-capture", meta: { slots, phone, name, freshCharge, email } });
   };
 
-  // ─── Payment / Booking Flow ───────────────────────────────────────────────────
+  /* ── Summary ───────────────────────────────────────────────────────── */
+
+  const renderSummary = (slots: string[], phone: string, name: string, freshCharge: ChargeInfo | null, email: string, faceImg: string | null) => {
+    setStep("summary");
+    setSummaryData({ slots, phone, name, freshCharge, email, faceImage: faceImg });
+    addMsg({ from: "bot", text: "Here's your booking summary:" });
+    addMsg({ from: "bot-widget", widget: "summary" });
+  };
+
+  /* ── Payment / booking ─────────────────────────────────────────────── */
 
   const initiateBookingFlow = async (phone: string, name: string, amount: number, email: string) => {
     if (amount > 0) {
@@ -648,8 +685,9 @@ export default function BookingChat() {
             booking_data: {
               phone, name, email,
               room_id: selectedRoom.id, date: selectedDate,
-              start_time: isDayPassRoom(selectedRoom?.name) ? "08:00" : chosenSlots[0],
-              end_time: isDayPassRoom(selectedRoom?.name) ? "18:30" : addThirtyMinutes(chosenSlots[chosenSlots.length - 1]),
+              start_time: (isDayPassRoom(selectedRoom?.name) || isMonthlyPassRoom(selectedRoom?.name)) ? "08:00" : chosenSlots[0],
+              end_time: (isDayPassRoom(selectedRoom?.name) || isMonthlyPassRoom(selectedRoom?.name)) ? "18:30" : addThirtyMinutes(chosenSlots[chosenSlots.length - 1]),
+              face_image_base64: summaryData?.faceImage,
             },
           }),
         });
@@ -681,10 +719,15 @@ export default function BookingChat() {
           end_time: isDP ? "18:30" : addThirtyMinutes(chosenSlots[chosenSlots.length - 1]),
           payment_id: (paymentIntent as any)?.payment_id ?? "FREE",
           fcm_token: fcmToken,
+          face_image_base64: summaryData?.faceImage,
         }),
       });
-      if (res.ok) { setShowPayment(false); setStep("done"); }
-      else throw new Error();
+      if (res.ok) {
+        saveBookingHistory({ roomName: selectedRoom?.name || "Room", date: selectedDate, slots: chosenSlots });
+        setShowPayment(false);
+        setStep("done");
+        await botSay("You're all set! Booking confirmed 🎉");
+      } else throw new Error();
     } catch {
       toast({ title: "Booking failed", description: "Please try again." });
     } finally {
@@ -700,278 +743,172 @@ export default function BookingChat() {
     }
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────────
+  /* ── Reset ─────────────────────────────────────────────────────────── */
 
-  const isInputStep = step === "phone-lookup" || step === "name" || step === "email";
+  const resetAll = () => {
+    setMessages([]); setStep("room"); setSelectedRoom(null); setSelectedDate("");
+    setChosenSlots([]); setDisabledSlots([]); setInputValue(""); setUserName("");
+    setUserPhone(""); setUserEmail(""); setChargeInfo(null); setSummaryData(null);
+    setPaymentIntent(null); setShowPayment(false);
+    startConversation();
+  };
+
+  /* ── Render ────────────────────────────────────────────────────────── */
+
+  const isTextStep = step === "phone-lookup" || step === "name" || step === "email";
+  const composerDisabled = !isTextStep;
+  const composerPlaceholder =
+    step === "phone-lookup" ? "+91 98765 43210" : step === "name" ? "Your full name…" : step === "email" ? "you@email.com" : "Choose an option above…";
   const isDP = isDayPassRoom(selectedRoom?.name);
 
+  const fallbackAmount = () => {
+    if (isDP) return 299;
+    if (isMonthlyPassRoom(selectedRoom?.name)) return 5999;
+    const hours = chosenSlots.length * 0.5;
+    const isMeeting = selectedRoom?.name?.toLowerCase().includes("meeting") || selectedRoom?.name?.toLowerCase().includes("conference") || selectedRoom?.name?.toLowerCase().includes("huddle");
+    let discount = 1.0;
+    if (isMeeting) {
+      const isSaturday = new Date(selectedDate).getDay() === 6;
+      if (isSaturday || (hours >= 4 && hours <= 8)) discount = 0.8;
+    }
+    return Math.round(chosenSlots.length * 150 * discount);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-zinc-100 dark:bg-zinc-950 overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-zinc-950 overflow-hidden">
       <Navbar />
+      <div className="mt-16 w-full z-40 shrink-0">
+        <PromoBanner />
+      </div>
+      <div className="flex flex-1 min-h-0">
+        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen((v) => !v)} onNewBooking={resetAll} />
 
-      <main className="flex-1 flex flex-col min-h-0 pt-16 pb-4 px-3 sm:px-4">
-        <div className="flex-1 flex flex-col min-h-0 max-w-lg mx-auto w-full">
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="h-12 shrink-0 flex items-center gap-2 px-4 border-b border-zinc-100 dark:border-white/5">
+            {!sidebarOpen && (
+              <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500">
+                <PanelLeftOpen size={17} />
+              </button>
+            )}
+            <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">Booking Assistant</span>
+            <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800">The Living Desk</span>
+            <div className="ml-auto w-2 h-2 rounded-full bg-green-400" title="Online" />
+          </div>
 
-          <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-white/5 overflow-hidden">
-
-            <div className="flex-shrink-0 px-6 py-4 border-b border-zinc-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-zinc-900 z-10">
-              <div className="flex items-center gap-2.5">
-                <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles size={14} className="text-primary" />
-                  </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white dark:border-zinc-900" />
-                </div>
-                <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-200 leading-none">Booking Assistant</p>
-                  <p className="text-[10px] text-zinc-400 font-medium">The Living Desk</p>
-                </div>
-              </div>
-              {stepHistory.length > 0 && step !== "done" && (
-                <button
-                  onClick={goBack}
-                  className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-all"
-                >
-                  <ChevronLeft size={12} /> Back
-                </button>
-              )}
-            </div>
-
-            {/* Hide "slots" step from progress for Day Pass since it's skipped */}
-            {step !== "done" && <ProgressBar step={isDP && step === "phone-lookup" ? "phone-lookup" : step} />}
-
-            <div
-              ref={chatRef}
-              className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4"
-            >
+          <div ref={scrollRef} className="flex-1 overflow-y-auto">
+            <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 py-6 space-y-5">
               <AnimatePresence mode="popLayout">
-                {messages.map((m) => (
-                  <ChatMessage
-                    key={m.id}
-                    m={m}
-                    summaryData={summaryData}
-                    roomName={selectedRoom?.name ?? ""}
-                    selectedDate={selectedDate}
-                    isSubmitting={isSubmitting}
-                    loadingPayment={loadingPayment}
-                    onSummaryConfirm={initiateBookingFlow}
-                  />
-                ))}
+                {messages.map((m) => {
+                  if (m.from === "user") return <UserMessage key={m.id} text={m.text} />;
+                  if (m.from === "bot") return <AssistantMessage key={m.id} text={m.text} />;
+                  if (m.from === "bot-widget") {
+                    return (
+                      <div key={m.id} className="pl-[42px]">
+                        {m.widget === "room" && <RoomPicker rooms={rooms} selectedRoomId={selectedRoom?.id} onSelect={handleRoomSelect} />}
+                        {m.widget === "date" && <DatePicker onSelect={handleDateSelect} />}
+                        {m.widget === "slots" && (
+                          <SlotPicker disabledSlots={disabledSlots} loading={loadingAvailability} onConfirm={handleSlotsConfirm} />
+                        )}
+                        {m.widget === "face-capture" && step === "face-capture" && m.meta && (
+                          <div className="max-w-sm border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 rounded-2xl p-4">
+                            <div className="flex flex-col items-center gap-3">
+                              <Webcam
+                                audio={false}
+                                screenshotFormat="image/jpeg"
+                                width={320}
+                                height={240}
+                                videoConstraints={{ facingMode: "user" }}
+                                className="rounded-xl border border-zinc-200 dark:border-white/10"
+                                ref={webcamRef}
+                              />
+                              <button
+                                onClick={() => {
+                                  const imageSrc = webcamRef.current?.getScreenshot();
+                                  if (imageSrc) {
+                                    setFaceImage(imageSrc);
+                                    addMsg({ from: "user", text: "Captured face image." });
+                                    renderSummary(m.meta.slots, m.meta.phone, m.meta.name, m.meta.freshCharge, m.meta.email, imageSrc);
+                                  }
+                                }}
+                                className="mt-2 w-full py-2 bg-primary text-primary-foreground rounded-xl font-medium"
+                              >
+                                Capture Photo
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {m.widget === "summary" && summaryData && (
+                          <SummaryCardInline
+                            roomName={selectedRoom?.name ?? ""}
+                            date={selectedDate}
+                            slots={summaryData.slots}
+                            chargeInfo={summaryData.freshCharge}
+                            amount={summaryData.freshCharge?.amount ?? fallbackAmount()}
+                            busy={isSubmitting || loadingPayment}
+                            onConfirm={() =>
+                              initiateBookingFlow(
+                                summaryData.phone,
+                                summaryData.name,
+                                summaryData.freshCharge?.amount ?? fallbackAmount(),
+                                summaryData.email
+                              )
+                            }
+                          />
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
               </AnimatePresence>
 
-              {typing && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 ml-9">
-                  <div className="flex gap-1 bg-white dark:bg-zinc-800 rounded-2xl px-3 py-2 shadow-sm border border-zinc-100 dark:border-white/5">
-                    {[0, 0.15, 0.3].map((delay, i) => (
-                      <div key={i} className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: `${delay}s` }} />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-              <div ref={bottomRef} />
-            </div>
+              {typing && <TypingDots />}
 
-            <div className="flex-shrink-0 border-t border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-900/80">
-              <AnimatePresence mode="wait">
-
-                {step === "room" && (
-                  <motion.div key="room" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="p-4">
-                    {rooms.length === 0 ? (
-                      <div className="flex items-center justify-center py-8 gap-2 text-zinc-400">
-                        <Loader2 size={16} className="animate-spin" />
-                        <span className="text-sm font-medium">Loading spaces…</span>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2.5">
-                        {rooms.map((r) => (
-                          <button
-                            key={r.id}
-                            onClick={() => handleRoomSelect(r)}
-                            className="p-4 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border-2 border-transparent hover:border-primary/50 active:scale-[0.97] transition-all text-left group"
-                          >
-                            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-700 rounded-lg mb-3 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-                              <MapPin size={16} className="text-zinc-500 group-hover:text-primary transition-colors" />
-                            </div>
-                            <p className="font-black text-xs uppercase tracking-wide text-zinc-800 dark:text-zinc-100">{r.name}</p>
-                            <div className="flex items-center gap-1 mt-1">
-                              <Users size={9} className="text-zinc-400" />
-                              {isDayPassRoom(r.name) && (
-                                <span className="text-[9px] font-bold text-primary">₹299 · Full Day</span>
-                              )}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {step === "date" && (
-                  <motion.div key="date" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="p-4">
-                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                      {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-                        const d = addDays(new Date(), i);
-                        const today = isToday(d);
-                        return (
-                          <button
-                            key={i}
-                            onClick={() => handleDateSelect(format(d, "yyyy-MM-dd"), today ? "Today" : format(d, "EEE, do"))}
-                            className={`flex-shrink-0 w-[4.5rem] h-[5.5rem] rounded-2xl flex flex-col items-center justify-center border-2 transition-all active:scale-95 ${today
-                              ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
-                              : "bg-white dark:bg-zinc-800 border-zinc-100 dark:border-white/5 hover:border-primary/50 text-zinc-800 dark:text-zinc-100"
-                              }`}
-                          >
-                            <span className="text-[9px] font-black uppercase tracking-wider opacity-70">
-                              {today ? "Today" : format(d, "EEE")}
-                            </span>
-                            <span className="text-xl font-black mt-0.5">{format(d, "d")}</span>
-                            <span className="text-[9px] font-bold opacity-60">{format(d, "MMM")}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === "slots" && (
-                  <motion.div key="slots" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="p-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 mr-1">Quick:</span>
-                      {[1, 2, 3].map((h) => (
-                        <button
-                          key={h}
-                          onClick={() => applyDuration(h)}
-                          disabled={loadingAvailability}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-700 text-white rounded-full text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all disabled:opacity-40"
-                        >
-                          <Timer size={10} /> {h}h
-                        </button>
-                      ))}
-                    </div>
-
-                    {loadingAvailability ? (
-                      <div className="flex items-center justify-center py-6 gap-2 text-zinc-400">
-                        <Loader2 size={15} className="animate-spin" />
-                        <span className="text-xs font-medium">Checking availability…</span>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5">
-                        {TIME_SLOTS.map((s) => {
-                          const isDisabled = disabledSlots.includes(s);
-                          const isSelected = chosenSlots.includes(s);
-                          const isFirst = s === chosenSlots[0];
-                          const isLast = s === chosenSlots[chosenSlots.length - 1];
-                          return (
-                            <button
-                              key={s}
-                              disabled={isDisabled}
-                              onClick={() => handleSlotToggle(s)}
-                              className={`py-2 rounded-xl text-[10px] font-black border transition-all relative ${isSelected
-                                ? "bg-primary border-primary text-white shadow-sm"
-                                : isDisabled
-                                  ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-300 dark:text-zinc-600 cursor-not-allowed line-through"
-                                  : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/10 hover:border-primary/50 text-zinc-700 dark:text-zinc-200"
-                                }`}
-                            >
-                              {s}
-                              {(isFirst || isLast) && isSelected && chosenSlots.length > 1 && (
-                                <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border-2 border-primary rounded-full" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {chosenSlots.length > 0 && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between bg-primary/8 dark:bg-primary/15 rounded-xl px-3 py-2 border border-primary/20">
-                        <div className="flex items-center gap-2">
-                          <Clock size={12} className="text-primary" />
-                          <span className="text-xs font-black text-primary">
-                            {chosenSlots[0]} – {addThirtyMinutes(chosenSlots[chosenSlots.length - 1])}
-                          </span>
-                          <span className="text-[10px] text-primary/60 font-bold">· {formatDuration(chosenSlots.length)}</span>
-                        </div>
-                        <button
-                          onClick={handleSlotsConfirm}
-                          className="flex items-center gap-1 bg-primary text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all"
-                        >
-                          Next <ArrowRight size={10} />
-                        </button>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                )}
-
-                {isInputStep && (
-                  <motion.div key="text-input" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="p-4 space-y-2.5">
-                    {step === "email" && (
-                      <div className="flex gap-2">
-                        {["@gmail.com", "@outlook.com", "@yahoo.com"].map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => setInputValue((prev) => prev.split("@")[0] + s)}
-                            className="px-3 py-1.5 bg-white dark:bg-zinc-800 rounded-full text-[10px] font-black border border-zinc-200 dark:border-white/10 hover:border-primary/50 transition-all active:scale-95"
-                          >
-                            <AtSign size={9} className="inline mr-0.5 text-primary" />{s}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <div className="relative flex items-center gap-2">
-                      <div className="absolute left-4 text-zinc-400 pointer-events-none">
-                        {step === "phone-lookup" ? <Hash size={16} /> : step === "name" ? <Sparkles size={16} /> : <AtSign size={16} />}
-                      </div>
-                      <input
-                        ref={inputRef}
-                        autoFocus
-                        value={inputValue}
-                        onChange={(e) => step === "phone-lookup" ? handlePhoneInput(e.target.value) : setInputValue(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") step === "phone-lookup" ? submitPhone() : handleTextInput(); }}
-                        placeholder={step === "phone-lookup" ? "+91 98765 43210" : step === "name" ? "Your full name…" : "your@email.com"}
-                        className="flex-1 bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-white/10 focus:border-primary rounded-2xl py-3.5 pl-11 pr-4 outline-none font-bold text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-300 dark:placeholder:text-zinc-600 transition-all"
-                      />
-                      <button
-                        onClick={() => step === "phone-lookup" ? submitPhone() : handleTextInput()}
-                        className="flex-shrink-0 w-11 h-11 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 active:scale-90 transition-transform"
-                      >
-                        <Send size={17} />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === "summary" && (
-                  <motion.div key="summary-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-4 py-3">
-                    <p className="text-center text-[10px] text-zinc-400 font-semibold">
-                      Review your booking above and tap <strong className="text-zinc-600 dark:text-zinc-300">Confirm & Pay</strong> when ready
-                    </p>
-                  </motion.div>
-                )}
-
-                {step === "done" && (
-                  <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="p-6 text-center space-y-3">
-                    <div className="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto shadow-xl shadow-green-500/30">
-                      <CheckCircle2 size={32} />
-                    </div>
+              {step === "done" && (
+                <div className="pl-[42px]">
+                  <div className="max-w-sm border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 rounded-2xl p-5 flex items-center gap-3">
+                    <CheckCircle2 size={28} className="text-green-500 shrink-0" />
                     <div>
-                      <h3 className="font-black text-lg uppercase tracking-tight text-zinc-800 dark:text-zinc-100">Booking Confirmed!</h3>
-                      <p className="text-xs text-zinc-400 font-medium mt-0.5">See you at The Living Desk.</p>
+                      <p className="text-sm font-bold text-green-800 dark:text-green-300">Booking confirmed</p>
+                      <p className="text-xs text-green-600 dark:text-green-400">See you at The Living Desk.</p>
                     </div>
-                    <button
-                      onClick={() => window.location.reload()}
-                      className="px-8 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-black text-xs tracking-widest uppercase hover:opacity-90 transition-opacity"
-                    >
-                      Book Another
-                    </button>
-                  </motion.div>
-                )}
+                  </div>
+                  <button onClick={resetAll} className="mt-3 text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 flex items-center gap-1">
+                    <Plus size={12} /> Start another booking
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
-              </AnimatePresence>
+          <div className="shrink-0 px-4 pb-5 pt-2">
+            <div className="max-w-2xl mx-auto w-full">
+              <div className={`flex items-center gap-2 rounded-full border transition-colors px-2 py-2 ${composerDisabled ? "border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-zinc-900" : "border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-sm focus-within:border-primary"
+                }`}>
+                <div className="pl-2.5 text-zinc-400">
+                  {step === "phone-lookup" ? <Hash size={16} /> : step === "email" ? <AtSign size={16} /> : <Sparkles size={16} />}
+                </div>
+                <input
+                  ref={inputRef}
+                  value={composerDisabled ? "" : inputValue}
+                  disabled={composerDisabled}
+                  onChange={(e) => step === "phone-lookup" ? handlePhoneInput(e.target.value) : setInputValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") step === "phone-lookup" ? submitPhone() : handleTextInput(); }}
+                  placeholder={composerPlaceholder}
+                  className="flex-1 bg-transparent outline-none text-sm font-medium text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 disabled:cursor-not-allowed py-1.5"
+                />
+                <button
+                  onClick={() => step === "phone-lookup" ? submitPhone() : handleTextInput()}
+                  disabled={composerDisabled || !inputValue.trim()}
+                  className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-25 transition-opacity shrink-0"
+                >
+                  <Send size={15} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       <PaymentDialog
         open={showPayment}
@@ -986,7 +923,7 @@ export default function BookingChat() {
           phone: userPhone,
           name: userName,
           email: userEmail,
-          totalCharge: chargeInfo?.amount ?? (isDP ? 299 : chosenSlots.length * 150),
+          totalCharge: chargeInfo?.amount ?? fallbackAmount(),
         }}
         copied={copied}
         onCopyUpiId={handleCopyUpi}
@@ -995,4 +932,4 @@ export default function BookingChat() {
       />
     </div>
   );
-} 
+}

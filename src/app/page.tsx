@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import PromoBanner from "@/components/PromoBanner";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import Pricing from "@/components/Pricing";
@@ -24,8 +25,11 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative">
       <Navbar />
+      <div className="absolute top-16 w-full z-40">
+        <PromoBanner />
+      </div>
       <Hero />
       <Services />
       <Pricing />

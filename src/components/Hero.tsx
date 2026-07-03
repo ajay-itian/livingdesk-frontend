@@ -11,7 +11,7 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-16">
+    <section id="home" className="relative min-h-screen flex items-center pt-28 pb-16">
       <div className="absolute inset-0 z-0">
         <img
           src={heroImage}

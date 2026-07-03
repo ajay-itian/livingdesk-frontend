@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import FcmHandler from "@/components/FcmHandler";
+import FloatingBookButton from "@/components/utils/FloatingBookButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -59,8 +60,8 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
-          {/* This component handles the Notification logic for Windows/Browsers */}
           <FcmHandler />
+          <FloatingBookButton />
           {children}
         </Providers>
         <GoogleAnalytics gaId="G-V7HM7LJ0T4" />

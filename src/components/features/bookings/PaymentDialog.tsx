@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, Copy, User, CalendarDays, ShieldCheck, ArrowRight, Zap, Check, Smartphone, QrCode } from "lucide-react";
 import { PaymentIntent, PendingBooking } from "./booking.types";
@@ -29,6 +29,8 @@ export function PaymentDialog({ open, onOpenChange, loadingPayment, paymentInten
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 gap-0 overflow-hidden rounded-[2rem] sm:rounded-[3rem] w-[95vw] max-w-lg border-none shadow-2xl bg-white">
+        {/* Required by Radix for a11y — visually hidden since the amount above already acts as the heading */}
+        <DialogTitle className="sr-only">Complete your payment</DialogTitle>
 
         {/* Top Branding Section */}
         <div className="bg-zinc-950 p-8 pt-10 text-center relative overflow-hidden">
