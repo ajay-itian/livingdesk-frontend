@@ -8,6 +8,7 @@ import Gallery from "@/components/Gallery";
 import LocateUs from "@/components/LocateUs";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import BookingChatbot from "@/components/BookingChatbot";
 
 export const metadata: Metadata = {
   title: "Coworking Space & Managed Office in Pune | The Living Desk",
@@ -37,6 +38,7 @@ export default function Home() {
       <LocateUs />
       <Contact />
       <Footer />
+      <BookingChatbot />
     </main>
   );
 }

@@ -4,10 +4,10 @@
   "/survey/page": "app/survey/page.js",
   "/visitor-survey/page": "app/visitor-survey/page.js",
   "/wifi/page": "app/wifi/page.js",
-  "/managed-office-pune/[slug]/page": "app/managed-office-pune/[slug]/page.js",
-  "/blogs/page": "app/blogs/page.js",
-  "/blogs/[slug]/page": "app/blogs/[slug]/page.js",
   "/page": "app/page.js",
   "/booking/page": "app/booking/page.js",
-  "/managed-office-pune/page": "app/managed-office-pune/page.js"
+  "/managed-office-pune/page": "app/managed-office-pune/page.js",
+  "/managed-office-pune/[slug]/page": "app/managed-office-pune/[slug]/page.js",
+  "/blogs/page": "app/blogs/page.js",
+  "/blogs/[slug]/page": "app/blogs/[slug]/page.js"
 }

@@ -477,18 +477,29 @@ export default function BookingChat() {
       let autoSelected = false;
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
-        if (params.get("autoSelect") === "meeting") {
-          const meetingRoom = roomsData.find(r => r.name.toLowerCase().includes("meeting") || r.name.toLowerCase().includes("conference") || r.name.toLowerCase().includes("huddle"));
-          if (meetingRoom) {
+        const auto = params.get("autoSelect");
+        if (auto) {
+          const matchedRoom = roomsData.find(r => {
+            const lower = r.name.toLowerCase();
+            if (auto === "meeting") return lower.includes("meeting") || lower.includes("conference") || lower.includes("huddle");
+            if (auto === "daypass") return lower.includes("day pass");
+            if (auto === "monthly") return lower.includes("monthly");
+            if (auto === "dedicated") return lower.includes("dedicated");
+            return false;
+          });
+          
+          if (matchedRoom) {
             autoSelected = true;
-            window.history.replaceState({}, '', '/booking/');
+            // Remove the query param to keep URL clean, but use Next.js router instead if possible.
+            // Using window.history is okay for a quick visual cleanup
+            window.history.replaceState(null, '', window.location.pathname);
             await botSay(`${greeting}! Which space would you like to book today?`);
             addMsg({ from: "bot-widget", widget: "room" });
             
-            setSelectedRoom(meetingRoom);
-            addMsg({ from: "user", text: meetingRoom.name });
+            setSelectedRoom(matchedRoom);
+            addMsg({ from: "user", text: matchedRoom.name });
             setStep("date");
-            await botSay("Great choice! Now pick a date:");
+            await botSay(`Great choice! You have selected ${matchedRoom.name}. Now pick a date:`);
             addMsg({ from: "bot-widget", widget: "date" });
           }
         }
@@ -506,6 +517,9 @@ export default function BookingChat() {
 
   useEffect(() => {
     startConversation();
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -519,7 +533,7 @@ export default function BookingChat() {
     setSelectedRoom(room);
     addMsg({ from: "user", text: room.name });
     setStep("date");
-    await botSay("Great choice! Now pick a date:");
+    await botSay(`Great choice! You have selected ${room.name}. Now pick a date:`);
     addMsg({ from: "bot-widget", widget: "date" });
   };
 
