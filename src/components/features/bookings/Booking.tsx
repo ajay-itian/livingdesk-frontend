@@ -11,7 +11,7 @@ import {
   Send, Sparkles, MapPin, Plus, CheckCircle2, Loader2, ArrowRight,
   Hash, AtSign, MessageSquare, PanelLeftClose,
   PanelLeftOpen, Building2, TrendingUp,
-  Sun, Repeat, Users,
+  Sun, Repeat, Users, Star,
 } from "lucide-react";
 
 import PromoBanner from "@/components/PromoBanner";
@@ -134,6 +134,17 @@ function Sidebar({ open, onToggle, onNewBooking }: { open: boolean; onToggle: ()
               <MessageSquare size={12} /> No history yet
             </div>
           )}
+        </div>
+
+        <div className="px-3 py-3 mt-auto">
+          <a
+            href="https://g.page/r/CWL2APY32ejlEBM/review"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition-colors"
+          >
+            <Star size={15} className="text-yellow-500 fill-yellow-500" /> Give Review
+          </a>
         </div>
       </div>
     </aside>

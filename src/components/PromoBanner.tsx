@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
@@ -37,15 +37,11 @@ export default function PromoBanner() {
         className="relative w-full overflow-hidden"
         aria-label="View meeting room and Saturday booking discounts"
       >
-        <motion.div
-          className="flex items-center tracking-wide"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, duration: 22, ease: "linear" }}
-        >
+        <div className="flex items-center tracking-wide animate-[marquee_22s_linear_infinite]">
           {/* duplicated twice back-to-back = seamless loop, no reset jump */}
           <BannerContent />
           <BannerContent />
-        </motion.div>
+        </div>
       </Link>
 
       {/* standalone clickable CTA — separate hit target from the scrolling marquee link */}
@@ -64,6 +60,10 @@ export default function PromoBanner() {
         @keyframes shine {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
+        }
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>

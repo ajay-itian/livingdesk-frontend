@@ -2,12 +2,12 @@
   "/_not-found/page": "/_not-found",
   "/community/page": "/community",
   "/survey/page": "/survey",
-  "/visitor-survey/page": "/visitor-survey",
   "/wifi/page": "/wifi",
-  "/page": "/",
-  "/booking/page": "/booking",
-  "/managed-office-pune/page": "/managed-office-pune",
-  "/managed-office-pune/[slug]/page": "/managed-office-pune/[slug]",
+  "/visitor-survey/page": "/visitor-survey",
   "/blogs/page": "/blogs",
-  "/blogs/[slug]/page": "/blogs/[slug]"
+  "/booking/page": "/booking",
+  "/managed-office-pune/[slug]/page": "/managed-office-pune/[slug]",
+  "/blogs/[slug]/page": "/blogs/[slug]",
+  "/managed-office-pune/page": "/managed-office-pune",
+  "/page": "/"
 }

@@ -12,6 +12,7 @@ import {
   Check,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { sendGAEvent } from "@next/third-parties/google";
 
 // Custom "Desk Bot" mark — a chat bubble holding a four-point spark.
 // Reads as "assistant" without being a literal robot glyph, and ties
@@ -129,7 +130,10 @@ export default function BookingChatbot() {
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        sendGAEvent({ event: "chatbot_close", method: "escape_key", debug_mode: true });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -190,6 +194,7 @@ export default function BookingChatbot() {
     setIsOpen(true);
     setShowTeaser(false);
     setHasUnread(false);
+    sendGAEvent({ event: "chatbot_open", value: "opened", debug_mode: true });
     if (messages.length === 0) {
       setIsTyping(true);
       setTimeout(() => {
@@ -213,6 +218,7 @@ export default function BookingChatbot() {
   }, []);
 
   const handleSelectSpace = (label: string, url: string) => {
+    sendGAEvent({ event: "chatbot_select_space", space_type: label, debug_mode: true });
     addMessage({ id: Date.now().toString(), sender: "user", text: label });
     setIsTyping(true);
     setTimeout(() => {
@@ -232,6 +238,7 @@ export default function BookingChatbot() {
   };
 
   const handleRestart = () => {
+    sendGAEvent({ event: "chatbot_restart", debug_mode: true });
     setMessages([]);
     setIsTyping(true);
     setTimeout(() => {
@@ -335,7 +342,10 @@ export default function BookingChatbot() {
                   </button>
                 )}
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    sendGAEvent({ event: "chatbot_close", method: "close_button", debug_mode: true });
+                  }}
                   aria-label="Close chat"
                   className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-zinc-400 hover:text-white transition-colors"
                 >

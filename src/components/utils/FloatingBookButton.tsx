@@ -7,24 +7,43 @@ import { CalendarCheck } from "lucide-react";
 
 export default function FloatingBookButton() {
     const [visible, setVisible] = useState(false);
-    const lastScrollY = useRef(0);
-
     useEffect(() => {
-        lastScrollY.current = window.scrollY;
+        let cachedInnerHeight = window.innerHeight;
+        let cachedScrollHeight = document.body.scrollHeight;
+
+        const updateDimensions = () => {
+            cachedInnerHeight = window.innerHeight;
+            cachedScrollHeight = document.body.scrollHeight;
+        };
+
+        const observer = new ResizeObserver(updateDimensions);
+        observer.observe(document.body);
+        window.addEventListener("resize", updateDimensions, { passive: true });
+
+        let ticking = false;
 
         const handleScroll = () => {
-            const currentY = window.scrollY;
-            const scrolledPastThreshold = currentY > 400;
-            const scrollingUp = currentY < lastScrollY.current;
-            const nearBottom =
-                window.innerHeight + currentY >= document.body.scrollHeight - 200;
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentY = window.scrollY;
+                    const scrolledPastThreshold = currentY > 400;
+                    const nearBottom =
+                        cachedInnerHeight + currentY >= cachedScrollHeight - 200;
 
-            setVisible(scrolledPastThreshold && (scrollingUp || currentY - lastScrollY.current < 0 || true) && !nearBottom);
-            lastScrollY.current = currentY;
+                    setVisible(scrolledPastThreshold && !nearBottom);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         };
 
         window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
+        
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", updateDimensions);
+            observer.disconnect();
+        };
     }, []);
 
     return (

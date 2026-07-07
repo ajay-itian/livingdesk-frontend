@@ -3,6 +3,7 @@
 import { Facebook, Instagram, Linkedin, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FooterGoogleRating } from "@/components/reviews/FooterGoogleRating";
 
 const Footer = () => {
   const router = useRouter();
@@ -119,9 +120,12 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">Follow Us</h4>
               <div className="flex space-x-4">
-                <a href="https://www.facebook.com/people/The-Living-Desk-Coworking-Spaces/61580666948052/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground"><Facebook className="h-5 w-5" /></a>
-                <a href="https://www.instagram.com/thelivingdesk/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground"><Instagram className="h-5 w-5" /></a>
-                <a href="https://www.linkedin.com/company/living-desk/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground"><Linkedin className="h-5 w-5" /></a>
+                <a href="https://www.facebook.com/people/The-Living-Desk-Coworking-Spaces/61580666948052/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
+                <a href="https://www.instagram.com/thelivingdesk/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
+                <a href="https://www.linkedin.com/company/living-desk/" target="_blank" className="text-primary-foreground/80 hover:text-primary-foreground" aria-label="LinkedIn"><Linkedin className="h-5 w-5" /></a>
+              </div>
+              <div className="mt-8">
+                <FooterGoogleRating />
               </div>
             </div>
           </div>

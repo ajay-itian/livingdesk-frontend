@@ -53,7 +53,9 @@ const LocateUs = () => {
               <img
                 src={directionGuide}
                 alt="Hand-drawn direction guide to The Living Desk"
-                className="w-full rounded-lg border"
+                width="800"
+                height="600"
+                className="w-full h-auto rounded-lg border"
               />
             </div>
           </div>

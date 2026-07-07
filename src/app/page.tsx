@@ -3,12 +3,13 @@ import Navbar from "@/components/Navbar";
 import PromoBanner from "@/components/PromoBanner";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
+import { ReviewsCarousel } from "@/components/reviews/ReviewsCarousel";
 import Pricing from "@/components/Pricing";
 import Gallery from "@/components/Gallery";
 import LocateUs from "@/components/LocateUs";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import BookingChatbot from "@/components/BookingChatbot";
+import BookingChatbotWrapper from "@/components/BookingChatbotWrapper";
 
 export const metadata: Metadata = {
   title: "Coworking Space & Managed Office in Pune | The Living Desk",
@@ -33,12 +34,13 @@ export default function Home() {
       </div>
       <Hero />
       <Services />
+      <ReviewsCarousel />
       <Pricing />
       <Gallery />
       <LocateUs />
       <Contact />
       <Footer />
-      <BookingChatbot />
+      <BookingChatbotWrapper />
     </main>
   );
 }

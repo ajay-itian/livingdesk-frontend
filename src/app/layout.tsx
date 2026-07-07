@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import FcmHandler from "@/components/FcmHandler";
+import { FloatingGoogleReview } from "@/components/reviews/FloatingGoogleReview";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,13 +55,16 @@ export default function RootLayout({
         <meta name="ICBM" content="18.5921498, 73.7589091" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#09090b" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || [];` }} />
       </head>
       <body className={inter.className}>
         <Providers>
           <FcmHandler />
           {children}
+          <FloatingGoogleReview />
         </Providers>
         <GoogleAnalytics gaId="G-V7HM7LJ0T4" />
       </body>

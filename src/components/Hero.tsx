@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Wind, Wifi, Coffee, Clock } from "lucide-react";
+import Image from "next/image";
+import { GoogleRatingBadge } from "@/components/reviews/GoogleRatingBadge";
 const heroImage = '/images/hero-coworking.webp';
 
 const Hero = () => {
@@ -13,11 +15,13 @@ const Hero = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-28 pb-16">
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           src={heroImage}
           alt="Modern Coworking Space in Pimple Saudagar Pune - The Living Desk Interior"
-          className="w-full h-full object-cover"
-          fetchPriority="high" // ✅ Boosts LCP performance
+          className="object-cover"
+          fill
+          priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
       </div>
@@ -51,11 +55,15 @@ const Hero = () => {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <Button size="lg" onClick={scrollToContact} className="group" aria-label="Book a free tour">
                 Schedule a Tour
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
+            </div>
+            
+            <div className="flex items-center">
+              <GoogleRatingBadge />
             </div>
           </div>
         </div>

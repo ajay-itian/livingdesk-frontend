@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
             <Link href="/#home" onClick={closeMenu}>
-              <img src={logo} alt="The Living Desk" className="h-12 w-auto" />
+              <img src={logo} alt="The Living Desk" width="150" height="48" className="h-12 w-auto" />
             </Link>
           </div>
 

@@ -10,5 +10,12 @@
     "files": [
       "static/chunks/646.f342b7cffc01feb0.js"
     ]
+  },
+  "components\\BookingChatbotWrapper.tsx -> ./BookingChatbot": {
+    "id": 6893,
+    "files": [
+      "static/chunks/125-f32e3063da78e019.js",
+      "static/chunks/893.4357ed1071b154bc.js"
+    ]
   }
 }

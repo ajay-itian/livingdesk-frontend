@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Info } from "lucide-react";
+import { Check, Info, Star } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const plans = [
@@ -138,6 +138,17 @@ const Pricing = () => {
                     </li>
                   ))}
                 </ul>
+
+                <div className="flex items-center justify-center gap-1 mb-4 text-xs font-medium text-muted-foreground">
+                  <div className="flex text-yellow-400">
+                    <Star className="w-3 h-3 fill-current" />
+                    <Star className="w-3 h-3 fill-current" />
+                    <Star className="w-3 h-3 fill-current" />
+                    <Star className="w-3 h-3 fill-current" />
+                    <Star className="w-3 h-3 fill-current" />
+                  </div>
+                  <span>Rated 4.9 on Google</span>
+                </div>
 
                 <Button
                   className={`w-full ${plan.popular ? 'shadow-md' : ''}`}

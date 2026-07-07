@@ -75,6 +75,19 @@ const Contact = () => {
             <CardHeader>
               <CardTitle>Send us a message</CardTitle>
               <CardDescription>Fill out the form and we'll get back to you shortly</CardDescription>
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-sm text-foreground">Join 150+ Happy Members</div>
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <span className="font-bold text-foreground">4.9</span> Google Rating
+                  </div>
+                </div>
+                <div className="flex text-yellow-500">
+                  {[1, 2, 3, 4, 5].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -125,7 +138,7 @@ const Contact = () => {
                     required
                     disabled={loading}
                   >
-                    <SelectTrigger className="mt-2">
+                    <SelectTrigger className="mt-2" aria-label="Select a service">
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50">
